@@ -1,0 +1,31 @@
+[project]
+name = "sheetsage-infer"
+version = "0.1.0"
+description = "Minimal inference-only version of SheetSage for music transcription"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch",
+    "librosa",
+    "numpy",
+    "scipy",
+    "audioread",
+    "SoundFile",
+    "validators",
+    "pillow",
+    "scikit-learn",
+    "pretty-midi",
+    "tqdm",
+]
+
+[project.scripts]
+sheetsage = "sheetsage.infer:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sheetsage"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+

@@ -1,0 +1,12 @@
+torch
+librosa
+numpy
+scipy
+audioread
+SoundFile
+validators
+pillow
+scikit-learn
+pretty-midi
+tqdm
+

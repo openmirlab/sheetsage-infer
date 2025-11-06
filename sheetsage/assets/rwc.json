@@ -1,0 +1,62 @@
+{
+  "RWC_RYY_SEGMENTS": {
+    "path": "rwc/RWC_Ryy_Segments.json",
+    "url": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/rwc/RWC_Ryy_Segments.json",
+    "checksum": "2b7917af462615b9aa8dcc7250970f502904bc8940932457afbd44f7dd06a296"
+  },
+  "RWC_RYY_MIDI": {
+    "path": "rwc/RWC_Ryy_MIDI.tar.gz",
+    "url": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/rwc/RWC_Ryy_MIDI.tar.gz",
+    "checksum": "7ef2bbd2f6fc457f271812a706f1b7fa3d4e7e3c32572c48fb3c18737bc5af4a"
+  },
+  "RWC_RYYVOX_SEGMENTS": {
+    "path": "rwc/RWC_RyyVox_Segments.json",
+    "url": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/rwc/RWC_RyyVox_Segments.json",
+    "checksum": "2db81af696b8e6ab5cc2af789788de80a1bb3315d4b142d3757e8385c88da002"
+  },
+  "RWC_RYYVOX_MIDI": {
+    "path": "rwc/RWC_RyyVox_MIDI.tar.gz",
+    "url": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/rwc/RWC_RyyVox_MIDI.tar.gz",
+    "checksum": "7099da70a3b983036e93e99218e2c10a2ed32b36b44becc24d0299929f235ff9"
+  },
+  "RWC_AUDIO_P012": {
+    "path": "rwc/audio/popular/Disc01-Track12.wav",
+    "checksum": "8aae6241e568d57d6d799c5a41a56d9ca94701ed3d47d88fcc8301749753e21a"
+  },
+  "RWC_AUDIO_P038": {
+    "path": "rwc/audio/popular/Disc03-Track06.wav",
+    "checksum": "39afc8975959618b481f1dc4deaa048ba21eab93921b5ae475ab823086880bc8"
+  },
+  "RWC_AUDIO_P060": {
+    "path": "rwc/audio/popular/Disc04-Track12.wav",
+    "checksum": "943ab44b3c88c8ad1f3d0489e05183a806da7ed238488d9e1c6d82e95ae31f06"
+  },
+  "RWC_AUDIO_P070": {
+    "path": "rwc/audio/popular/Disc05-Track06.wav",
+    "checksum": "7bc06b86ff01075589dee396427ed27247e0c63dc0e49f6dcf44f070b3fa9bc5"
+  },
+  "RWC_AUDIO_P079": {
+    "path": "rwc/audio/popular/Disc05-Track15.wav",
+    "checksum": "d39fb3ea61f2a52b8cdd97e2edf4bea5ea746a5a117fac8e99c42659268ef347"
+  },
+  "RWC_AUDIO_G002": {
+    "path": "rwc/audio/genre/Disc01-Track02.wav",
+    "checksum": "aa89b13b1af9d8572c3c0c08e2fa2df54a47c382cbda3ba0bed5b47f9392f18f"
+  },
+  "RWC_AUDIO_G010": {
+    "path": "rwc/audio/genre/Disc01-Track10.wav",
+    "checksum": "23a311a6289687e1edef94bf68a365b6498c7862847bb37ec789d57172e023c3"
+  },
+  "RWC_AUDIO_G036": {
+    "path": "rwc/audio/genre/Disc03-Track09.wav",
+    "checksum": "c1197e8a8df39d84e9e30ed21d17ffcb14b825f87156ff07e5d6a943b8fb9193"
+  },
+  "RWC_AUDIO_G068": {
+    "path": "rwc/audio/genre/Disc07-Track03.wav",
+    "checksum": "c41e13032bc7ca20bb214658a0e39c7715f68cd18949d106ca32477f8aa996dc"
+  },
+  "RWC_AUDIO_G072": {
+    "path": "rwc/audio/genre/Disc07-Track07.wav",
+    "checksum": "59efe4b4ac59b373c52d92671d9417c5b217d1a3f57f5ea9eac84cf4a57a66ea"
+  }
+}

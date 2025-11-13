@@ -1,6 +1,7 @@
 import json
 import logging
 import pathlib
+import shutil
 import urllib.request
 
 from . import CACHE_DIR, LIB_DIR
@@ -41,17 +42,25 @@ def get_asset_tags():
     return set(_ASSETS.keys())
 
 
-def _download(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE):
+def _download_from_url(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE, log=True):
+    if log:
+        logging.info(f"Downloading from: {url}")
     if "mega.nz" in url.lower():
-        import shutil
         import subprocess
+
         if shutil.which("megadl"):
-            result = subprocess.run(["megadl", url, "--path", str(dest_path)], capture_output=True, text=True)
+            result = subprocess.run(
+                ["megadl", url, "--path", str(dest_path)],
+                capture_output=True,
+                text=True,
+            )
             if result.returncode != 0:
                 raise Exception(f"Mega.nz download failed: {result.stderr}")
             return
-        raise Exception(f"Mega.nz links require megatools. Install: sudo apt-get install megatools")
-    
+        raise Exception(
+            "Mega.nz links require megatools. Install: sudo apt-get install megatools"
+        )
+
     with open(dest_path, "wb") as f:
         r = urllib.request.urlopen(url)
         while True:
@@ -59,6 +68,67 @@ def _download(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE):
             if not chunk:
                 break
             f.write(chunk)
+
+
+def _download_from_huggingface(asset, dest_path, log=True):
+    repo_id = asset.get("huggingface_repo")
+    filename = asset.get("huggingface_filename")
+    if not repo_id or not filename:
+        raise Exception("Missing Hugging Face repository information for asset")
+    repo_type = asset.get("huggingface_repo_type", "model")
+    revision = asset.get("huggingface_revision")
+    if log:
+        logging.info(
+            "Downloading from Hugging Face: repo=%s file=%s", repo_id, filename
+        )
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as exc:
+        raise Exception(
+            "huggingface-hub is required for Hugging Face downloads. Install with `pip install huggingface-hub`."
+        ) from exc
+
+    try:
+        downloaded_path = hf_hub_download(
+            repo_id=repo_id,
+            filename=filename,
+            repo_type=repo_type,
+            revision=revision,
+        )
+    except Exception as exc:
+        raise Exception(
+            f"Failed to download {filename} from Hugging Face repo {repo_id}: {exc}"
+        ) from exc
+
+    shutil.copyfile(downloaded_path, dest_path)
+
+
+def _download(asset, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE, log=True):
+    errors = []
+
+    url = asset.get("url")
+    if url:
+        try:
+            _download_from_url(url, dest_path, chunk_size=chunk_size, log=log)
+            return
+        except Exception as exc:
+            errors.append(f"URL download failed ({exc})")
+            if dest_path.exists():
+                dest_path.unlink()
+
+    if asset.get("huggingface_repo") and asset.get("huggingface_filename"):
+        try:
+            _download_from_huggingface(asset, dest_path, log=log)
+            return
+        except Exception as exc:
+            errors.append(f"Hugging Face download failed ({exc})")
+            if dest_path.exists():
+                dest_path.unlink()
+
+    if errors:
+        raise Exception("; ".join(errors))
+
+    raise Exception("File is missing and cannot be downloaded")
 
 
 def retrieve_asset(tag, delete_wrong=False, chunk_size=_DEFAULT_CHUNK_SIZE, log=True):
@@ -121,16 +191,9 @@ def retrieve_asset(tag, delete_wrong=False, chunk_size=_DEFAULT_CHUNK_SIZE, log=
 
     # Attempt to download
     if not path.is_file():
-        url = asset.get("url")
-        if url is None:
-            raise Exception("File is missing and cannot be downloaded")
-        if log:
-            logging.info(f"Downloading from: {url}")
         try:
-            _download(url, path)
+            _download(asset, path, chunk_size=chunk_size, log=log)
         except Exception as e:
-            if path.is_file():
-                path.unlink()
             raise Exception(f"Download failed: {e}")
     assert path.is_file()
 

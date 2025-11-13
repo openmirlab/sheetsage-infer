@@ -10,7 +10,7 @@ SheetSage is a tool for transcribing audio to lead sheets (melody + chord symbol
 
 ### Prerequisites
 
-- Python >= 3.12
+- Python >= 3.9 (tested with 3.9, 3.10, and 3.12)
 - [LilyPond](https://lilypond.org/) (for generating PDF lead sheets)
   - **Linux**: `sudo apt-get install lilypond` or `sudo yum install lilypond`
   - **macOS**: `brew install lilypond`
@@ -18,17 +18,40 @@ SheetSage is a tool for transcribing audio to lead sheets (melody + chord symbol
 
 ### Install Package
 
+#### Standard Installation (Recommended)
+
 ```bash
 # Clone or download this repository
 cd sheetsage-infer
 
-# Install in development mode
-pip install -e .
-
-# Or install dependencies from requirements.txt
-pip install -r requirements.txt
+# Step 1: Install from pyproject.toml (works fine)
 pip install -e .
 ```
+
+This installs all main dependencies. Jukebox is optional and can be installed separately if needed.
+
+#### Install with Jukebox Support (Optional)
+
+If you need Jukebox embeddings for improved transcription quality:
+
+```bash
+# Step 1: Install from pyproject.toml (works fine)
+pip install -e .
+
+# Step 2: Install jukebox separately with --no-deps (command line only)
+pip install git+https://github.com/chrisdonahue/jukebox.git@7e0a38b679ff3f64987d8297d9d0eb5a046880c1 --no-deps
+```
+
+**Note**: Jukebox must be installed separately because it has compatibility issues with Python 3.12. The `--no-deps` flag bypasses pip's strict dependency resolver. See `DEPENDENCY_FIX_SUMMARY_2025-11-13.md` for details.
+
+#### Alternative: Use Installation Script
+
+```bash
+# Complete installation with optional jukebox
+./install.sh
+```
+
+This script will guide you through the installation process and optionally install jukebox.
 
 ## Quick Start
 
@@ -200,13 +223,13 @@ After downloading, place the model files in `~/.sheetsage/jukebox/models/5b/` (t
 
 ## Requirements
 
-- Python >= 3.12
+- Python >= 3.9 (tested with 3.9, 3.10, and 3.12)
 - PyTorch
 - librosa
 - numpy
 - scipy
 - audioread
-- SoundFile
+- soundfile
 - validators
 - pillow
 - scikit-learn

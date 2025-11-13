@@ -37,31 +37,43 @@
   "SHEETSAGE_V02_JUKEBOX_HARMONY_CFG": {
     "path": "sheetsage/v0.2/0920_01_e0908_jukebox53/f94f45ed03c8696f187a8bfded0f0d65476b4d48.cfg.json",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "f94f45ed03c8696f187a8bfded0f0d65476b4d48"
+    "checksum": "f94f45ed03c8696f187a8bfded0f0d65476b4d48",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_01_e0908_jukebox53/f94f45ed03c8696f187a8bfded0f0d65476b4d48.cfg.json"
   },
   "SHEETSAGE_V02_JUKEBOX_HARMONY_STEP": {
     "path": "sheetsage/v0.2/0920_01_e0908_jukebox53/step.pkl",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "05f8ed82a062f152fc805dbf3e78996fa3b24d23b719ce90f4f3656e1b292a49"
+    "checksum": "05f8ed82a062f152fc805dbf3e78996fa3b24d23b719ce90f4f3656e1b292a49",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_01_e0908_jukebox53/step.pkl"
   },
   "SHEETSAGE_V02_JUKEBOX_HARMONY_MODEL": {
     "path": "sheetsage/v0.2/0920_01_e0908_jukebox53/model.pt",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "a8d4641852c1efeae707a6fcf7d6ecddc7e2f33fa8c9753495684ae5b2e352bd"
+    "checksum": "a8d4641852c1efeae707a6fcf7d6ecddc7e2f33fa8c9753495684ae5b2e352bd",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_01_e0908_jukebox53/model.pt"
   },
   "SHEETSAGE_V02_JUKEBOX_MELODY_CFG": {
     "path": "sheetsage/v0.2/0920_00_e0830_jukebox53/e968ecb8349156b2e9761ae61606454988fa614d.cfg.json",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "e968ecb8349156b2e9761ae61606454988fa614d"
+    "checksum": "e968ecb8349156b2e9761ae61606454988fa614d",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_00_e0830_jukebox53/e968ecb8349156b2e9761ae61606454988fa614d.cfg.json"
   },
   "SHEETSAGE_V02_JUKEBOX_MELODY_STEP": {
     "path": "sheetsage/v0.2/0920_00_e0830_jukebox53/step.pkl",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "4443a859b4d1fd6f93a5b4351a0056522a12a771f2912b8c308e985c7a0695f1"
+    "checksum": "4443a859b4d1fd6f93a5b4351a0056522a12a771f2912b8c308e985c7a0695f1",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_00_e0830_jukebox53/step.pkl"
   },
   "SHEETSAGE_V02_JUKEBOX_MELODY_MODEL": {
     "path": "sheetsage/v0.2/0920_00_e0830_jukebox53/model.pt",
     "url": "https://mega.nz/file/j9YyWbAK#LjROFI9qxGq6Om9dx9HaORd5NaiYOcV8ULVUBKB0bcg",
-    "checksum": "e4a2cbce0a5a027e05ac753d72794ca723be2d18312f07daa0e43980d054249e"
+    "checksum": "e4a2cbce0a5a027e05ac753d72794ca723be2d18312f07daa0e43980d054249e",
+    "huggingface_repo": "mku121/sheetsage",
+    "huggingface_filename": "sheetsage_models/sheetsage/v0.2/0920_00_e0830_jukebox53/model.pt"
   }
 }

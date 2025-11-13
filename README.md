@@ -44,14 +44,6 @@ pip install git+https://github.com/chrisdonahue/jukebox.git@7e0a38b679ff3f64987d
 
 **Note**: Jukebox must be installed separately because it has compatibility issues with Python 3.12. The `--no-deps` flag bypasses pip's strict dependency resolver. See `DEPENDENCY_FIX_SUMMARY_2025-11-13.md` for details.
 
-#### Alternative: Use Installation Script
-
-```bash
-# Complete installation with optional jukebox
-./install.sh
-```
-
-This script will guide you through the installation process and optionally install jukebox.
 
 ## Quick Start
 

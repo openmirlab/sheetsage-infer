@@ -92,6 +92,10 @@ poetry.lock
 # pdm
 .pdm.toml
 
+# uv (Python package manager)
+.uv/
+.uvcache/
+
 # PEP 582
 __pypackages__/
 
@@ -110,6 +114,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+user_test_env/
 
 # Spyder project settings
 .spyderproject
@@ -141,6 +146,10 @@ cython_debug/
 # VS Code
 .vscode/
 *.code-workspace
+
+# Cursor / Claude
+.claude/
+.cursor/
 
 # Sublime Text
 *.sublime-project
@@ -216,6 +225,8 @@ outputs/
 results/
 checkpoints/
 models/
+output/
+user_test_output/
 
 # Cache directories
 .cache/
@@ -231,5 +242,24 @@ config.local.*
 
 # Test outputs
 test_output*/
-*.log
+
+# Backup directories (old jukebox_infer, etc.)
+*_bak/
+*_backup/
+*.bak/
+jukebox_infer/
+sheetsage_bak/
+pyproject.toml_bak
+requirements.txt.bak
+
+# Dev and test documentation files (optional - uncomment if you want to ignore these)
+# *_2025-*.md
+# ANALYSIS_*.md
+# DEV_*.md
+# DOC_*.md
+# FIX_*.md
+# INSTALL_*.md
+# SUMMARY_*.md
+# TEST_*.md
+# *.dev
 

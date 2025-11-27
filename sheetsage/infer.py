@@ -14,7 +14,7 @@ from .align import create_beat_to_time_fn
 from .assets import retrieve_asset
 from .beat_track import madmom
 from .modules import EncOnlyTransducer, IdentityEncoder, TransformerEncoder
-from .representations import Handcrafted, Jukebox
+from .representations import Handcrafted, JukeboxEmbeddings
 from .theory import (
     Chord,
     Harmony,
@@ -84,7 +84,7 @@ def _init_extractor(input_feats):
     if input_feats == InputFeats.HANDCRAFTED:
         extractor = Handcrafted()
     elif input_feats == InputFeats.JUKEBOX:
-        extractor = Jukebox()
+        extractor = JukeboxEmbeddings()
     else:
         raise ValueError()
     return extractor

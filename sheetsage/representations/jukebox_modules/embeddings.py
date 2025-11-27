@@ -1,19 +1,17 @@
+"""
+Jukebox Embeddings Extractor - SheetSage Pattern Implementation
+
+This module implements the two-stage embedding extraction pattern used by SheetSage:
+1. VQ-VAE Encoding: Audio → discrete codes
+2. Language Model Activations: Codes → high-level embeddings
+
+Based on the pattern described in JUKEBOX_EMBEDDINGS_USAGE_2025-11-19.md
+"""
+
 import torch as t
 import numpy as np
-import warnings
-import librosa
-import logging
 from typing import Union, Optional, Tuple
-import sys
-import os
-
-from ..utils import get_approximate_audio_length
-
-# Add jukebox_modules to path if it exists locally
-_jukebox_modules_path = os.path.join(os.path.dirname(__file__), 'jukebox_modules')
-if os.path.exists(_jukebox_modules_path) and _jukebox_modules_path not in sys.path:
-    sys.path.insert(0, os.path.dirname(__file__))
-
+from jukebox_modules.utils.audio_utils import load_audio
 from jukebox_modules.make_models import make_model
 from jukebox_modules.hparams import Hyperparams
 from jukebox_modules.utils.torch_utils import empty_cache
@@ -71,60 +69,31 @@ class JukeboxEmbeddings:
             n_samples=1
         )
         
-        def _build_models(target_device):
-            return make_model(
-                model_name,
-                target_device,
-                hps,
-                levels=None,  # Load all levels
-                auto_download=auto_download,
-            )
-
-        try:
-            self.vqvae, self.priors = _build_models(self.device)
-        except RuntimeError as e:
-            if (
-                "out of memory" in str(e).lower()
-                and isinstance(self.device, t.device)
-                and self.device.type == "cuda"
-            ):
-                logging.warning(
-                    "CUDA out of memory while loading Jukebox (device=%s). "
-                    "Falling back to CPU – this will be much slower.",
-                    self.device,
-                )
-                self.device = t.device("cpu")
-                self.vqvae, self.priors = _build_models(self.device)
-            else:
-                raise
+        self.vqvae, self.priors = make_model(
+            model_name, 
+            self.device, 
+            hps,
+            levels=None,  # Load all levels
+            auto_download=auto_download
+        )
         
         # Use top-level prior (deepest layer) for embeddings
         self.prior = self.priors[-1]  # Level 2 for 5B model
         
         # Calculate frame rate from raw_to_tokens
-        # Try to access raw_to_tokens from prior
-        try:
-            self.raw_to_tokens = self.prior.raw_to_tokens
-        except AttributeError:
-            # Try alternative path
-            self.raw_to_tokens = self.prior.prior.raw_to_tokens
+        self.raw_to_tokens = self.prior.raw_to_tokens
         self.frame_rate = _SAMPLE_RATE / self.raw_to_tokens  # ~344.5 Hz
         
         # Chunk sizes
-        self.chunk_frames = int(self.prior.n_ctx)  # Prior context window
-        self.chunk_samples = int(self.chunk_frames * self.raw_to_tokens)
+        self.chunk_samples = _CHUNK_FRAMES * self.raw_to_tokens  # ~1,048,576 samples
+        self.chunk_frames = self.prior.n_ctx  # 8192 frames (prior context window)
         
         # Layer to extract activations from
-        num_attn_layers = len(self.prior.prior.transformer._attn_mods)  # noqa: SLF001
         if num_layers is None:
             # Extract from deepest layer (last layer)
-            self.num_layers = num_attn_layers - 1
+            # Access protected member _attn_mods to get layer count
+            self.num_layers = len(self.prior.prior.transformer._attn_mods) - 1  # noqa: SLF001
         else:
-            if num_layers >= num_attn_layers:
-                raise ValueError(
-                    f"num_layers {num_layers} >= {num_attn_layers} available layers. "
-                    f"Use a value between 0 and {num_attn_layers - 1}"
-                )
             self.num_layers = num_layers
         
         # Model width (embedding dimension)
@@ -145,7 +114,7 @@ class JukeboxEmbeddings:
             duration: Duration in seconds (None = entire file)
             
         Returns:
-            Audio array: (samples,) format, mono, normalized
+            Audio array: (samples, channels) format, mono, normalized
         """
         # Handle bytes input (e.g., from HTTP)
         if isinstance(audio_path, bytes):
@@ -155,77 +124,75 @@ class JukeboxEmbeddings:
                 f.write(audio_path)
                 temp_path = f.name
             try:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
-                    audio, sr = librosa.load(
-                        temp_path, 
-                        sr=None, 
-                        mono=False, 
-                        offset=offset, 
-                        duration=duration
-                    )
+                audio = load_audio(
+                    temp_path, 
+                    sr=_SAMPLE_RATE, 
+                    offset=offset, 
+                    duration=duration, 
+                    mono=True
+                )
             finally:
                 os.unlink(temp_path)
         else:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                audio, sr = librosa.load(
-                    audio_path, 
-                    sr=None, 
-                    mono=False, 
-                    offset=offset, 
-                    duration=duration
-                )
-        
-        # Convert to mono if stereo
-        if audio.ndim == 1:
-            audio = audio[np.newaxis, :]
-        audio = np.swapaxes(audio, 0, 1)  # (channels, samples) -> (samples, channels)
-        audio = np.mean(audio, axis=1, keepdims=False)  # Convert to mono: (samples,)
-        
-        # Resample to target sample rate if needed
-        if sr != _SAMPLE_RATE:
-            audio = librosa.resample(
-                audio, 
-                orig_sr=sr, 
-                target_sr=_SAMPLE_RATE, 
-                res_type="kaiser_best"
+            audio = load_audio(
+                audio_path, 
+                sr=_SAMPLE_RATE, 
+                offset=offset, 
+                duration=duration, 
+                mono=True
             )
         
-        # Normalize
-        if audio.shape[0] > 0:
-            norm_factor = np.abs(audio).max()
-            if norm_factor > 0:
-                audio /= norm_factor
+        # Return as (samples, channels) - mono is (samples, 1)
+        if len(audio.shape) == 1:
+            audio = audio.reshape(-1, 1)
         
         return audio
     
     def codify_audio(self, audio: np.ndarray, tqdm=lambda x: x) -> t.Tensor:
         """
-        Convert raw audio into discrete VQ-VAE codes using model-specific chunk sizes.
+        Convert raw audio into discrete VQ-VAE codes.
+        
+        Process:
+        1. Audio is chunked into windows of _CHUNK_SAMPLES (1,048,576 samples ≈ 23.75s at 44.1kHz)
+        2. Each chunk is encoded through VQ-VAE encoder
+        3. Output: discrete codes at frame rate of 44100/128 = 344.5 Hz
+        
+        Args:
+            audio: Audio array, shape (samples, channels)
+            tqdm: Progress bar function (optional)
+            
+        Returns:
+            Codes tensor: shape (batch_size, num_frames) where num_frames = samples / raw_to_tokens
         """
-        hop_size = self.chunk_samples
-        hop_size_frames = hop_size // _FRAME_HOP_SIZE
-        result = []
-        for start in tqdm(range(0, audio.shape[0], hop_size)):
-            context = audio[start : start + hop_size]
-            if context.shape[0] < hop_size:
-                context = np.pad(context, (0, hop_size - context.shape[0]))
-            with t.no_grad():
-                context_tensor = (
-                    t.from_numpy(context)
-                    .float()
-                    .to(self.device)
-                    .view(1, -1, 1)
-                )
-                context_codified = (
-                    self.vqvae.encode(context_tensor, start_level=2, end_level=3)[-1]
-                    .view(-1)
-                )
-            context_codified = context_codified[:hop_size_frames]
-            result.append(context_codified)
-        codes = t.cat(result, dim=0)
-        codes = codes.view(1, -1)
+        # Convert to tensor and add batch dimension
+        # VQVAE expects (batch, time, channels) format
+        audio_tensor = t.from_numpy(audio).unsqueeze(0).float().to(self.device)  # (1, T, C)
+        
+        total_samples = audio_tensor.shape[1]
+        
+        # Chunk audio if necessary
+        if total_samples > self.chunk_samples:
+            codes_list = []
+            for start in tqdm(range(0, total_samples, self.chunk_samples)):
+                end = min(start + self.chunk_samples, total_samples)
+                chunk = audio_tensor[:, start:end, :]
+                
+                # Encode to top-level codes (level 2)
+                # Returns list: [level0_codes, level1_codes, level2_codes]
+                chunk_codes = self.vqvae.encode(chunk, start_level=2, end_level=3)
+                
+                # Get top-level codes only
+                codes_list.append(chunk_codes[0])  # shape: (1, T_codes)
+                
+                empty_cache()
+            
+            # Concatenate codes from all chunks
+            codes = t.cat(codes_list, dim=1)  # (1, total_frames)
+        else:
+            # Single chunk - no chunking needed
+            chunk_codes = self.vqvae.encode(audio_tensor, start_level=2, end_level=3)
+            codes = chunk_codes[0]  # (1, T_codes)
+        
         return codes
     
     def lm_activations(
@@ -233,7 +200,6 @@ class JukeboxEmbeddings:
         audio_codified: t.Tensor,
         metadata_offset_seconds: float = 0.0,
         metadata_total_length_seconds: Optional[float] = None,
-        chunk_duration_seconds: Optional[float] = None,
         tqdm=lambda x: x
     ) -> t.Tensor:
         """
@@ -256,14 +222,10 @@ class JukeboxEmbeddings:
         """
         codes = audio_codified
         batch_size = codes.shape[0]
-        total_frames = int(codes.shape[1])
+        total_frames = codes.shape[1]
         
         # Prepare metadata labels (optional conditioning)
-        y = self._get_labels(
-            metadata_offset_seconds,
-            metadata_total_length_seconds,
-            chunk_duration_seconds,
-        )
+        y = self._get_labels(metadata_offset_seconds, metadata_total_length_seconds)
         
         activations_list = []
         
@@ -295,17 +257,11 @@ class JukeboxEmbeddings:
                 
                 # Adjust metadata offset for this chunk
                 if y is not None:
-                    # y is a dict with 'y' and 'info' keys from get_batch_labels
+                    chunk_y = y.clone()
                     chunk_offset = metadata_offset_seconds + (start / self.frame_rate)
-                    # Create new labels dict for this chunk
-                    chunk_labels = {
-                        'y': y['y'].clone(),
-                        'info': y['info']  # Copy info reference
-                    }
-                    # Update offset in y tensor (y[:, 1] is offset)
-                    chunk_labels['y'][:, 1:2] = int(chunk_offset * _SAMPLE_RATE)
-                    # Pass dict to get_y (not a list)
-                    chunk_y = self.prior.get_y(chunk_labels, start=0)
+                    # Update offset in labels (y[:, 1] is offset)
+                    chunk_y[:, 1:2] = int(chunk_offset * _SAMPLE_RATE)
+                    chunk_y = self.prior.get_y([chunk_y], start=0)
                 else:
                     chunk_y = None
                 
@@ -343,9 +299,8 @@ class JukeboxEmbeddings:
     def _get_labels(
         self, 
         offset_seconds: float, 
-        total_length_seconds: Optional[float],
-        chunk_duration_seconds: Optional[float],
-    ) -> Optional[dict]:
+        total_length_seconds: Optional[float]
+    ) -> Optional[t.Tensor]:
         """
         Create metadata labels for conditioning.
         
@@ -354,20 +309,10 @@ class JukeboxEmbeddings:
             total_length_seconds: Total audio length in seconds
             
         Returns:
-            Labels dict with 'y' and 'info' keys, or None if not using conditioning
+            Labels tensor or None if not using conditioning
         """
         if not self.prior.y_cond:
             return None
-        
-        # Ensure total length is at least offset + chunk duration
-        effective_total_length_seconds = total_length_seconds
-        if effective_total_length_seconds is None or effective_total_length_seconds <= 0:
-            effective_total_length_seconds = chunk_duration_seconds
-        if effective_total_length_seconds is None:
-            effective_total_length_seconds = 0.0
-        if effective_total_length_seconds <= offset_seconds:
-            fallback = chunk_duration_seconds or (self.chunk_frames * self.raw_to_tokens / _SAMPLE_RATE)
-            effective_total_length_seconds = offset_seconds + fallback
         
         # Create empty labels (no artist/genre/lyrics conditioning)
         # For embeddings extraction, we typically don't need metadata
@@ -375,11 +320,10 @@ class JukeboxEmbeddings:
             artist="",
             genre="",
             lyrics="",
-            total_length=int(effective_total_length_seconds * _SAMPLE_RATE),
+            total_length=int((total_length_seconds or 0) * _SAMPLE_RATE),
             offset=int(offset_seconds * _SAMPLE_RATE)
         )]
         
-        # get_batch_labels returns dict with 'y' (tensor) and 'info' (list) keys
         labels = self.prior.labeller.get_batch_labels(metas, self.device)
         return labels
     
@@ -410,20 +354,7 @@ class JukeboxEmbeddings:
         """
         # 1. Decode and preprocess audio
         audio = self.decode_audio(audio_path, offset=offset, duration=duration)
-        chunk_duration_seconds = audio.shape[0] / _SAMPLE_RATE
-
-        if offset == 0.0 and duration is None:
-            total_length_seconds = chunk_duration_seconds
-        else:
-            try:
-                total_length_seconds = get_approximate_audio_length(audio_path)
-            except Exception as exc:
-                logging.warning(
-                    "Failed to estimate total audio length via ffprobe (%s). "
-                    "Falling back to chunk duration.",
-                    exc,
-                )
-                total_length_seconds = chunk_duration_seconds + offset
+        total_length_seconds = audio.shape[0] / _SAMPLE_RATE
         
         # 2. Encode to VQ-VAE codes
         codified_audio = self.codify_audio(audio)
@@ -432,8 +363,7 @@ class JukeboxEmbeddings:
         activations = self.lm_activations(
             codified_audio,
             metadata_offset_seconds=offset,
-            metadata_total_length_seconds=total_length_seconds,
-            chunk_duration_seconds=chunk_duration_seconds,
+            metadata_total_length_seconds=total_length_seconds
         )
         
         # 4. Trim to match audio length
@@ -489,3 +419,4 @@ def init_jukebox_singleton(
 def get_jukebox_singleton() -> Optional[JukeboxEmbeddings]:
     """Get the current Jukebox singleton instance."""
     return _jukebox_singleton
+

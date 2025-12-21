@@ -73,7 +73,7 @@ class HumanPitchName(str):
             elif c == "#":
                 accidental += 1
             else:
-                assert False
+                raise AssertionError()
         return PitchClass((pc + accidental) % 12)
 
     def as_lily_pitch_name(self):
@@ -84,7 +84,7 @@ class HumanPitchName(str):
             elif c == "#":
                 pn += "is"
             else:
-                assert False
+                raise AssertionError()
         return LilyPitchName(pn)
 
 
@@ -121,5 +121,5 @@ class LilyPitchName(str):
             elif self[i : i + 2] == "is":
                 pn += "#"
             else:
-                assert False
+                raise AssertionError()
         return HumanPitchName(pn)

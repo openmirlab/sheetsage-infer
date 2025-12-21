@@ -1,19 +1,20 @@
 #!/usr/bin/env pytest
 """Test output format conversions (LilyPond, MIDI, etc.)."""
 
-import pytest
 from io import BytesIO
+
+import pytest
 
 
 @pytest.fixture
 def sample_lead_sheet():
     """Create a minimal lead sheet for testing."""
-    from sheetsage.theory import LeadSheet, Melody, Harmony, Note, Chord, Key, Meter, Tempo
+    from sheetsage.theory import Chord, Harmony, Key, LeadSheet, Melody, Meter, Note, Tempo
 
     # Create minimal valid lead sheet
     meter = Meter(4, 4)
     tempo = Tempo(120)
-    key = Key('C', 'major')
+    key = Key("C", "major")
 
     # Simple melody: C, D, E, F for one measure
     melody = Melody(
@@ -28,17 +29,11 @@ def sample_lead_sheet():
     # Simple harmony: C major for whole measure
     harmony = Harmony(
         chords=[
-            Chord('C', 16),  # C major for whole note
+            Chord("C", 16),  # C major for whole note
         ]
     )
 
-    lead_sheet = LeadSheet(
-        meter=meter,
-        tempo=tempo,
-        key=key,
-        harmony=harmony,
-        melody=melody
-    )
+    lead_sheet = LeadSheet(meter=meter, tempo=tempo, key=key, harmony=harmony, melody=melody)
 
     return lead_sheet
 
@@ -47,6 +42,7 @@ def sample_lead_sheet():
 def beat_to_time_fn():
     """Create a simple beat-to-time function for testing."""
     import numpy as np
+
     from sheetsage.align import create_beat_to_time_fn
 
     # Simple: 4 beats at 120 BPM (0.5 seconds per beat)
@@ -70,7 +66,7 @@ class TestLilyPondExport:
         """Test LilyPond code contains version declaration."""
         lily_code = sample_lead_sheet.as_lily()
 
-        assert '\\version' in lily_code
+        assert "\\version" in lily_code
 
     def test_as_lily_has_structure(self, sample_lead_sheet):
         """Test LilyPond code has basic structure."""
@@ -96,7 +92,7 @@ class TestMIDIExport:
         midi_bytes = sample_lead_sheet.as_midi(beat_to_time_fn)
 
         # MIDI files start with "MThd"
-        assert midi_bytes[:4] == b'MThd'
+        assert midi_bytes[:4] == b"MThd"
 
     def test_as_midi_can_be_parsed(self, sample_lead_sheet, beat_to_time_fn):
         """Test MIDI can be parsed by pretty_midi."""
@@ -124,16 +120,16 @@ class TestEngraving:
         lily_code = sample_lead_sheet.as_lily()
 
         try:
-            png_bytes = engrave(lily_code, out_format='png')
+            png_bytes = engrave(lily_code, out_format="png")
 
             assert isinstance(png_bytes, bytes)
             assert len(png_bytes) > 0
 
             # PNG files start with specific magic bytes
-            assert png_bytes[:8] == b'\x89PNG\r\n\x1a\n'
+            assert png_bytes[:8] == b"\x89PNG\r\n\x1a\n"
 
         except Exception as e:
-            if 'lilypond' in str(e).lower():
+            if "lilypond" in str(e).lower():
                 pytest.skip("LilyPond not installed")
             raise
 
@@ -145,21 +141,17 @@ class TestEngraving:
 
         try:
             pdf_bytes = engrave(
-                lily_code,
-                out_format='pdf',
-                transparent=False,
-                trim=False,
-                hide_footer=False
+                lily_code, out_format="pdf", transparent=False, trim=False, hide_footer=False
             )
 
             assert isinstance(pdf_bytes, bytes)
             assert len(pdf_bytes) > 0
 
             # PDF files start with "%PDF"
-            assert pdf_bytes[:4] == b'%PDF'
+            assert pdf_bytes[:4] == b"%PDF"
 
         except Exception as e:
-            if 'lilypond' in str(e).lower():
+            if "lilypond" in str(e).lower():
                 pytest.skip("LilyPond not installed")
             raise
 
@@ -171,13 +163,12 @@ class TestTheoryTabConversion:
         """Test from_theorytab method exists."""
         from sheetsage.theory import LeadSheet
 
-        assert hasattr(LeadSheet, 'from_theorytab')
+        assert hasattr(LeadSheet, "from_theorytab")
         assert callable(LeadSheet.from_theorytab)
 
     @pytest.mark.skip(reason="Requires TheoryTab format example data")
     def test_from_theorytab_conversion(self):
         """Test conversion from TheoryTab format."""
-        from sheetsage.theory import LeadSheet
 
         # This would require actual TheoryTab format data
         # Skip for now
@@ -192,13 +183,13 @@ class TestOutputToFile:
         lily_code = sample_lead_sheet.as_lily()
 
         lily_file = tmp_path / "test.ly"
-        lily_file.write_text(lily_code, encoding='utf-8')
+        lily_file.write_text(lily_code, encoding="utf-8")
 
         assert lily_file.exists()
         assert lily_file.stat().st_size > 0
 
         # Read back and verify
-        content = lily_file.read_text(encoding='utf-8')
+        content = lily_file.read_text(encoding="utf-8")
         assert content == lily_code
 
     def test_save_midi_to_file(self, sample_lead_sheet, beat_to_time_fn, tmp_path):

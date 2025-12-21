@@ -1,12 +1,14 @@
 HPARAMS_REGISTRY = {}
 DEFAULTS = {}
 
+
 class Hyperparams(dict):
     def __getattr__(self, attr):
         return self[attr]
 
     def __setattr__(self, attr, value):
         self[attr] = value
+
 
 def setup_hparams(hparam_set_names, kwargs):
     H = Hyperparams()
@@ -23,9 +25,9 @@ def setup_hparams(hparam_set_names, kwargs):
     H.update(**kwargs)
     return H
 
+
 # Teeny for testing
-teeny = Hyperparams(
-)
+teeny = Hyperparams()
 HPARAMS_REGISTRY["teeny"] = teeny
 
 easy = Hyperparams(
@@ -33,28 +35,28 @@ easy = Hyperparams(
 )
 HPARAMS_REGISTRY["easy"] = easy
 
-REMOTE_PREFIX = 'https://openaipublic.azureedge.net/'
+REMOTE_PREFIX = "https://openaipublic.azureedge.net/"
 
 # Model hps
 vqvae = Hyperparams(
-    levels = 3,
-    downs_t = (3, 2, 2),
-    strides_t = (2, 2, 2),
-    emb_width = 64,
-    l_bins = 2048,
-    l_mu = 0.99,
-    commit = 0.02,
-    spectral = 0.0,
-    multispectral = 1.0,
-    hvqvae_multipliers = (2, 1, 1),
-    loss_fn = 'lmix',
-    lmix_l2 = 1.0,
+    levels=3,
+    downs_t=(3, 2, 2),
+    strides_t=(2, 2, 2),
+    emb_width=64,
+    l_bins=2048,
+    l_mu=0.99,
+    commit=0.02,
+    spectral=0.0,
+    multispectral=1.0,
+    hvqvae_multipliers=(2, 1, 1),
+    loss_fn="lmix",
+    lmix_l2=1.0,
     lmix_linf=0.02,
-    width = 32,
-    depth = 4,
-    m_conv = 1.0,
-    dilation_growth_rate = 3,
-    restore_vqvae=REMOTE_PREFIX + 'jukebox/models/5b/vqvae.pth.tar',
+    width=32,
+    depth=4,
+    m_conv=1.0,
+    dilation_growth_rate=3,
+    restore_vqvae=REMOTE_PREFIX + "jukebox/models/5b/vqvae.pth.tar",
 )
 HPARAMS_REGISTRY["vqvae"] = vqvae
 
@@ -86,8 +88,7 @@ upsamplers = Hyperparams(
 upsamplers.update(labels)
 
 upsampler_level_0 = Hyperparams(
-    level=0,
-    restore_prior=REMOTE_PREFIX + 'jukebox/models/5b/prior_level_0.pth.tar'
+    level=0, restore_prior=REMOTE_PREFIX + "jukebox/models/5b/prior_level_0.pth.tar"
 )
 upsampler_level_0.update(upsamplers)
 HPARAMS_REGISTRY["upsampler_level_0"] = upsampler_level_0
@@ -95,7 +96,7 @@ HPARAMS_REGISTRY["upsampler_level_0"] = upsampler_level_0
 upsampler_level_1 = Hyperparams(
     level=1,
     cond_res_scale=True,
-    restore_prior=REMOTE_PREFIX + 'jukebox/models/5b/prior_level_1.pth.tar'
+    restore_prior=REMOTE_PREFIX + "jukebox/models/5b/prior_level_1.pth.tar",
 )
 upsampler_level_1.update(upsamplers)
 HPARAMS_REGISTRY["upsampler_level_1"] = upsampler_level_1
@@ -117,7 +118,7 @@ prior_5b = Hyperparams(
     n_tokens=0,
     prime_loss_fraction=0.0,
     merged_decoder=True,
-    restore_prior=REMOTE_PREFIX + 'jukebox/models/5b/prior_level_2.pth.tar',
+    restore_prior=REMOTE_PREFIX + "jukebox/models/5b/prior_level_2.pth.tar",
     fp16_params=True,
 )
 prior_5b.update(labels)
@@ -147,7 +148,7 @@ prior_5b_lyrics = Hyperparams(
     n_tokens=512,
     prime_loss_fraction=0.4,
     merged_decoder=True,
-    restore_prior=REMOTE_PREFIX + 'jukebox/models/5b_lyrics/prior_level_2.pth.tar',
+    restore_prior=REMOTE_PREFIX + "jukebox/models/5b_lyrics/prior_level_2.pth.tar",
     fp16_params=True,
     alignment_layer=68,
     alignment_head=2,
@@ -179,7 +180,7 @@ prior_1b_lyrics = Hyperparams(
     n_tokens=384,
     prime_loss_fraction=0.4,
     single_enc_dec=True,
-    restore_prior=REMOTE_PREFIX + 'jukebox/models/1b_lyrics/prior_level_2.pth.tar',
+    restore_prior=REMOTE_PREFIX + "jukebox/models/1b_lyrics/prior_level_2.pth.tar",
     fp16_params=False,
     alignment_layer=63,
     alignment_head=0,
@@ -189,21 +190,21 @@ HPARAMS_REGISTRY["prior_1b_lyrics"] = prior_1b_lyrics
 
 # Small models
 small_vqvae = Hyperparams(
-    sr = 22050,
-    levels = 2,
-    downs_t = (5, 3),
-    strides_t = (2, 2),
-    emb_width = 64,
-    l_bins = 1024,
-    l_mu = 0.99,
-    commit = 0.02,
-    spectral = 0.0,
-    multispectral = 1.0,
-    loss_fn = 'l2',
-    width = 32,
-    depth = 4,
-    m_conv = 1.0,
-    dilation_growth_rate = 3,
+    sr=22050,
+    levels=2,
+    downs_t=(5, 3),
+    strides_t=(2, 2),
+    emb_width=64,
+    l_bins=1024,
+    l_mu=0.99,
+    commit=0.02,
+    spectral=0.0,
+    multispectral=1.0,
+    loss_fn="l2",
+    width=32,
+    depth=4,
+    m_conv=1.0,
+    dilation_growth_rate=3,
 )
 HPARAMS_REGISTRY["small_vqvae"] = small_vqvae
 
@@ -222,7 +223,7 @@ HPARAMS_REGISTRY["small_prior"] = small_prior
 small_labelled_prior = Hyperparams(
     labels=True,
     labels_v3=True,
-    y_bins=(10,100), # Set this to (genres, artists) for your dataset
+    y_bins=(10, 100),  # Set this to (genres, artists) for your dataset
     max_bow_genre_size=1,
     min_duration=60.0,
     max_duration=600.0,
@@ -244,7 +245,7 @@ small_single_enc_dec_prior = Hyperparams(
     single_enc_dec=True,
     labels=True,
     labels_v3=True,
-    y_bins=(10,100), # Set this to (genres, artists) for your dataset
+    y_bins=(10, 100),  # Set this to (genres, artists) for your dataset
     max_bow_genre_size=1,
     min_duration=60.0,
     max_duration=600.0,
@@ -274,7 +275,7 @@ small_sep_enc_dec_prior = Hyperparams(
     prime_loss_fraction=0.4,
     labels=True,
     labels_v3=True,
-    y_bins=(10,100), # Set this to (genres, artists) for your dataset
+    y_bins=(10, 100),  # Set this to (genres, artists) for your dataset
     max_bow_genre_size=1,
     min_duration=60.0,
     max_duration=600.0,
@@ -326,7 +327,7 @@ DEFAULTS["rcall"] = Hyperparams(
 )
 
 DEFAULTS["script"] = Hyperparams(
-    name='',
+    name="",
     debug_mem=False,
     debug_eval_files=False,
     debug_speed=False,
@@ -334,8 +335,8 @@ DEFAULTS["script"] = Hyperparams(
     debug_batch=False,
     debug_grad_accum=False,
     debug_inputs=False,
-    local_path='',
-    local_logdir='logs',
+    local_path="",
+    local_logdir="logs",
     max_len=24,
     max_log=32,
     save=True,
@@ -343,12 +344,12 @@ DEFAULTS["script"] = Hyperparams(
     seed=0,
     prior=False,
     log_steps=100,
-    func='',
+    func="",
 )
 
 DEFAULTS["data"] = Hyperparams(
-    audio_files_dir='',
-    finetune='',
+    audio_files_dir="",
+    finetune="",
     english_only=False,
     bs=1,
     bs_sample=1,
@@ -368,10 +369,10 @@ DEFAULTS["data"] = Hyperparams(
 )
 
 DEFAULTS["vqvae"] = Hyperparams(
-    restore_vqvae='',
+    restore_vqvae="",
     levels=2,
-    downs_t=(1,1),
-    strides_t=(2,2),
+    downs_t=(1, 1),
+    strides_t=(2, 2),
     hvqvae_multipliers=None,
     revival_threshold=1.0,
     emb_width=64,
@@ -380,7 +381,7 @@ DEFAULTS["vqvae"] = Hyperparams(
     commit=1.0,
     spectral=0.0,
     multispectral=1.0,
-    loss_fn='l2',
+    loss_fn="l2",
     linf_k=2048,
     lmix_l1=0.0,
     lmix_l2=0.0,
@@ -398,7 +399,7 @@ DEFAULTS["vqvae_conv_block"] = Hyperparams(
 )
 
 DEFAULTS["prior"] = Hyperparams(
-    restore_prior='',
+    restore_prior="",
     restore_prior_ddp=False,
     max_bow_genre_size=None,
     y_bins=0,
@@ -448,7 +449,7 @@ DEFAULTS["cond_conv_block"] = Hyperparams(
 
 DEFAULTS["sample"] = Hyperparams(
     primed_chunk_size=None,
-    selected_artists='',
+    selected_artists="",
     temp_top=1.0,
     temp_rest=0.99,
     sample_length_in_seconds=24,
@@ -456,9 +457,9 @@ DEFAULTS["sample"] = Hyperparams(
 )
 
 DEFAULTS["prime"] = Hyperparams(
-    #encoder_kv_width=128,
+    # encoder_kv_width=128,
     prime_loss_fraction=0.1,
-    restore_decoder='',
+    restore_decoder="",
 )
 DEFAULTS["prime_attn_block"] = Hyperparams(
     prime_depth=3,
@@ -524,10 +525,10 @@ DEFAULTS["train_test_eval"] = Hyperparams(
     train=False,
     test=False,
     sample=False,
-    sampler='ancestral',
-    codes_logdir='',
+    sampler="ancestral",
+    codes_logdir="",
     date=None,
-    labeller='top_genres',
+    labeller="top_genres",
     label_line=0,
     iters_before_update=1,
     grad_accum_iters=0,
@@ -545,7 +546,7 @@ DEFAULTS["audio"] = Hyperparams(
     window_size=1024,
     sr=44100,
     channels=2,
-    wav='',
+    wav="",
     n_inps=1,
     n_hops=2,
     n_segment=1,
@@ -557,11 +558,9 @@ DEFAULTS["audio"] = Hyperparams(
     max_silence_pad_length=0,
     ignore_boundaries=False,
     use_nonrelative_specloss=True,
-    multispec_loss_n_fft=(2048,1024,512),
-    multispec_loss_hop_length=(240,120,50),
-    multispec_loss_window_size=(1200,600,240),
+    multispec_loss_n_fft=(2048, 1024, 512),
+    multispec_loss_hop_length=(240, 120, 50),
+    multispec_loss_window_size=(1200, 600, 240),
 )
 
-DEFAULTS["distributed"] = Hyperparams(
-    bucket=128
-)
+DEFAULTS["distributed"] = Hyperparams(bucket=128)

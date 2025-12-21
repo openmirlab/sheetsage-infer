@@ -79,7 +79,7 @@ _TASK_TO_VOCAB_SIZE = {Task.MELODY: 89, Task.HARMONY: 97}
 _MAX_TERTIARIES_PER_CHUNK = 384
 
 
-@cache()
+@cache
 def _init_extractor(input_feats):
     if input_feats == InputFeats.HANDCRAFTED:
         extractor = Handcrafted()
@@ -90,14 +90,14 @@ def _init_extractor(input_feats):
     return extractor
 
 
-@cache()
+@cache
 def _init_model(task, input_feats, model):
     if model == Model.LINEAR:
         # NOTE: Just need to catalogue these configs / weights
         raise NotImplementedError()
 
     asset_prefix = f"SHEETSAGE_V02_{input_feats.name}_{task.name}"
-    with open(retrieve_asset(f"{asset_prefix}_CFG", log=False), "r") as f:
+    with open(retrieve_asset(f"{asset_prefix}_CFG", log=False)) as f:
         cfg = json.load(f)
     assert cfg["src_max_len"] == _MAX_TERTIARIES_PER_CHUNK
 
@@ -140,17 +140,15 @@ def _init_model(task, input_feats, model):
     device = torch.device("cpu")
     model.to(device)
     model.load_state_dict(
-        torch.load(
-            retrieve_asset(f"{asset_prefix}_MODEL", log=False), map_location=device
-        )
+        torch.load(retrieve_asset(f"{asset_prefix}_MODEL", log=False), map_location=device)
     )
     model.eval()
     return model
 
 
-def _closest_idx(x, l):
-    assert len(l) > 0
-    return int(np.argmin([abs(li - x) for li in l]) + 1e-6)
+def _closest_idx(x, lst):
+    assert len(lst) > 0
+    return int(np.argmin([abs(li - x) for li in lst]) + 1e-6)
 
 
 def _beat_tracking_with_hints(
@@ -168,20 +166,18 @@ def _beat_tracking_with_hints(
     beat_detection_start = max(beat_detection_start - beat_detection_padding, 0.0)
     beat_detection_end = None if segment_end_hint is None else segment_end_hint
     beat_detection_end = (
-        None
-        if beat_detection_end is None
-        else beat_detection_end + beat_detection_padding
+        None if beat_detection_end is None else beat_detection_end + beat_detection_padding
     )
     if legacy_behavior:
-        l = segment_start_hint - beat_detection_padding
-        r = segment_start_hint + _JUKEBOX_CHUNK_DURATION_EDGE + beat_detection_padding
+        left = segment_start_hint - beat_detection_padding
+        right = segment_start_hint + _JUKEBOX_CHUNK_DURATION_EDGE + beat_detection_padding
         sr, audio = decode_audio(audio_path_or_bytes)
         audio_duration = audio.shape[0] / sr
-        l, r = [round(t * sr) for t in (l, r)]
-        l = max(0, l)
-        r = min(audio.shape[0], r)
-        assert r > l
-        audio = audio[l:r]
+        left, right = [round(t * sr) for t in (left, right)]
+        left = max(0, left)
+        right = min(audio.shape[0], right)
+        assert right > left
+        audio = audio[left:right]
     else:
         sr, audio = decode_audio(
             audio_path_or_bytes,
@@ -195,9 +191,7 @@ def _beat_tracking_with_hints(
     first_downbeat_idx, beats_per_measure, beats = madmom(
         sr,
         audio,
-        beats_per_bar=beats_per_measure_hint
-        if beats_per_measure_hint is not None
-        else [3, 4],
+        beats_per_bar=beats_per_measure_hint if beats_per_measure_hint is not None else [3, 4],
         beats_per_minute_hint=beats_per_minute_hint,
     )
     if first_downbeat_idx is None or beats_per_measure is None or len(beats) == 0:
@@ -205,9 +199,7 @@ def _beat_tracking_with_hints(
     assert first_downbeat_idx >= 0 and first_downbeat_idx < beats_per_measure
     assert beats_per_measure in [3, 4]
     beats = [beat_detection_start + t for t in beats]
-    downbeats = [
-        t for i, t in enumerate(beats) if i % beats_per_measure == first_downbeat_idx
-    ]
+    downbeats = [t for i, t in enumerate(beats) if i % beats_per_measure == first_downbeat_idx]
     assert len(beats) > 0
     assert len(downbeats) > 0
 
@@ -264,18 +256,12 @@ def _beat_tracking_with_hints(
         tertiaries_times = np.minimum(tertiaries_times, audio_duration)
         segment_offset = tertiaries_times[0]
         tertiaries_times = [
-            t
-            for t in tertiaries_times
-            if t < segment_offset + _JUKEBOX_CHUNK_DURATION_EDGE
+            t for t in tertiaries_times if t < segment_offset + _JUKEBOX_CHUNK_DURATION_EDGE
         ]
-        segment_duration = tertiaries_times[-1] - segment_offset
-        tertiaries = (
-            np.arange(len(tertiaries_times)) * (1 / _TERTIARIES_PER_BEAT)
-        ).tolist()
+        tertiaries_times[-1] - segment_offset
+        tertiaries = (np.arange(len(tertiaries_times)) * (1 / _TERTIARIES_PER_BEAT)).tolist()
 
-        segment_end_beat = (
-            segment_start_downbeat + len(tertiaries) / _TERTIARIES_PER_BEAT
-        )
+        segment_end_beat = segment_start_downbeat + len(tertiaries) / _TERTIARIES_PER_BEAT
         if abs(segment_end_beat - round(segment_end_beat)) < 1e-6:
             segment_end_beat = round(segment_end_beat)
         else:
@@ -342,9 +328,7 @@ def _split_into_chunks(
     return chunks
 
 
-def _extract_features(
-    audio_path_or_bytes, input_feats, tertiaries_times, chunks_tertiaries, tqdm
-):
+def _extract_features(audio_path_or_bytes, input_feats, tertiaries_times, chunks_tertiaries, tqdm):
     tertiary_diff_frames = np.diff(tertiaries_times) * _INPUT_TO_FRAME_RATE[input_feats]
     if np.any(tertiary_diff_frames.astype(np.int64) == 0):
         raise ValueError("Tempo too fast for beat-informed feature resampling")
@@ -378,9 +362,7 @@ def _extract_features(
     # NOTE: Normalizing after beat resampling is probably a bug in retrospect, but it's
     # what the model expects.
     if input_feats == InputFeats.HANDCRAFTED:
-        moments = np.load(
-            retrieve_asset(f"SHEETSAGE_V02_{input_feats.name}_MOMENTS", log=False)
-        )
+        moments = np.load(retrieve_asset(f"SHEETSAGE_V02_{input_feats.name}_MOMENTS", log=False))
         for chunk in chunks_features:
             chunk -= moments[0]
             chunk /= moments[1]
@@ -518,7 +500,7 @@ def _format_lead_sheet(
     tempo_changes = TempoChanges((0, (round(beats_per_second * 60),)))
     try:
         key_changes = estimate_key_changes(meter_changes, harmony, melody)
-    except:
+    except Exception:
         # NOTE: C major by default
         key_changes = KeyChanges((0, (0, (2, 2, 1, 2, 2, 2))))
     lead_sheet = LeadSheet(
@@ -618,9 +600,7 @@ def sheetsage(
         # TODO: Allow 32 if time signature is 3/4??
         raise ValueError("Sheet Sage can only transcribe 24 measures per chunk")
     if beats_per_measure_hint is not None and beats_per_measure_hint not in [3, 4]:
-        raise ValueError(
-            "Currently, Sheet Sage only supports 4/4 and 3/4 time signatures"
-        )
+        raise ValueError("Currently, Sheet Sage only supports 4/4 and 3/4 time signatures")
     if beat_detection_padding < 0:
         raise ValueError("Beat detection padding cannot be negative")
     input_feats = InputFeats.JUKEBOX if use_jukebox else InputFeats.HANDCRAFTED
@@ -635,10 +615,7 @@ def sheetsage(
         else:
             logging.info(f"Loading audio from {audio_path_bytes_or_url}")
             audio_path_or_bytes = pathlib.Path(audio_path_bytes_or_url).resolve()
-    if (
-        isinstance(audio_path_or_bytes, pathlib.Path)
-        and not audio_path_or_bytes.exists()
-    ):
+    if isinstance(audio_path_or_bytes, pathlib.Path) and not audio_path_or_bytes.exists():
         raise FileNotFoundError(audio_path_or_bytes)
 
     # Run beat detection
@@ -865,19 +842,13 @@ def main():
     with open(pathlib.Path(output_dir, "output.ly"), "w") as f:
         f.write(lily)
     with open(pathlib.Path(output_dir, "output.pdf"), "wb") as f:
-        f.write(
-            engrave(
-                lily, out_format="pdf", transparent=False, trim=False, hide_footer=False
-            )
-        )
+        f.write(engrave(lily, out_format="pdf", transparent=False, trim=False, hide_footer=False))
 
     # Write MIDI
     with open(pathlib.Path(output_dir, "output.midi"), "wb") as f:
         f.write(
             lead_sheet.as_midi(
-                pulse_to_time_fn=create_beat_to_time_fn(
-                    segment_beats, segment_beats_times
-                )
+                pulse_to_time_fn=create_beat_to_time_fn(segment_beats, segment_beats_times)
             )
         )
 

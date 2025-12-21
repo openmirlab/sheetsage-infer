@@ -8,12 +8,12 @@ optimized for PyTorch 2.7+ and single-GPU inference.
 __version__ = "0.1.0"
 
 from jukebox_modules.api import Jukebox
-from jukebox_modules.make_models import download_checkpoints
 from jukebox_modules.embeddings import (
     JukeboxEmbeddings,
+    get_jukebox_singleton,
     init_jukebox_singleton,
-    get_jukebox_singleton
 )
+from jukebox_modules.make_models import download_checkpoints
 
 __all__ = [
     "Jukebox",
@@ -21,5 +21,5 @@ __all__ = [
     "JukeboxEmbeddings",
     "init_jukebox_singleton",
     "get_jukebox_singleton",
-    "__version__"
+    "__version__",
 ]

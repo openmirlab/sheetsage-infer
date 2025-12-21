@@ -104,8 +104,8 @@ def madmom(sr, audio, beats_per_bar=None, beats_per_minute_hint=None):
                 if result == 0:
                     dbts = []
                     bts = []
-                    for l in stdout.splitlines():
-                        t, p = l.split()
+                    for line in stdout.splitlines():
+                        t, p = line.split()
                         t = float(t)
                         if int(p) == 1:
                             dbts.append(t)
@@ -132,7 +132,9 @@ def madmom(sr, audio, beats_per_bar=None, beats_per_minute_hint=None):
                         partial_tail = [t for t in bts if t > dbts[-1]]
                         for i in range(len(dbts) - 1):
                             beats_this_bar = 1
-                            beats_this_bar += len([t for t in bts if t > dbts[i] and t < dbts[i + 1]])
+                            beats_this_bar += len(
+                                [t for t in bts if t > dbts[i] and t < dbts[i + 1]]
+                            )
                             if detected_beats_per_bar is None:
                                 detected_beats_per_bar = beats_this_bar
                             assert beats_this_bar == detected_beats_per_bar
@@ -144,7 +146,10 @@ def madmom(sr, audio, beats_per_bar=None, beats_per_minute_hint=None):
                             detected_beats_per_bar is None
                             or len(partial_tail) < detected_beats_per_bar
                         )
-                        if beats_per_bar_normalized is not None and detected_beats_per_bar is not None:
+                        if (
+                            beats_per_bar_normalized is not None
+                            and detected_beats_per_bar is not None
+                        ):
                             if isinstance(beats_per_bar_normalized, list):
                                 assert detected_beats_per_bar in beats_per_bar_normalized
                             else:
@@ -157,15 +162,18 @@ def madmom(sr, audio, beats_per_bar=None, beats_per_minute_hint=None):
                     result,
                     stderr.strip(),
                 )
-        except (OSError, ValueError, RuntimeError, AssertionError) as exc:  # pragma: no cover - defensive logging
+        except (
+            OSError,
+            ValueError,
+            RuntimeError,
+            AssertionError,
+        ) as exc:  # pragma: no cover - defensive logging
             logging.warning(
                 "DBNDownBeatTracker failed (%s). Falling back to librosa beat tracker.",
                 exc,
             )
     else:
-        logging.info(
-            "DBNDownBeatTracker not found. Using librosa beat tracker fallback."
-        )
+        logging.info("DBNDownBeatTracker not found. Using librosa beat tracker fallback.")
 
     return _librosa_fallback(
         sr,

@@ -1,5 +1,3 @@
-import pickle
-
 import librosa
 import numpy as np
 

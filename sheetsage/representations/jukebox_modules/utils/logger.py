@@ -3,13 +3,20 @@ Stub for logger utilities (training functionality removed).
 Only includes functions needed for model code compatibility.
 """
 
-from tqdm import tqdm
 import sys
+
+from tqdm import tqdm
+
 
 def def_tqdm(x):
     """Simple tqdm wrapper"""
-    return tqdm(x, leave=True, file=sys.stdout,
-                bar_format="{n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]")
+    return tqdm(
+        x,
+        leave=True,
+        file=sys.stdout,
+        bar_format="{n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]",
+    )
+
 
 def get_range(x):
     """
@@ -17,6 +24,7 @@ def get_range(x):
     Returns tqdm wrapper for iterables.
     """
     return def_tqdm(x)
+
 
 def average_metrics(metrics):
     """

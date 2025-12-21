@@ -3,12 +3,12 @@ Simple API for Jukebox inference.
 """
 
 import os
+
 import torch
-import numpy as np
 from jukebox_modules.hparams import Hyperparams
-from jukebox_modules.make_models import make_model, download_checkpoints
-from jukebox_modules.sample import ancestral_sample, primed_sample, load_prompts
-from jukebox_modules.utils.audio_utils import save_wav, load_audio
+from jukebox_modules.make_models import make_model
+from jukebox_modules.sample import ancestral_sample, load_prompts, primed_sample
+from jukebox_modules.utils.audio_utils import save_wav
 
 
 class Jukebox:
@@ -47,13 +47,15 @@ class Jukebox:
             total_sample_length_in_seconds=sample_length_in_seconds,
             sr=44100,
             n_samples=n_samples,
-            hop_fraction=[0.5, 0.5, 0.125]
+            hop_fraction=[0.5, 0.5, 0.125],
         )
 
         print(f"Loading {self.model_name}...")
         if auto_download:
             print("Note: Missing checkpoints will be downloaded automatically.")
-        self.vqvae, self.priors = make_model(self.model_name, self.device, hps, auto_download=auto_download)
+        self.vqvae, self.priors = make_model(
+            self.model_name, self.device, hps, auto_download=auto_download
+        )
         self.hps = hps
         print("✓ Model loaded successfully")
 
@@ -64,7 +66,7 @@ class Jukebox:
         lyrics="",
         duration_seconds=20,
         temperature=0.99,
-        output_path=None
+        output_path=None,
     ):
         """
         Generate music from scratch.
@@ -84,24 +86,25 @@ class Jukebox:
             self.load(sample_length_in_seconds=duration_seconds)
 
         # Create labels
-        metas = [dict(
-            artist=artist,
-            genre=genre,
-            lyrics=lyrics,
-            total_length=duration_seconds * self.hps.sr,
-            offset=0
-        )]
-        labels = [prior.labeller.get_batch_labels(metas, self.device)
-                 for prior in self.priors]
+        metas = [
+            {
+                "artist": artist,
+                "genre": genre,
+                "lyrics": lyrics,
+                "total_length": duration_seconds * self.hps.sr,
+                "offset": 0,
+            }
+        ]
+        labels = [prior.labeller.get_batch_labels(metas, self.device) for prior in self.priors]
 
         # Sampling kwargs - optimized for GPU
         # Larger batch sizes = better GPU utilization
-        chunk_size = 32 if self.model_name == '1b_lyrics' else 16
-        max_batch_size = 32 if self.model_name == '1b_lyrics' else 16
+        chunk_size = 32 if self.model_name == "1b_lyrics" else 16
+        max_batch_size = 32 if self.model_name == "1b_lyrics" else 16
         sampling_kwargs = [
-            dict(temp=temperature, fp16=True, chunk_size=64, max_batch_size=32),
-            dict(temp=temperature, fp16=True, chunk_size=64, max_batch_size=32),
-            dict(temp=temperature, fp16=True, chunk_size=chunk_size, max_batch_size=max_batch_size)
+            {"temp": temperature, "fp16": True, "chunk_size": 64, "max_batch_size": 32},
+            {"temp": temperature, "fp16": True, "chunk_size": 64, "max_batch_size": 32},
+            {"temp": temperature, "fp16": True, "chunk_size": chunk_size, "max_batch_size": max_batch_size},
         ]
 
         # Generate
@@ -124,8 +127,9 @@ class Jukebox:
                 os.makedirs(output_dir, exist_ok=True)
                 # Save directly using soundfile for single file
                 import soundfile
+
                 aud_clipped = torch.clamp(torch.from_numpy(audio), -1, 1).numpy()
-                soundfile.write(output_path, aud_clipped[0], samplerate=self.hps.sr, format='wav')
+                soundfile.write(output_path, aud_clipped[0], samplerate=self.hps.sr, format="wav")
                 print(f"Saved to {output_path}")
             else:  # Directory path
                 os.makedirs(output_path, exist_ok=True)
@@ -135,11 +139,7 @@ class Jukebox:
         return audio
 
     def generate_from_audio(
-        self,
-        prompt_audio,
-        prompt_duration=12,
-        total_duration=30,
-        output_path=None
+        self, prompt_audio, prompt_duration=12, total_duration=30, output_path=None
     ):
         """
         Generate music continuation from an audio prompt.
@@ -158,26 +158,27 @@ class Jukebox:
 
         # Load prompt
         if isinstance(prompt_audio, str):
-            x = load_prompts([prompt_audio],
-                           prompt_duration * self.hps.sr,
-                           self.hps,
-                           device=self.device)
+            x = load_prompts(
+                [prompt_audio], prompt_duration * self.hps.sr, self.hps, device=self.device
+            )
         else:
             x = torch.from_numpy(prompt_audio).unsqueeze(0).to(self.device)
 
         # Create empty labels
-        metas = [dict(artist="", genre="", lyrics="",
-                     total_length=total_duration * self.hps.sr, offset=0)]
-        labels = [prior.labeller.get_batch_labels(metas, self.device)
-                 for prior in self.priors]
+        metas = [
+            {
+                "artist": "", "genre": "", "lyrics": "", "total_length": total_duration * self.hps.sr, "offset": 0
+            }
+        ]
+        labels = [prior.labeller.get_batch_labels(metas, self.device) for prior in self.priors]
 
         # Sampling kwargs - optimized for GPU
-        chunk_size = 32 if self.model_name == '1b_lyrics' else 16
-        max_batch_size = 32 if self.model_name == '1b_lyrics' else 16
+        chunk_size = 32 if self.model_name == "1b_lyrics" else 16
+        max_batch_size = 32 if self.model_name == "1b_lyrics" else 16
         sampling_kwargs = [
-            dict(temp=0.99, fp16=True, chunk_size=64, max_batch_size=32),
-            dict(temp=0.99, fp16=True, chunk_size=64, max_batch_size=32),
-            dict(temp=0.99, fp16=True, chunk_size=chunk_size, max_batch_size=max_batch_size)
+            {"temp": 0.99, "fp16": True, "chunk_size": 64, "max_batch_size": 32},
+            {"temp": 0.99, "fp16": True, "chunk_size": 64, "max_batch_size": 32},
+            {"temp": 0.99, "fp16": True, "chunk_size": chunk_size, "max_batch_size": max_batch_size},
         ]
 
         # Generate
@@ -200,8 +201,9 @@ class Jukebox:
                 os.makedirs(output_dir, exist_ok=True)
                 # Save directly using soundfile for single file
                 import soundfile
+
                 aud_clipped = torch.clamp(torch.from_numpy(audio), -1, 1).numpy()
-                soundfile.write(output_path, aud_clipped[0], samplerate=self.hps.sr, format='wav')
+                soundfile.write(output_path, aud_clipped[0], samplerate=self.hps.sr, format="wav")
                 print(f"Saved to {output_path}")
             else:  # Directory path
                 os.makedirs(output_path, exist_ok=True)

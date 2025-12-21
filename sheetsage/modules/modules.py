@@ -51,9 +51,7 @@ class Encoder(nn.Module):
 
     def forward(self, src_emb, src_len):
         src_max_len, batch_size, _ = src_emb.shape
-        if not (
-            torch.all(0 <= src_len).item() and torch.all(src_len <= src_max_len).item()
-        ):
+        if not (torch.all(0 <= src_len).item() and torch.all(src_len <= src_max_len).item()):
             raise ValueError("Invalid sequence lengths")
         if src_emb.shape[-1] != self.src_emb_dim:
             raise ValueError()
@@ -69,7 +67,9 @@ class IdentityEncoder(Encoder):
 
 
 class MLPEncoder(Encoder):
-    def __init__(self, src_emb_dim, hidden_layer_dims=[512], dropout_p=0.5):
+    def __init__(self, src_emb_dim, hidden_layer_dims=None, dropout_p=0.5):
+        if hidden_layer_dims is None:
+            hidden_layer_dims = [512]
         super().__init__(src_emb_dim)
         self.num_layers = len(hidden_layer_dims)
         d = self.src_emb_dim
@@ -134,9 +134,9 @@ class TransformerEncoder(Encoder):
         src_max_len, batch_size, _ = src_emb.shape
 
         # Create sequence mask
-        seq_idxs = torch.arange(
-            0, src_max_len, dtype=src_len.dtype, device=src_emb.device
-        ).expand(batch_size, -1)
+        seq_idxs = torch.arange(0, src_max_len, dtype=src_len.dtype, device=src_emb.device).expand(
+            batch_size, -1
+        )
         # NOTE: True means *do* mask that position
         src_key_padding_mask = seq_idxs >= src_len.unsqueeze(1)
 
@@ -160,15 +160,10 @@ class Decoder(nn.Module):
             raise ValueError("Batch sizes must be the same")
         src_max_len, batch_size, _ = src_enc.shape
         tgt_max_len, _, _ = tgt_emb.shape
-        if not (
-            torch.all(0 <= src_len).item() and torch.all(src_len <= src_max_len).item()
-        ):
+        if not (torch.all(0 <= src_len).item() and torch.all(src_len <= src_max_len).item()):
             raise ValueError("Invalid sequence lengths")
         if tgt_len is not None:
-            if not (
-                torch.all(0 <= tgt_len).item()
-                and torch.all(tgt_len <= tgt_max_len).item()
-            ):
+            if not (torch.all(0 <= tgt_len).item() and torch.all(tgt_len <= tgt_max_len).item()):
                 raise ValueError("Invalid sequence lengths")
         if src_enc.shape[-1] != self.src_enc_dim:
             raise ValueError()
@@ -225,25 +220,23 @@ class TransformerDecoder(Decoder):
         tgt_max_len, _, _ = tgt_emb.shape
 
         # Create src mask (based on sequence length)
-        seq_idxs = torch.arange(
-            0, src_max_len, dtype=src_len.dtype, device=src_enc.device
-        ).expand(batch_size, -1)
+        seq_idxs = torch.arange(0, src_max_len, dtype=src_len.dtype, device=src_enc.device).expand(
+            batch_size, -1
+        )
         # NOTE: True means *do* mask that position
         src_key_padding_mask = seq_idxs >= src_len.unsqueeze(1)
 
         # Create tgt mask (causal)
         tgt_mask = (
             torch.triu(
-                torch.ones(
-                    (tgt_max_len, tgt_max_len), dtype=torch.bool, device=tgt_emb.device
-                )
+                torch.ones((tgt_max_len, tgt_max_len), dtype=torch.bool, device=tgt_emb.device)
             )
             == 1
         ).transpose(0, 1)
         tgt_mask = (
             tgt_mask.float()
             .masked_fill(tgt_mask == 0, float("-inf"))
-            .masked_fill(tgt_mask == 1, float(0.0))
+            .masked_fill(tgt_mask == 1, 0.0)
         )
 
         return self.transformer(
@@ -264,7 +257,7 @@ class _TransducerImpl(nn.Module):
         src_pos_emb=False,
         src_dropout_p=0,
         enc_cls=IdentityEncoder,
-        enc_kwargs={},
+        enc_kwargs=None,
         tgt_emb_mode="identity",
         tgt_vocab_size=None,
         tgt_dim=None,
@@ -272,8 +265,12 @@ class _TransducerImpl(nn.Module):
         tgt_pos_emb=False,
         tgt_dropout_p=0,
         dec_cls=None,
-        dec_kwargs={},
+        dec_kwargs=None,
     ):
+        if dec_kwargs is None:
+            dec_kwargs = {}
+        if enc_kwargs is None:
+            enc_kwargs = {}
         super().__init__()
 
         # Init src embed

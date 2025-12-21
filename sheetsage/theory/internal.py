@@ -18,7 +18,7 @@ _SCALE_DEGREES_TO_LILY_NAME = {v: k for k, v in _LILY_NAME_TO_SCALE_DEGREES.item
 _KEY_TO_ENHARMONICS = {}
 for o, ln in zip(
     [0, 2, 4, 5, 7, 9, 11],
-    ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"],
+    ["major", "dorian", "phrygian", "lydian", "mixolydian", "minor", "locrian"], strict=False,
 ):
     for i, pc in enumerate(range(12)):
         pc = (o + (pc * 7)) % 12
@@ -138,9 +138,7 @@ class Note(_ImmutableIterable):
         enharmonics = _KEY_TO_ENHARMONICS.get(key)
         if enharmonics is None:
             raise ValueError()
-        pitch_class_str = (
-            self[0].as_human_pitch_name(enharmonics=enharmonics).as_lily_pitch_name()
-        )
+        pitch_class_str = self[0].as_human_pitch_name(enharmonics=enharmonics).as_lily_pitch_name()
         octave = (octave_0 - _LILY_ABSOLUTE_OCTAVE) + self[1]
         octave_str = ("'" if octave > 0 else ",") * abs(octave)
         return (pitch_class_str, octave_str)
@@ -179,11 +177,7 @@ class Chord(_ImmutableIterable):
             enharmonics = _KEY_TO_ENHARMONICS.get(key)
             if enharmonics is None:
                 raise ValueError()
-            root_str = (
-                self[0]
-                .as_human_pitch_name(enharmonics=enharmonics)
-                .as_lily_pitch_name()
-            )
+            root_str = self[0].as_human_pitch_name(enharmonics=enharmonics).as_lily_pitch_name()
             result = (root_str, _CHORD_DEGREES_TO_LILY_NAME.get(self[1], self[1]))
         return result
 
@@ -231,7 +225,7 @@ class _InstantEventList(_ImmutableIterable):
         instant_events = sorted(instant_events, key=lambda ie: ie[0])
 
         # Check that no two start on same offset
-        offsets = set(ie[0] for ie in instant_events)
+        offsets = {ie[0] for ie in instant_events}
         if len(offsets) != len(instant_events):
             raise ValueError()
 
@@ -252,7 +246,7 @@ class _SustainedEventList(_ImmutableIterable):
         sustained_events = sorted(sustained_events, key=lambda se: se[0])
 
         # Check that no two start on same offset
-        offsets = set(se[0] for se in sustained_events)
+        offsets = {se[0] for se in sustained_events}
         if len(offsets) != len(sustained_events):
             raise ValueError()
 

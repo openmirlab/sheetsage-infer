@@ -1,9 +1,9 @@
 #!/usr/bin/env pytest
 """Full integration tests for the inference pipeline."""
 
-import pytest
 import logging
-from pathlib import Path
+
+import pytest
 
 logging.basicConfig(level=logging.INFO)
 
@@ -11,17 +11,17 @@ logging.basicConfig(level=logging.INFO)
 @pytest.fixture
 def test_audio_url():
     """Provide test audio URL."""
-    return 'https://foodgroup.bandcamp.com/track/universe'
+    return "https://foodgroup.bandcamp.com/track/universe"
 
 
 @pytest.fixture
 def test_params_handcrafted():
     """Parameters for handcrafted feature testing."""
     return {
-        'use_jukebox': False,
-        'segment_start_hint': 69,
-        'segment_end_hint': 88,
-        'beats_per_minute_hint': 76
+        "use_jukebox": False,
+        "segment_start_hint": 69,
+        "segment_end_hint": 88,
+        "beats_per_minute_hint": 76,
     }
 
 
@@ -29,10 +29,10 @@ def test_params_handcrafted():
 def test_params_jukebox():
     """Parameters for Jukebox feature testing."""
     return {
-        'use_jukebox': True,
-        'segment_start_hint': 69,
-        'segment_end_hint': 88,
-        'beats_per_minute_hint': 76
+        "use_jukebox": True,
+        "segment_start_hint": 69,
+        "segment_end_hint": 88,
+        "beats_per_minute_hint": 76,
     }
 
 
@@ -53,8 +53,7 @@ class TestInferenceHandcrafted:
         from sheetsage.infer import sheetsage
 
         lead_sheet, segment_beats, segment_beats_times = sheetsage(
-            test_audio_url,
-            **test_params_handcrafted
+            test_audio_url, **test_params_handcrafted
         )
 
         # Verify outputs
@@ -65,13 +64,13 @@ class TestInferenceHandcrafted:
     @pytest.mark.slow
     def test_output_types(self, test_audio_url, test_params_handcrafted):
         """Test that outputs have correct types."""
-        from sheetsage.infer import sheetsage
-        from sheetsage.theory import LeadSheet
         import numpy as np
 
+        from sheetsage.infer import sheetsage
+        from sheetsage.theory import LeadSheet
+
         lead_sheet, segment_beats, segment_beats_times = sheetsage(
-            test_audio_url,
-            **test_params_handcrafted
+            test_audio_url, **test_params_handcrafted
         )
 
         # Check types
@@ -85,8 +84,7 @@ class TestInferenceHandcrafted:
         from sheetsage.infer import sheetsage
 
         lead_sheet, segment_beats, segment_beats_times = sheetsage(
-            test_audio_url,
-            **test_params_handcrafted
+            test_audio_url, **test_params_handcrafted
         )
 
         # Beats and beat times should have same length
@@ -108,8 +106,7 @@ class TestInferenceJukebox:
 
         try:
             lead_sheet, segment_beats, segment_beats_times = sheetsage(
-                test_audio_url,
-                **test_params_jukebox
+                test_audio_url, **test_params_jukebox
             )
 
             assert lead_sheet is not None
@@ -143,7 +140,7 @@ class TestNotebookPattern:
             use_jukebox=USE_JUKEBOX,
             segment_start_hint=SEGMENT_START_HINT,
             segment_end_hint=SEGMENT_END_HINT,
-            beats_per_minute_hint=BPM_HINT
+            beats_per_minute_hint=BPM_HINT,
         )
 
         assert lead_sheet is not None
@@ -161,7 +158,7 @@ class TestNotebookPattern:
             use_jukebox=False,
             segment_start_hint=69,
             segment_end_hint=88,
-            beats_per_minute_hint=76
+            beats_per_minute_hint=76,
         )
 
         # Pattern from Cell 1
@@ -173,8 +170,8 @@ class TestNotebookPattern:
     @pytest.mark.slow
     def test_notebook_cell_2_pattern(self, test_audio_url):
         """Test Cell 2 pattern: MIDI creation."""
-        from sheetsage.infer import sheetsage
         from sheetsage.align import create_beat_to_time_fn
+        from sheetsage.infer import sheetsage
 
         # Get outputs
         lead_sheet, segment_beats, segment_beats_times = sheetsage(
@@ -182,7 +179,7 @@ class TestNotebookPattern:
             use_jukebox=False,
             segment_start_hint=69,
             segment_end_hint=88,
-            beats_per_minute_hint=76
+            beats_per_minute_hint=76,
         )
 
         # Pattern from Cell 2
@@ -202,11 +199,11 @@ class TestEdgeCases:
 
         with pytest.raises(Exception):
             sheetsage(
-                'https://invalid-url-that-does-not-exist.com/audio.mp3',
+                "https://invalid-url-that-does-not-exist.com/audio.mp3",
                 use_jukebox=False,
                 segment_start_hint=0,
                 segment_end_hint=10,
-                beats_per_minute_hint=120
+                beats_per_minute_hint=120,
             )
 
     @pytest.mark.slow
@@ -222,7 +219,7 @@ class TestEdgeCases:
                 use_jukebox=False,
                 segment_start_hint=69,
                 segment_end_hint=88,
-                beats_per_minute_hint=bpm
+                beats_per_minute_hint=bpm,
             )
 
             assert lead_sheet is not None

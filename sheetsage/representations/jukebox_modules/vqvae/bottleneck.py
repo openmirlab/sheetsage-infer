@@ -1,8 +1,9 @@
+import jukebox_modules.utils.dist_adapter as dist
 import numpy as np
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
-import jukebox_modules.utils.dist_adapter as dist
+
 
 class BottleneckBlock(nn.Module):
     def __init__(self, k_bins, emb_width, mu):
@@ -19,7 +20,7 @@ class BottleneckBlock(nn.Module):
         self.k_elem = None
         # Register buffer - will be moved to correct device when model is moved
         # Using CPU initially, will be moved by .to(device) call
-        self.register_buffer('k', t.zeros(self.k_bins, self.emb_width))
+        self.register_buffer("k", t.zeros(self.k_bins, self.emb_width))
 
     def _tile(self, x):
         d, ew = x.shape
@@ -31,7 +32,7 @@ class BottleneckBlock(nn.Module):
         return x
 
     def init_k(self, x):
-        mu, emb_width, k_bins = self.mu, self.emb_width, self.k_bins
+        _mu, emb_width, k_bins = self.mu, self.emb_width, self.k_bins
         self.init = True
         # init k_w using random vectors from x
         y = self._tile(x)
@@ -43,7 +44,7 @@ class BottleneckBlock(nn.Module):
         self.k_elem = t.ones(k_bins, device=self.k.device)
 
     def restore_k(self, num_tokens=None, threshold=1.0):
-        mu, emb_width, k_bins = self.mu, self.emb_width, self.k_bins
+        _mu, emb_width, k_bins = self.mu, self.emb_width, self.k_bins
         self.init = True
         assert self.k.shape == (k_bins, emb_width)
         self.k_sum = self.k.clone()
@@ -72,20 +73,19 @@ class BottleneckBlock(nn.Module):
 
             # Update centres
             old_k = self.k
-            self.k_sum = mu * self.k_sum + (1. - mu) * _k_sum  # w, k_bins
-            self.k_elem = mu * self.k_elem + (1. - mu) * _k_elem  # k_bins
+            self.k_sum = mu * self.k_sum + (1.0 - mu) * _k_sum  # w, k_bins
+            self.k_elem = mu * self.k_elem + (1.0 - mu) * _k_elem  # k_bins
             usage = (self.k_elem.view(k_bins, 1) >= self.threshold).float()
-            self.k = usage * (self.k_sum.view(k_bins, emb_width) / self.k_elem.view(k_bins, 1)) \
-                     + (1 - usage) * _k_rand
+            self.k = (
+                usage * (self.k_sum.view(k_bins, emb_width) / self.k_elem.view(k_bins, 1))
+                + (1 - usage) * _k_rand
+            )
             _k_prob = _k_elem / t.sum(_k_elem)  # x_l_onehot.mean(dim=-1)  # prob of each bin
             entropy = -t.sum(_k_prob * t.log(_k_prob + 1e-8))  # entropy ie how diverse
             used_curr = (_k_elem >= self.threshold).sum()
             usage = t.sum(usage)
             dk = t.norm(self.k - old_k) / np.sqrt(np.prod(old_k.shape))
-        return dict(entropy=entropy,
-                    used_curr=used_curr,
-                    usage=usage,
-                    dk=dk)
+        return {"entropy": entropy, "used_curr": used_curr, "usage": usage, "dk": dk}
 
     def preprocess(self, x):
         # NCT -> NTC -> [NT, C]
@@ -95,13 +95,15 @@ class BottleneckBlock(nn.Module):
         if x.shape[-1] == self.emb_width:
             prenorm = t.norm(x - t.mean(x)) / np.sqrt(np.prod(x.shape))
         elif x.shape[-1] == 2 * self.emb_width:
-            x1, x2 = x[...,:self.emb_width], x[...,self.emb_width:]
-            prenorm = (t.norm(x1 - t.mean(x1)) / np.sqrt(np.prod(x1.shape))) + (t.norm(x2 - t.mean(x2)) / np.sqrt(np.prod(x2.shape)))
+            x1, x2 = x[..., : self.emb_width], x[..., self.emb_width :]
+            prenorm = (t.norm(x1 - t.mean(x1)) / np.sqrt(np.prod(x1.shape))) + (
+                t.norm(x2 - t.mean(x2)) / np.sqrt(np.prod(x2.shape))
+            )
 
             # Normalise
             x = x1 + x2
         else:
-            assert False, f"Expected {x.shape[-1]} to be (1 or 2) * {self.emb_width}"
+            raise AssertionError(f"Expected {x.shape[-1]} to be (1 or 2) * {self.emb_width}")
         return x, prenorm
 
     def postprocess(self, x_l, x_d, x_shape):
@@ -114,8 +116,11 @@ class BottleneckBlock(nn.Module):
     def quantise(self, x):
         # Calculate latent code x_l
         k_w = self.k.t()
-        distance = t.sum(x ** 2, dim=-1, keepdim=True) - 2 * t.matmul(x, k_w) + t.sum(k_w ** 2, dim=0,
-                                                                                            keepdim=True)  # (N * L, b)
+        distance = (
+            t.sum(x**2, dim=-1, keepdim=True)
+            - 2 * t.matmul(x, k_w)
+            + t.sum(k_w**2, dim=0, keepdim=True)
+        )  # (N * L, b)
         min_distance, x_l = t.min(distance, dim=-1)
         fit = t.mean(min_distance)
         return x_l, fit
@@ -175,29 +180,31 @@ class BottleneckBlock(nn.Module):
         x_d = x + (x_d - x).detach()
 
         # Postprocess
-        x_l, x_d = self.postprocess(x_l, x_d, (N,T))
-        return x_l, x_d, commit_loss, dict(fit=fit,
-                                           pn=prenorm,
-                                           **update_metrics)
+        x_l, x_d = self.postprocess(x_l, x_d, (N, T))
+        return x_l, x_d, commit_loss, dict(fit=fit, pn=prenorm, **update_metrics)
 
 
 class Bottleneck(nn.Module):
     def __init__(self, l_bins, emb_width, mu, levels):
         super().__init__()
         self.levels = levels
-        level_block = lambda level: BottleneckBlock(l_bins, emb_width, mu)
+        def level_block(level):
+            return BottleneckBlock(l_bins, emb_width, mu)
         self.level_blocks = nn.ModuleList()
         for level in range(self.levels):
             self.level_blocks.append(level_block(level))
 
     def encode(self, xs):
-        zs = [level_block.encode(x) for (level_block, x) in zip(self.level_blocks, xs)]
+        zs = [level_block.encode(x) for (level_block, x) in zip(self.level_blocks, xs, strict=False)]
         return zs
 
     def decode(self, zs, start_level=0, end_level=None):
         if end_level is None:
             end_level = self.levels
-        xs_quantised = [level_block.decode(z) for (level_block, z) in zip(self.level_blocks[start_level:end_level], zs)]
+        xs_quantised = [
+            level_block.decode(z)
+            for (level_block, z) in zip(self.level_blocks[start_level:end_level], zs, strict=False)
+        ]
         return xs_quantised
 
     def forward(self, xs):
@@ -217,16 +224,18 @@ class Bottleneck(nn.Module):
                 metrics.append(metric)
         return zs, xs_quantised, commit_losses, metrics
 
+
 class NoBottleneckBlock(nn.Module):
     def restore_k(self):
         pass
+
 
 class NoBottleneck(nn.Module):
     def __init__(self, levels):
         super().__init__()
         self.level_blocks = nn.ModuleList()
         self.levels = levels
-        for level in range(levels):
+        for _level in range(levels):
             self.level_blocks.append(NoBottleneckBlock())
 
     def encode(self, xs):
@@ -242,6 +251,8 @@ class NoBottleneck(nn.Module):
         device = next(self.parameters()).device
         zero = t.zeros((), device=device)
         commit_losses = [zero for _ in range(self.levels)]
-        metrics = [dict(entropy=zero, usage=zero, used_curr=zero, pn=zero, dk=zero) for _ in range(self.levels)]
+        metrics = [
+            {"entropy": zero, "usage": zero, "used_curr": zero, "pn": zero, "dk": zero}
+            for _ in range(self.levels)
+        ]
         return xs, xs, commit_losses, metrics
-

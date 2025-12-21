@@ -109,14 +109,14 @@ class LeadSheet(_ImmutableIterable):
             if total_num_tertiary <= 0:
                 raise ValueError()
             user_defined = True
-        for l in [meter_changes, tempo_changes, key_changes, harmony, melody]:
-            if len(l) == 0:
+        for item in [meter_changes, tempo_changes, key_changes, harmony, melody]:
+            if len(item) == 0:
                 continue
-            if len(l[-1]) == 2:
-                o, _ = l[-1]
+            if len(item[-1]) == 2:
+                o, _ = item[-1]
                 d = 1
             else:
-                o, d, _ = l[-1]
+                o, d, _ = item[-1]
             if (o + d) > total_num_tertiary:
                 if user_defined:
                     raise ValueError()
@@ -229,20 +229,18 @@ class LeadSheet(_ImmutableIterable):
             elif clef == "bass":
                 midi_pitch_range = (42, 58)  # Gb at bottom of bass clef, A# at top
             else:
-                assert False
+                raise AssertionError()
             midi_pitches = np.array([ns.as_midi_pitch() for _, _, ns in melody])
             candidate_octaves = np.arange(-1000, 1000)
-            midi_pitches_adjusted = (candidate_octaves * 12)[
-                :, np.newaxis
-            ] + midi_pitches[np.newaxis, :]
+            midi_pitches_adjusted = (candidate_octaves * 12)[:, np.newaxis] + midi_pitches[
+                np.newaxis, :
+            ]
             midi_pitches_onstaff = np.logical_and(
                 midi_pitches_adjusted >= midi_pitch_range[0],
                 midi_pitches_adjusted <= midi_pitch_range[1],
             )
             best_octave = int(
-                candidate_octaves[
-                    np.argmax(midi_pitches_onstaff.astype(np.int64).sum(axis=1))
-                ]
+                candidate_octaves[np.argmax(midi_pitches_onstaff.astype(np.int64).sum(axis=1))]
             )
             melody = [(s, d, Note(ns[0], ns[1] + best_octave)) for s, d, ns in melody]
 
@@ -266,7 +264,6 @@ class LeadSheet(_ImmutableIterable):
         bar_to_notes = defaultdict(list)
         t = 0
         for d, ns in notes_and_rests:
-            tied = False
             while d > 0:
                 bar = t // tertiary_per_group
                 bar_remaining = ((bar + 1) * tertiary_per_group) - t
@@ -283,7 +280,6 @@ class LeadSheet(_ImmutableIterable):
                 lp += _NUM_SIXTEENTHS_TO_LILY_NAME[consumed]
                 lp += "~" if d > 0 else ""
                 bar_to_notes[bar].append(lp)
-                tied = True
 
         # Format notes
         melody_lily = " | ".join([" ".join(notes) for _, notes in bar_to_notes.items()])
@@ -332,24 +328,23 @@ class LeadSheet(_ImmutableIterable):
             times = [0, 1 / pps]
             tertiary_to_time_fn = create_beat_to_time_fn(tertiaries, times)
         else:
-            tertiary_to_time_fn = lambda t: pulse_to_time_fn(t / tertiary_per_pulse)
+            def tertiary_to_time_fn(t):
+                return pulse_to_time_fn(t / tertiary_per_pulse)
 
         # Adjust melody to be mostly in midi octave 5
         if adjust_melody_octave and len(melody) > 0:
             midi_pitch_range = (60, 71)
             midi_pitches = np.array([ns.as_midi_pitch() for _, _, ns in melody])
             candidate_octaves = np.arange(-1000, 1000)
-            midi_pitches_adjusted = (candidate_octaves * 12)[
-                :, np.newaxis
-            ] + midi_pitches[np.newaxis, :]
+            midi_pitches_adjusted = (candidate_octaves * 12)[:, np.newaxis] + midi_pitches[
+                np.newaxis, :
+            ]
             midi_pitches_onstaff = np.logical_and(
                 midi_pitches_adjusted >= midi_pitch_range[0],
                 midi_pitches_adjusted <= midi_pitch_range[1],
             )
             best_octave = int(
-                candidate_octaves[
-                    np.argmax(midi_pitches_onstaff.astype(np.int64).sum(axis=1))
-                ]
+                candidate_octaves[np.argmax(midi_pitches_onstaff.astype(np.int64).sum(axis=1))]
             )
             melody = [(s, d, Note(ns[0], ns[1] + best_octave)) for s, d, ns in melody]
 
@@ -418,7 +413,8 @@ class LeadSheet(_ImmutableIterable):
         skip_bad_notes_and_chords=False,
     ):
         # For theorytab we always subdivide into 1/4 beat
-        beat_to_tertiary = lambda b: round(b * 4)
+        def beat_to_tertiary(b):
+            return round(b * 4)
         end_beat = analysis["endBeat"] - 1
 
         # Meters

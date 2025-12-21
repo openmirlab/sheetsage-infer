@@ -10,36 +10,28 @@ def pytest_addoption(parser):
         "--run-slow",
         action="store_true",
         default=False,
-        help="Run slow tests (integration tests with real audio)"
+        help="Run slow tests (integration tests with real audio)",
     )
     parser.addoption(
         "--run-jukebox",
         action="store_true",
         default=False,
-        help="Run Jukebox tests (requires GPU and Jukebox installed)"
+        help="Run Jukebox tests (requires GPU and Jukebox installed)",
     )
     parser.addoption(
         "--with-lilypond",
         action="store_true",
         default=False,
-        help="Run tests requiring LilyPond binary"
+        help="Run tests requiring LilyPond binary",
     )
 
 
 def pytest_configure(config):
     """Register custom markers."""
-    config.addinivalue_line(
-        "markers", "slow: marks tests as slow (integration tests)"
-    )
-    config.addinivalue_line(
-        "markers", "gpu: marks tests as requiring GPU"
-    )
-    config.addinivalue_line(
-        "markers", "jukebox: marks tests as requiring Jukebox"
-    )
-    config.addinivalue_line(
-        "markers", "lilypond: marks tests as requiring LilyPond binary"
-    )
+    config.addinivalue_line("markers", "slow: marks tests as slow (integration tests)")
+    config.addinivalue_line("markers", "gpu: marks tests as requiring GPU")
+    config.addinivalue_line("markers", "jukebox: marks tests as requiring Jukebox")
+    config.addinivalue_line("markers", "lilypond: marks tests as requiring LilyPond binary")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -71,24 +63,20 @@ def pytest_collection_modifyitems(config, items):
 @pytest.fixture(scope="session")
 def test_audio_url():
     """Test audio URL for integration tests."""
-    return 'https://foodgroup.bandcamp.com/track/universe'
+    return "https://foodgroup.bandcamp.com/track/universe"
 
 
 @pytest.fixture(scope="session")
 def test_params():
     """Common test parameters."""
-    return {
-        'segment_start_hint': 69,
-        'segment_end_hint': 88,
-        'beats_per_minute_hint': 76
-    }
+    return {"segment_start_hint": 69, "segment_end_hint": 88, "beats_per_minute_hint": 76}
 
 
 @pytest.fixture
 def handcrafted_params(test_params):
     """Parameters for handcrafted feature tests."""
     params = test_params.copy()
-    params['use_jukebox'] = False
+    params["use_jukebox"] = False
     return params
 
 
@@ -96,5 +84,5 @@ def handcrafted_params(test_params):
 def jukebox_params(test_params):
     """Parameters for Jukebox feature tests."""
     params = test_params.copy()
-    params['use_jukebox'] = True
+    params["use_jukebox"] = True
     return params

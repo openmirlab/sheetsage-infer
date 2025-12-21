@@ -24,15 +24,14 @@ def estimate_key_changes(meter_changes, harmony, melody):
     tertiary_per_pulse = meter[1] * meter[2]
     tertiary_per_group = meter[0] * tertiary_per_pulse
     total_num_tertiary = 0 if len(harmony) == 0 else harmony[-1][0] + 1
-    total_num_tertiary = max(
-        total_num_tertiary, 0 if len(melody) == 0 else sum(melody[-1][:2])
-    )
+    total_num_tertiary = max(total_num_tertiary, 0 if len(melody) == 0 else sum(melody[-1][:2]))
     while total_num_tertiary % tertiary_per_group != 0:
         total_num_tertiary += 1
 
     # Fake tempo
     ppm = 120
-    tertiary_to_ms = lambda t: round((t / tertiary_per_pulse) / (ppm / 60) * 1000)
+    def tertiary_to_ms(t):
+        return round((t / tertiary_per_pulse) / (ppm / 60) * 1000)
 
     # "Beat" events
     lines = []
@@ -53,15 +52,11 @@ def estimate_key_changes(meter_changes, harmony, melody):
             d = harmony[i + 1][0] - t
         else:
             d = total_num_tertiary - t
-        lines.append(
-            ("Chord", tertiary_to_ms(t), tertiary_to_ms(t + d), pc_to_melisma_pc[c[0]])
-        )
+        lines.append(("Chord", tertiary_to_ms(t), tertiary_to_ms(t + d), pc_to_melisma_pc[c[0]]))
 
     # "Note" events
     for t, d, n in melody:
-        lines.append(
-            ("Note", tertiary_to_ms(t), tertiary_to_ms(t + d), n.as_midi_pitch())
-        )
+        lines.append(("Note", tertiary_to_ms(t), tertiary_to_ms(t + d), n.as_midi_pitch()))
 
     parameters = """
 verbosity=1
@@ -90,15 +85,13 @@ change_penalty=12
 %change_penalty = 0.002
     """.strip()
 
-    formatted = "\n".join(["\t".join([str(a) for a in l]) for l in lines])
+    formatted = "\n".join(["\t".join([str(a) for a in line]) for line in lines])
     with tempfile.NamedTemporaryFile() as f, tempfile.NamedTemporaryFile() as p:
         with open(f.name, "w") as f:
             f.write(formatted)
         with open(p.name, "w") as p:
             p.write(parameters)
-        res, stdout, stderr = run_cmd_sync(
-            f"melisma-key -p {p.name} {f.name}", timeout=60
-        )
+        res, stdout, stderr = run_cmd_sync(f"melisma-key -p {p.name} {f.name}", timeout=60)
         if res != 0 or len(stderr) > 0:
             raise Exception(f"{stdout}\n{stderr}".strip())
 

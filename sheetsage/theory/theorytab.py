@@ -143,7 +143,7 @@ class TheorytabKey(_TheorytabDict):
         try:
             HumanPitchName(self["tonic"])
         except ValueError:
-            raise TheorytabValueError("tonic")
+            raise TheorytabValueError("tonic") from None
 
     def as_key(self):
         return Key(
@@ -162,9 +162,7 @@ class _TheorytabNoteOrChord(_TheorytabDict):
             raise TheorytabValueError("duration")
 
     def will_sound(self, min_duration=1e-8):
-        return (
-            self["beat"] >= 1 and self["duration"] > min_duration and not self["isRest"]
-        )
+        return self["beat"] >= 1 and self["duration"] > min_duration and not self["isRest"]
 
 
 class TheorytabNote(_TheorytabNoteOrChord):
@@ -197,9 +195,7 @@ class TheorytabNote(_TheorytabNoteOrChord):
             sd = self["sd"]
             accidental_str = sd[:-1]
             if legacy_behavior:
-                accidental = _THEORYTAB_ACCIDENTAL_STR_TO_NUM_SEMITONES_LEGACY_BUG[
-                    accidental_str
-                ]
+                accidental = _THEORYTAB_ACCIDENTAL_STR_TO_NUM_SEMITONES_LEGACY_BUG[accidental_str]
             else:
                 accidental = _THEORYTAB_ACCIDENTAL_STR_TO_NUM_SEMITONES[accidental_str]
             sd = int(sd[-1]) - 1
@@ -266,9 +262,7 @@ class TheorytabChord(_TheorytabNoteOrChord):
             raise TheorytabValueError("omits")
 
         # Check 'alterations'
-        if any(
-            a not in ["b5", "#5", "b9", "#9", "#11", "b13"] for a in self["alterations"]
-        ):
+        if any(a not in ["b5", "#5", "b9", "#9", "#11", "b13"] for a in self["alterations"]):
             raise TheorytabValueError("alterations")
         if len(self["alterations"]) != len(set(self["alterations"])):
             raise TheorytabValueError("alterations")
@@ -297,9 +291,7 @@ class TheorytabChord(_TheorytabNoteOrChord):
             raise TheorytabValueError("borrowed")
 
         # Check 'type' against others
-        for name, allowed_options in _THEORYTAB_CHORD_TYPE_TO_ALLOWED_OPTIONS[
-            self["type"]
-        ].items():
+        for name, allowed_options in _THEORYTAB_CHORD_TYPE_TO_ALLOWED_OPTIONS[self["type"]].items():
             if name == "inversions":
                 if self["inversion"] not in allowed_options:
                     raise TheorytabValueError("type,inversion")
@@ -325,9 +317,7 @@ class TheorytabChord(_TheorytabNoteOrChord):
             raise TheorytabValueError("adds,suspensions")
 
         # Check 'omits,alterations'
-        if 5 in self["omits"] and (
-            "b5" in self["alterations"] or "#5" in self["alterations"]
-        ):
+        if 5 in self["omits"] and ("b5" in self["alterations"] or "#5" in self["alterations"]):
             raise TheorytabValueError("omits,alterations")
 
         # Check 'omits,suspensions'
@@ -379,7 +369,7 @@ class TheorytabChord(_TheorytabNoteOrChord):
                 chord_degrees.add(d)
 
             # Convert to list
-            chord_degrees = sorted(list(chord_degrees))
+            chord_degrees = sorted(chord_degrees)
 
             # Find scale intervals
             key_tonic_pc, key_scale_intervals = key
@@ -399,9 +389,7 @@ class TheorytabChord(_TheorytabNoteOrChord):
             major_scale_intervals = _THEORYTAB_SCALE_NAME_TO_PITCH_INTERVALS["major"]
             major_scale_intervals = [0] + np.cumsum(major_scale_intervals).tolist()
             if chord["applied"] > 0:
-                key_tonic_pc = (
-                    key_tonic_pc + key_scale_intervals[chord["root"] - 1]
-                ) % 12
+                key_tonic_pc = (key_tonic_pc + key_scale_intervals[chord["root"] - 1]) % 12
                 chord["root"] = chord["applied"]
                 key_scale_intervals = major_scale_intervals
 

@@ -2,7 +2,6 @@
 """Test feature extractors (representations)."""
 
 import pytest
-import numpy as np
 
 
 class TestHandcraftedExtractor:
@@ -42,6 +41,7 @@ class TestJukeboxExtractor:
     def test_jukebox_class_exists(self):
         """Test JukeboxEmbeddings class exists."""
         from sheetsage.representations import JukeboxEmbeddings
+
         assert JukeboxEmbeddings is not None
 
     def test_jukebox_inheritance(self):
@@ -55,7 +55,7 @@ class TestJukeboxExtractor:
         """Test JukeboxEmbeddings has required methods."""
         from sheetsage.representations import JukeboxEmbeddings
 
-        required_methods = ['__call__']
+        required_methods = ["__call__"]
         for method in required_methods:
             assert hasattr(JukeboxEmbeddings, method), f"Method '{method}' not found"
 
@@ -84,7 +84,7 @@ class TestRepresentationBase:
         from sheetsage.representations.base import Representation
 
         # Should have __call__ as abstract method
-        assert hasattr(Representation, '__call__')
+        assert callable(Representation)
 
     def test_representation_cannot_instantiate(self):
         """Test Representation cannot be instantiated directly."""
@@ -106,14 +106,17 @@ class TestInputFeatsEnum:
     def test_input_feats_enum_exists(self):
         """Test InputFeats enum can be imported."""
         from sheetsage.infer import InputFeats
+
         assert InputFeats is not None
 
     def test_input_feats_has_handcrafted(self):
         """Test InputFeats has HANDCRAFTED option."""
         from sheetsage.infer import InputFeats
-        assert hasattr(InputFeats, 'HANDCRAFTED')
+
+        assert hasattr(InputFeats, "HANDCRAFTED")
 
     def test_input_feats_has_jukebox(self):
         """Test InputFeats has JUKEBOX option."""
         from sheetsage.infer import InputFeats
-        assert hasattr(InputFeats, 'JUKEBOX')
+
+        assert hasattr(InputFeats, "JUKEBOX")

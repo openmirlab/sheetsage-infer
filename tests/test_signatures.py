@@ -1,7 +1,6 @@
 #!/usr/bin/env pytest
 """Test function signatures and API contracts."""
 
-import pytest
 import inspect
 
 
@@ -17,11 +16,11 @@ class TestSheetsageSignature:
 
         # Required parameters from notebook usage
         required = [
-            'audio',
-            'use_jukebox',
-            'segment_start_hint',
-            'segment_end_hint',
-            'beats_per_minute_hint'
+            "audio",
+            "use_jukebox",
+            "segment_start_hint",
+            "segment_end_hint",
+            "beats_per_minute_hint",
         ]
 
         for param in required:
@@ -35,11 +34,7 @@ class TestSheetsageSignature:
         params = list(sig.parameters.keys())
 
         # Known optional parameters
-        optional = [
-            'measures_per_chunk',
-            'avoid_chunking_if_possible',
-            'legacy_behavior'
-        ]
+        optional = ["measures_per_chunk", "avoid_chunking_if_possible", "legacy_behavior"]
 
         for param in optional:
             assert param in params, f"Optional parameter '{param}' not found"
@@ -67,7 +62,7 @@ class TestRepresentationSignatures:
         sig = inspect.signature(extractor.__call__)
         params = list(sig.parameters.keys())
 
-        expected = ['audio_path', 'offset', 'duration']
+        expected = ["audio_path", "offset", "duration"]
         for param in expected:
             assert param in params, f"Parameter '{param}' not found in Handcrafted.__call__"
 
@@ -76,13 +71,13 @@ class TestRepresentationSignatures:
         from sheetsage.representations import JukeboxEmbeddings
 
         # Check class has __call__ method
-        assert hasattr(JukeboxEmbeddings, '__call__')
+        assert callable(JukeboxEmbeddings)
 
         # Check signature
         sig = inspect.signature(JukeboxEmbeddings.__call__)
         params = list(sig.parameters.keys())
 
-        expected = ['audio_path', 'offset', 'duration']
+        expected = ["audio_path", "offset", "duration"]
         for param in expected:
             assert param in params, f"Parameter '{param}' not found in JukeboxEmbeddings.__call__"
 
@@ -94,27 +89,27 @@ class TestTheorySignatures:
         """Test LeadSheet.as_lily method exists."""
         from sheetsage.theory import LeadSheet
 
-        assert hasattr(LeadSheet, 'as_lily')
+        assert hasattr(LeadSheet, "as_lily")
         assert callable(LeadSheet.as_lily)
 
     def test_leadsheet_as_midi(self):
         """Test LeadSheet.as_midi method exists."""
         from sheetsage.theory import LeadSheet
 
-        assert hasattr(LeadSheet, 'as_midi')
+        assert hasattr(LeadSheet, "as_midi")
         assert callable(LeadSheet.as_midi)
 
         # Check signature
         sig = inspect.signature(LeadSheet.as_midi)
         params = list(sig.parameters.keys())
 
-        assert 'beat_to_time_fn' in params, "as_midi should accept beat_to_time_fn"
+        assert "beat_to_time_fn" in params, "as_midi should accept beat_to_time_fn"
 
     def test_leadsheet_from_theorytab(self):
         """Test LeadSheet.from_theorytab method exists."""
         from sheetsage.theory import LeadSheet
 
-        assert hasattr(LeadSheet, 'from_theorytab')
+        assert hasattr(LeadSheet, "from_theorytab")
         assert callable(LeadSheet.from_theorytab)
 
 
@@ -128,7 +123,7 @@ class TestUtilitySignatures:
         sig = inspect.signature(engrave)
         params = list(sig.parameters.keys())
 
-        expected = ['lily_code', 'out_format', 'transparent', 'trim', 'hide_footer']
+        expected = ["lily_code", "out_format", "transparent", "trim", "hide_footer"]
         for param in expected:
             assert param in params, f"Parameter '{param}' not found in engrave"
 
@@ -139,7 +134,7 @@ class TestUtilitySignatures:
         sig = inspect.signature(create_beat_to_time_fn)
         params = list(sig.parameters.keys())
 
-        expected = ['segment_beats', 'segment_beats_times']
+        expected = ["segment_beats", "segment_beats_times"]
         for param in expected:
             assert param in params, f"Parameter '{param}' not found"
 
@@ -151,4 +146,4 @@ class TestUtilitySignatures:
         params = list(sig.parameters.keys())
 
         # Should accept audio_path and optional parameters
-        assert 'audio_path' in params or 'audio' in params
+        assert "audio_path" in params or "audio" in params

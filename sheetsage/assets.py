@@ -19,15 +19,15 @@ def _init_assets():
     _ASSETS = {}
     asset_paths = set()
     for json_path in sorted(pathlib.Path(LIB_DIR, "assets").rglob("*.json")):
-        with open(json_path, "r") as f:
+        with open(json_path) as f:
             d = json.load(f)
-        for tag, asset in d.items():
+        for _tag, asset in d.items():
             if "checksum" not in asset:
                 raise AssertionError("Missing checksum")
             try:
                 asset["path"] = pathlib.PurePosixPath(asset["path"].strip())
-            except:
-                raise AssertionError("Invalid path")
+            except Exception:
+                raise AssertionError("Invalid path") from None
             if asset["path"] in asset_paths:
                 raise AssertionError("Duplicate path")
             asset_paths.add(asset["path"])
@@ -57,9 +57,7 @@ def _download_from_url(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE, log=True)
             if result.returncode != 0:
                 raise Exception(f"Mega.nz download failed: {result.stderr}")
             return
-        raise Exception(
-            "Mega.nz links require megatools. Install: sudo apt-get install megatools"
-        )
+        raise Exception("Mega.nz links require megatools. Install: sudo apt-get install megatools")
 
     with open(dest_path, "wb") as f:
         r = urllib.request.urlopen(url)
@@ -78,9 +76,7 @@ def _download_from_huggingface(asset, dest_path, log=True):
     repo_type = asset.get("huggingface_repo_type", "model")
     revision = asset.get("huggingface_revision")
     if log:
-        logging.info(
-            "Downloading from Hugging Face: repo=%s file=%s", repo_id, filename
-        )
+        logging.info("Downloading from Hugging Face: repo=%s file=%s", repo_id, filename)
     try:
         from huggingface_hub import hf_hub_download
     except ImportError as exc:
@@ -173,9 +169,7 @@ def retrieve_asset(tag, delete_wrong=False, chunk_size=_DEFAULT_CHUNK_SIZE, log=
                 algorithm = "sha256"
             else:
                 raise AssertionError("Unknown checksum algorithm")
-            computed = compute_checksum(
-                path, algorithm=algorithm, chunk_size=chunk_size
-            )
+            computed = compute_checksum(path, algorithm=algorithm, chunk_size=chunk_size)
             if computed != checksum:
                 raise Exception(f"File {path} has wrong checksum.")
 
@@ -194,14 +188,14 @@ def retrieve_asset(tag, delete_wrong=False, chunk_size=_DEFAULT_CHUNK_SIZE, log=
         try:
             _download(asset, path, chunk_size=chunk_size, log=log)
         except Exception as e:
-            raise Exception(f"Download failed: {e}")
+            raise Exception(f"Download failed: {e}") from e
     assert path.is_file()
 
     # Ensure file integrity
     if not already_verified:
         verify()
     if log:
-        logging.info(f"Verified!")
+        logging.info("Verified!")
 
     return path
 
@@ -222,7 +216,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    tags = sorted(list(get_asset_tags()))
+    tags = sorted(get_asset_tags())
     if args.startswith is not None:
         tags = [t for t in tags if t.startswith(args.startswith.strip().upper())]
 

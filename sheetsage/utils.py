@@ -183,13 +183,11 @@ def retrieve_audio_bytes(
     # Check for yt-dlp or youtube-dl
     downloader = _check_command("yt-dlp", "youtube-dl")
     cmd_template = _RETRIEVE_AUDIO_CMD_TEMPLATE.replace("youtube-dl", downloader)
-    
+
     with tempfile.TemporaryDirectory() as d:
         if max_duration_seconds is not None:
             status, stdout, stderr = run_cmd_sync(
-                cmd=cmd_template.format(
-                    url=url.strip(), other="--dump-json"
-                ),
+                cmd=cmd_template.format(url=url.strip(), other="--dump-json"),
                 cwd=d,
                 timeout=timeout,
             )
@@ -197,8 +195,8 @@ def retrieve_audio_bytes(
                 assert status == 0
                 metadata = json.loads(stdout)
                 duration = float(metadata["duration"])
-            except:
-                raise Exception(f"Failed to retrieve duration from {url}:\n{stderr}")
+            except Exception:
+                raise Exception(f"Failed to retrieve duration from {url}:\n{stderr}") from None
             if duration > max_duration_seconds:
                 raise ValueError(
                     f"Specified url is too long ({duration} > {max_duration_seconds})."
@@ -208,9 +206,7 @@ def retrieve_audio_bytes(
         status, stdout, stderr = run_cmd_sync(
             cmd=cmd_template.format(
                 url=url.strip(),
-                other=""
-                if max_filesize_mb is None
-                else f"--max-filesize {max_filesize_mb}m",
+                other="" if max_filesize_mb is None else f"--max-filesize {max_filesize_mb}m",
             ),
             cwd=d,
             timeout=timeout,
@@ -358,8 +354,8 @@ def get_approximate_audio_length(path, timeout=10):
     try:
         assert status == 0
         assert len(stderr) == 0
-    except:
-        raise Exception(f"FFmpeg failed: {stderr}")
+    except Exception:
+        raise Exception(f"FFmpeg failed: {stderr}") from None
     d = json.loads(stdout)
     duration = float(d["format"]["duration"])
     return duration
@@ -388,7 +384,7 @@ def engrave(
         raise ValueError()
     if args is not None and not isinstance(args, str):
         raise ValueError()
-    
+
     _check_command("lilypond")  # Check before use
 
     # Adjust lilypond
@@ -417,9 +413,7 @@ def engrave(
             raise Exception(f"Failed to engrave ({status}): {stderr}")
 
         # Load output pages
-        out_paths = sorted(
-            [p for p in pathlib.Path(d).glob(f"out*.{out_format}") if p.is_file()]
-        )
+        out_paths = sorted([p for p in pathlib.Path(d).glob(f"out*.{out_format}") if p.is_file()])
         if len(out_paths) == 0:
             raise Exception("No output")
         assert len(out_paths) == 1 or out_format == "png"

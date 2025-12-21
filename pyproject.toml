@@ -33,10 +33,10 @@ classifiers = [
 dependencies = [
     "torch>=2.0.0",
     "jukebox-infer>=0.1.0",
-    "madmom>=0.16.0",
+    "madmom",
     "librosa>=0.11.0",
     "numpy>=2.0.0",
-    "scipy>=1.16.0",
+    "scipy>=1.11.0",
     "audioread>=3.1.0",
     "soundfile>=0.13.0",
     "validators>=0.35.0",
@@ -68,8 +68,11 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["sheetsage"]
 
-[tool.uv.extra-build-dependencies]
-madmom = ["Cython"]
+[tool.setuptools.package-data]
+sheetsage = ["assets/*.json"]
+
+[tool.uv.sources]
+madmom = {git = "https://github.com/CPJKU/madmom.git"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -101,7 +104,12 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"__init__.py" = ["F401", "F403"]  # Allow unused imports and star imports in __init__.py
+"sheetsage/representations/jukebox_modules/**" = ["E741", "N806", "N802", "E731", "B011", "B905", "F841", "E722", "I001", "F401", "N812", "C408", "W291", "W292", "W293", "B007", "B904", "F821", "E402"]  # Vendored code - ignore style issues
+"sheetsage/representations/jukebox.py" = ["E402"]  # Imports after sys.path.insert are intentional
+"sheetsage/modules/modules.py" = ["N812"]  # PyTorch convention uses F for functional
+"examples/**" = ["F401"]  # Example files may have unused imports for demonstration
+"tests/**" = ["B004", "B017", "N806", "F401", "I001"]  # Test files - allow some style flexibility
 
 [tool.mypy]
 python_version = "3.10"

@@ -1,5 +1,5 @@
 [project]
-name = "sheetsage"
+name = "sheetsage-infer"
 version = "0.1.0"
 description = "Minimal inference-only version of SheetSage for music transcription"
 readme = "README.md"
@@ -41,14 +41,15 @@ dependencies = [
     "soundfile>=0.13.0",
     "validators>=0.35.0",
     "pillow>=12.0.0",
-    "scikit-learn>=1.7.0",
     "pretty-midi>=0.2.11",
     "tqdm>=4.0.0",
-    "yt-dlp>=2025.11.0",
     "resampy>=0.4.0",  # Required by librosa for audio resampling
 ]
 
 [project.optional-dependencies]
+youtube = [
+    "yt-dlp>=2025.11.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",

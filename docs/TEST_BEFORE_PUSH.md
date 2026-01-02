@@ -1,5 +1,7 @@
 # Pre-Push Testing Guide
 
+**Date:** 2025-12-21
+
 This guide provides commands to test your code before pushing to git.
 
 ## Quick Start (Automated Script)

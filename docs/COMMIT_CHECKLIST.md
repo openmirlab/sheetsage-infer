@@ -1,5 +1,7 @@
 # Pre-Commit Checklist
 
+**Date:** 2026-01-01
+
 ## Files to Include
 
 ### ✅ Core Configuration Files
@@ -51,7 +53,7 @@
 
 ### ⚠️ Development Tools (Optional)
 - [ ] `test_before_push_py310.sh` - Pre-push test script (useful for contributors)
-- [ ] `TEST_BEFORE_PUSH.md` - Testing documentation (useful for contributors)
+- [ ] `docs/TEST_BEFORE_PUSH.md` - Testing documentation (useful for contributors)
 
 ## Files to Exclude (Already in .gitignore)
 
@@ -99,6 +101,6 @@ git status --ignored | grep -E "(venv|__pycache__|dist|build)"
 **Optional Files (Consider Including):**
 - `requirements.txt` (for pip compatibility)
 - `test_before_push_py310.sh` (useful for contributors)
-- `TEST_BEFORE_PUSH.md` (documentation)
+- `docs/TEST_BEFORE_PUSH.md` (documentation)
 
 

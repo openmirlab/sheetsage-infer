@@ -1,8 +1,0 @@
-feat: configure package data and improve code quality
-
-- Add package-data configuration to include asset JSON files in distribution
-- Update uv.lock with latest dependency resolutions
-- Fix linting errors and improve code structure across codebase
-
-This ensures asset files are properly included in the built package
-and maintains production-ready code quality.

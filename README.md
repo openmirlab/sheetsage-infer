@@ -1,6 +1,6 @@
 # SheetSage-Infer
 
-**Inference-only version of SheetSage for music transcription with vendored Jukebox modules and comprehensive testing.**
+**Inference-only version of SheetSage for music transcription with vendored Jukebox modules.**
 
 [![PyPI](https://img.shields.io/pypi/v/sheetsage-infer)](https://pypi.org/project/sheetsage-infer/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -12,30 +12,17 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 ## 📌 Overview
 
-**SheetSage-Infer** is a streamlined, inference-only version of [SheetSage](https://github.com/chrisdonahue/sheetsage), optimized for easier deployment and integration as a library package with vendored Jukebox modules.
-
-> **Note**: This project is based on [SheetSage](https://github.com/chrisdonahue/sheetsage) by Chris Donahue. All credit for the original model and research belongs to the original authors.
-
----
-
-## 🎉 What's New
-
-- **Latest**: Inference-only version with vendored Jukebox modules, comprehensive test suite (75+ tests), and improved dependency management
+**SheetSage-Infer** is an inference-only version of [SheetSage](https://github.com/chrisdonahue/sheetsage) for music transcription, optimized for easy deployment with vendored Jukebox modules.
 
 ---
 
 ## ✨ Features
 
-- ✅ **Vendored Jukebox Modules** - No external Jukebox dependency needed; works out of the box
-- ✅ **CPU & GPU Support** - Handcrafted mel-spectrograms (CPU) or Jukebox embeddings (GPU)
-- ✅ **Beat Detection** - Automatic beat tracking and time signature estimation
-- ✅ **Melody Transcription** - Note sequences with pitches and durations
-- ✅ **Harmony Transcription** - Chord progressions with symbols and timing
+- ✅ **Vendored Jukebox Modules** - No external Jukebox dependency needed
+- ✅ **CPU & GPU Support** - Handcrafted features (CPU) or Jukebox embeddings (GPU)
 - ✅ **Multiple Export Formats** - LilyPond notation, MIDI files, PDF generation
-- ✅ **Audio from URLs** - Support for YouTube, Bandcamp, and other audio sources
-- ✅ **Comprehensive Testing** - Full pytest test suite with 75+ tests
-- ✅ **Modern Python** - Compatible with Python 3.10, 3.11, 3.12
-- ✅ **Simple API** - High-level `sheetsage()` function for easy transcription
+- ✅ **Audio from URLs** - Support for YouTube, Bandcamp, and other sources
+- ✅ **Simple API** - High-level `sheetsage()` function
 
 ---
 
@@ -59,18 +46,10 @@ uv add sheetsage-infer
 **For Development:**
 
 ```bash
-# Clone the repository
 git clone https://github.com/openmirlab/sheetsage-infer.git
 cd sheetsage-infer
-
-# Install in editable mode
-pip install -e .
-
-# Or with uv
-uv pip install -e .
+pip install -e ".[dev]"
 ```
-
-> **Package:** https://pypi.org/project/sheetsage-infer/
 
 ### Prerequisites
 
@@ -129,7 +108,7 @@ lead_sheet, beats, beat_times = sheetsage(
 )
 ```
 
-**Note**: With vendored Jukebox modules, this works without external Jukebox installation!
+**Note**: Jukebox features require GPU with ≥12GB VRAM. Vendored modules work without external installation.
 
 ### Command-Line Interface
 
@@ -170,11 +149,12 @@ Transcription speed depends on audio length and feature extraction method:
 
 ---
 
-## 📚 Documentation
+## 📚 Examples
 
-- **[CLAUDE.md](CLAUDE.md)** - Comprehensive project documentation for Claude Code integration
-- **[tests/README_TESTS.md](tests/README_TESTS.md)** - Complete testing guide
-- **[examples/basic_transcription.py](examples/basic_transcription.py)** - Basic usage examples
+See `examples/` directory for usage examples:
+- `basic_transcription.py` - Basic usage
+- `jukebox_transcription.py` - GPU-based transcription
+- `hooktheory_example.py` - Working with Hooktheory data
 
 ---
 
@@ -182,37 +162,41 @@ Transcription speed depends on audio length and feature extraction method:
 
 ```
 sheetsage-infer/
-├── sheetsage/              # Main package
-│   ├── infer.py           # Main transcription pipeline
-│   ├── align.py           # Beat-to-time alignment
-│   ├── beat_track.py      # Beat detection
-│   ├── utils.py           # LilyPond engraving, audio I/O
-│   ├── modules/           # Neural network models
-│   ├── representations/   # Feature extractors
-│   │   ├── handcrafted.py # CPU-based mel-spectrograms
-│   │   ├── jukebox.py     # Jukebox embedding interface
-│   │   └── jukebox_modules/ # Vendored Jukebox code
-│   └── theory/            # Music theory classes
-│       ├── lead_sheet.py  # LeadSheet class with export methods
-│       ├── basic.py       # Basic music theory primitives
-│       └── internal.py    # Internal theory classes
-├── tests/                 # Test suite
-│   ├── test_imports.py    # Import verification (20 tests)
-│   ├── test_signatures.py # API contract tests (10 tests)
-│   ├── test_representations.py # Feature extractors (10 tests)
-│   ├── test_integration_full.py # Full pipeline tests (10 tests)
-│   ├── test_output_formats.py # LilyPond/MIDI tests (10 tests)
-│   └── test_theory_classes.py # Music theory (15 tests)
-├── examples/              # Example scripts
-│   └── basic_transcription.py
-├── pyproject.toml
-├── LICENSE
+├── sheetsage/                    # Main package
+│   ├── infer.py                 # Main transcription pipeline
+│   ├── align.py                 # Beat-to-time alignment
+│   ├── beat_track.py             # Beat detection
+│   ├── utils.py                 # LilyPond engraving, audio I/O
+│   ├── assets.py                 # Asset management
+│   ├── modules/                  # Neural network models
+│   │   └── modules.py            # Transformer architectures
+│   ├── representations/          # Feature extractors
+│   │   ├── handcrafted.py       # CPU-based mel-spectrograms
+│   │   ├── jukebox.py            # Jukebox embedding interface
+│   │   └── jukebox_modules/     # Vendored Jukebox code
+│   └── theory/                   # Music theory classes
+│       ├── lead_sheet.py         # LeadSheet class with export methods
+│       ├── basic.py              # Basic music theory primitives
+│       └── internal.py           # Internal theory classes
+├── tests/                        # Test suite
+│   ├── test_imports.py           # Import verification
+│   ├── test_signatures.py        # API contract tests
+│   ├── test_representations.py   # Feature extractors
+│   ├── test_integration_full.py  # Full pipeline tests
+│   ├── test_output_formats.py   # LilyPond/MIDI tests
+│   └── test_theory_classes.py    # Music theory tests
+├── examples/                     # Example scripts
+│   ├── basic_transcription.py    # Basic usage
+│   ├── jukebox_transcription.py # GPU-based transcription
+│   └── hooktheory_example.py    # Hooktheory data examples
+├── docs/                         # Documentation
+├── pyproject.toml               # Project configuration
 └── README.md
 ```
 
 ---
 
-## ✅ Changes from Original SheetSage
+## 🔄 Changes from Original SheetSage
 
 **SheetSage-Infer** has been modified from the [original SheetSage](https://github.com/chrisdonahue/sheetsage) to make it more suitable for library use and easier to maintain.
 
@@ -221,11 +205,10 @@ sheetsage-infer/
 | Feature | Original | This Version |
 |---------|----------|--------------|
 | **Jukebox Dependency** | External, complex install | Vendored, works out of box |
-| **Test Coverage** | Limited | 75+ comprehensive tests |
+| **Test Coverage** | Limited | Test suite included |
 | **Python Support** | 3.12+ only | 3.10, 3.11, 3.12 |
 | **Build System** | Hatch | Setuptools (standard) |
 | **Dependency Pins** | Loose | Explicit versions |
-| **Documentation** | Basic | CLAUDE.md + test docs |
 
 ### What We Maintain
 
@@ -239,9 +222,7 @@ sheetsage-infer/
 
 - **Vendored Jukebox Modules**: Eliminates complex external dependency
 - **Library-First Design**: Optimized for `pip install` and programmatic use
-- **Comprehensive Testing**: Full pytest test suite with 75+ tests
 - **Better Dependency Management**: Explicit version pins and compatibility
-- **AI Assistant Ready**: Includes CLAUDE.md for Claude Code integration
 
 ---
 
@@ -259,17 +240,16 @@ This work introduced hierarchical music transcription with melody and harmony ex
 
 ### Original Author
 
-- Chris Donahue
+- **Chris Donahue** - Original SheetSage creator
 
 ### About This Implementation
 
-> **Note**: This package was created to continue the excellent work by providing easier deployment, vendored Jukebox modules, and comprehensive testing, while preserving 100% of the original model quality and algorithms.
+This package was created to continue the excellent work by providing easier deployment and vendored Jukebox modules, while preserving 100% of the original model quality and algorithms.
 
 **What we maintain:**
 - PyTorch 2.0+ compatibility
 - Modern dependency management
 - Inference-only packaging
-- Comprehensive testing
 
 **What remains unchanged:**
 - All model architectures (100% original)
@@ -323,11 +303,9 @@ This project includes code adapted from [SheetSage](https://github.com/chrisdona
 
 We welcome contributions! Please:
 
-1. Read [CLAUDE.md](CLAUDE.md) for development guidelines
-2. Follow the code style (ruff/black)
-3. Add tests for new features
-4. Update documentation
-5. Submit PRs with clear descriptions
+1. Follow the code style (ruff/black)
+2. Add tests for new features
+3. Submit PRs with clear descriptions
 
 ### Development Setup
 
@@ -338,14 +316,9 @@ pip install -e ".[dev]"
 # Run tests
 pytest tests/
 
-# Run with coverage
-pytest tests/ --cov=sheetsage --cov-report=html
-
 # Format and lint code
 ruff format . && ruff check .
 ```
-
-See [tests/README_TESTS.md](tests/README_TESTS.md) for detailed testing guide.
 
 ---
 
@@ -353,8 +326,7 @@ See [tests/README_TESTS.md](tests/README_TESTS.md) for detailed testing guide.
 
 For issues and questions:
 - **GitHub Issues**: [github.com/openmirlab/sheetsage-infer/issues](https://github.com/openmirlab/sheetsage-infer/issues)
-- **Documentation**: `CLAUDE.md`, `tests/README_TESTS.md`
-- **Examples**: `examples/`
+- **Examples**: `examples/` directory
 
 ---
 
@@ -362,9 +334,7 @@ For issues and questions:
 
 - **Original SheetSage**: https://github.com/chrisdonahue/sheetsage
 - **This Repository**: https://github.com/openmirlab/sheetsage-infer
-- **OpenAI Jukebox**: https://github.com/openai/jukebox (vendored components)
-- **Test Documentation**: [tests/README_TESTS.md](tests/README_TESTS.md)
-- **Claude Code Guide**: [CLAUDE.md](CLAUDE.md)
+- **PyPI Package**: https://pypi.org/project/sheetsage-infer/
 
 ---
 

@@ -168,6 +168,12 @@ sheetsage-infer/
 │   ├── beat_track.py             # Beat detection
 │   ├── utils.py                 # LilyPond engraving, audio I/O
 │   ├── assets.py                 # Asset management
+│   ├── assets/                   # Asset JSON files
+│   │   ├── hooktheory.json
+│   │   ├── jukebox.json
+│   │   ├── rwc.json
+│   │   ├── sheetsage.json
+│   │   └── test.json
 │   ├── modules/                  # Neural network models
 │   │   └── modules.py            # Transformer architectures
 │   ├── representations/          # Feature extractors
@@ -177,21 +183,28 @@ sheetsage-infer/
 │   └── theory/                   # Music theory classes
 │       ├── lead_sheet.py         # LeadSheet class with export methods
 │       ├── basic.py              # Basic music theory primitives
-│       └── internal.py           # Internal theory classes
-├── tests/                        # Test suite
-│   ├── test_imports.py           # Import verification
-│   ├── test_signatures.py        # API contract tests
-│   ├── test_representations.py   # Feature extractors
-│   ├── test_integration_full.py  # Full pipeline tests
-│   ├── test_output_formats.py   # LilyPond/MIDI tests
-│   └── test_theory_classes.py    # Music theory tests
+│       ├── internal.py           # Internal theory classes
+│       ├── theorytab.py          # TheoryTab integration
+│       └── utils.py              # Theory utilities
 ├── examples/                     # Example scripts
 │   ├── basic_transcription.py    # Basic usage
-│   ├── jukebox_transcription.py # GPU-based transcription
-│   └── hooktheory_example.py    # Hooktheory data examples
+│   ├── jukebox_transcription.py  # GPU-based transcription
+│   ├── hooktheory_example.py     # Hooktheory data examples
+│   ├── hooktheory_simple.py     # Simple Hooktheory example
+│   └── transcribe_hooktheory_segments.py  # Hooktheory segment transcription
+├── hooktheory_data/              # Test data
+│   ├── Hooktheory_Test_MIDI.tar.gz
+│   └── Hooktheory_Test_Segments.json
 ├── docs/                         # Documentation
+│   └── generated/               # Generated documentation
+├── .github/                      # GitHub configuration
+│   └── workflows/
+│       └── publish.yml           # PyPI publishing workflow
 ├── pyproject.toml               # Project configuration
-└── README.md
+├── requirements.txt             # Python dependencies
+├── uv.lock                      # UV lock file
+├── LICENSE                      # MIT License
+└── README.md                    # This file
 ```
 
 ---

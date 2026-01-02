@@ -1,5 +1,5 @@
 [project]
-name = "sheetsage-infer"
+name = "openmirlab-sheetsage-infer"
 version = "0.1.1"
 description = "Minimal inference-only version of SheetSage for music transcription"
 readme = "README.md"

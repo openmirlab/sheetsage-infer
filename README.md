@@ -2,7 +2,7 @@
 
 **Inference-only version of SheetSage for music transcription with vendored Jukebox modules.**
 
-[![PyPI](https://img.shields.io/pypi/v/sheetsage-infer)](https://pypi.org/project/sheetsage-infer/)
+[![PyPI](https://img.shields.io/pypi/v/openmirlab-sheetsage-infer)](https://pypi.org/project/openmirlab-sheetsage-infer/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -347,7 +347,7 @@ For issues and questions:
 
 - **Original SheetSage**: https://github.com/chrisdonahue/sheetsage
 - **This Repository**: https://github.com/openmirlab/sheetsage-infer
-- **PyPI Package**: https://pypi.org/project/sheetsage-infer/
+- **PyPI Package**: https://pypi.org/project/openmirlab-sheetsage-infer/
 
 ---
 

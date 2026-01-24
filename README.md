@@ -34,13 +34,13 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 ```bash
 # Using pip
-pip install sheetsage-infer
+pip install openmirlab-sheetsage-infer
 
 # Using uv (recommended - faster)
-uv pip install sheetsage-infer
+uv pip install openmirlab-sheetsage-infer
 
 # Or add to your project with uv
-uv add sheetsage-infer
+uv add openmirlab-sheetsage-infer
 ```
 
 **For Development:**

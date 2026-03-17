@@ -44,9 +44,9 @@ def _librosa_fallback(sr, audio, beats_per_bar=None, beats_per_minute_hint=None)
         audio = np.mean(audio, axis=1)
     audio = audio.astype(np.float32, copy=False)
 
-    start_bpm = None
+    start_bpm = 120.0  # default for librosa (None not accepted in librosa >=0.10)
     if beats_per_minute_hint is not None and beats_per_minute_hint > 0:
-        start_bpm = beats_per_minute_hint
+        start_bpm = float(beats_per_minute_hint)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

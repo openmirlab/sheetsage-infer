@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -459,7 +459,7 @@ wheels = [
 
 [[package]]
 name = "jukebox-infer"
-version = "0.1.0"
+version = "0.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "librosa" },
@@ -470,9 +470,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "unidecode" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/a0/fb9da94efdbc16f487391740843d59f491acf6866b924b98c260a63a03ea/jukebox_infer-0.1.0.tar.gz", hash = "sha256:ff014b6b6b87b3c9e660dea43dfcc5b311189325ef2ee7ded5573ae5af685955", size = 159866, upload-time = "2025-11-25T05:34:44.504Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/72/021ca37af75dde17df89a6e7a72bea15da1d9c59c8ca4109386c6ad74bde/jukebox_infer-0.1.1.tar.gz", hash = "sha256:65b820ed978d0497d0d2b8b8a7879df06cd7c6fd7340d7eecb8b4c626a16d6e8", size = 164047, upload-time = "2026-07-11T14:29:32.409Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ee/b3/4ce67b7a6fa752d5d9488d3c81e47caad167e6dff942e61ab306633ded87/jukebox_infer-0.1.0-py3-none-any.whl", hash = "sha256:92f553a163961090344c61fbc2a34a5188706d741465108942d3665ac1e96a77", size = 172703, upload-time = "2025-11-25T05:34:42.512Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/80/77346cc6f1468c0f95435d4ea923cebb6f3aa0dfd1a7b20f88fda7f0675f/jukebox_infer-0.1.1-py3-none-any.whl", hash = "sha256:5343eef7049a30992cf8abd0cb82e603d91f580cbfadb13dca01736fabe2b728", size = 178215, upload-time = "2026-07-11T14:29:31.116Z" },
 ]
 
 [[package]]
@@ -1193,6 +1193,61 @@ wheels = [
 ]
 
 [[package]]
+name = "openmirlab-sheetsage-infer"
+version = "0.1.1"
+source = { editable = "." }
+dependencies = [
+    { name = "audioread" },
+    { name = "jukebox-infer" },
+    { name = "librosa" },
+    { name = "madmom" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "pillow" },
+    { name = "pretty-midi" },
+    { name = "resampy" },
+    { name = "scipy" },
+    { name = "soundfile" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "validators" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+youtube = [
+    { name = "yt-dlp" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "audioread", specifier = ">=3.1.0" },
+    { name = "jukebox-infer", specifier = ">=0.1.1" },
+    { name = "librosa", specifier = ">=0.11.0" },
+    { name = "madmom", git = "https://github.com/CPJKU/madmom.git" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
+    { name = "numpy", specifier = ">=2.0.0" },
+    { name = "pillow", specifier = ">=12.0.0" },
+    { name = "pretty-midi", specifier = ">=0.2.11" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+    { name = "resampy", specifier = ">=0.4.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "scipy", specifier = ">=1.11.0" },
+    { name = "soundfile", specifier = ">=0.13.0" },
+    { name = "torch", specifier = ">=2.0.0" },
+    { name = "tqdm", specifier = ">=4.0.0" },
+    { name = "validators", specifier = ">=0.35.0" },
+    { name = "yt-dlp", marker = "extra == 'youtube'", specifier = ">=2025.11.0" },
+]
+provides-extras = ["youtube", "dev"]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1568,61 +1623,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
 ]
-
-[[package]]
-name = "sheetsage"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "audioread" },
-    { name = "jukebox-infer" },
-    { name = "librosa" },
-    { name = "madmom" },
-    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "pillow" },
-    { name = "pretty-midi" },
-    { name = "resampy" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "soundfile" },
-    { name = "torch" },
-    { name = "tqdm" },
-    { name = "validators" },
-    { name = "yt-dlp" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "audioread", specifier = ">=3.1.0" },
-    { name = "jukebox-infer", specifier = ">=0.1.0" },
-    { name = "librosa", specifier = ">=0.11.0" },
-    { name = "madmom", git = "https://github.com/CPJKU/madmom.git" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "numpy", specifier = ">=2.0.0" },
-    { name = "pillow", specifier = ">=12.0.0" },
-    { name = "pretty-midi", specifier = ">=0.2.11" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "resampy", specifier = ">=0.4.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "scikit-learn", specifier = ">=1.7.0" },
-    { name = "scipy", specifier = ">=1.11.0" },
-    { name = "soundfile", specifier = ">=0.13.0" },
-    { name = "torch", specifier = ">=2.0.0" },
-    { name = "tqdm", specifier = ">=4.0.0" },
-    { name = "validators", specifier = ">=0.35.0" },
-    { name = "yt-dlp", specifier = ">=2025.11.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "six"

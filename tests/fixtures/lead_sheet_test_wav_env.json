@@ -1,0 +1,8 @@
+{
+  "torch": "2.9.1+cu128",
+  "librosa": "0.11.0",
+  "numpy": "2.3.5",
+  "python": "3.11.13",
+  "platform": "Linux-6.17.0-35-generic-x86_64-with-glibc2.39",
+  "device": "cpu"
+}

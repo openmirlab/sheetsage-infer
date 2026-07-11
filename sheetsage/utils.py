@@ -1,3 +1,13 @@
+"""Audio I/O, LilyPond engraving, and misc helpers shared across the package.
+
+Covers: fetching/decoding audio (files, bytes, or URLs via yt-dlp/ffmpeg),
+checksum-verified downloads (paired with .assets), and `engrave()` which
+shells out to `lilypond` to render `.ly` source into PDF/PNG/etc.
+
+Reads: (leaf module: stdlib + librosa/soundfile/subprocess); read by:
+sheetsage.infer, sheetsage.assets, sheetsage.representations.*
+"""
+
 import gzip
 import hashlib
 import json

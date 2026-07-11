@@ -5,7 +5,7 @@ Example script for transcribing audio using SheetSage with Jukebox embeddings.
 This script demonstrates how to use Jukebox features for higher-quality transcription.
 Jukebox features require:
 - GPU with >=12GB VRAM (recommended)
-- Jukebox modules (vendored in this repository)
+- The `jukebox-infer` package (a regular pip dependency of this project)
 - Slower processing time but better transcription quality
 
 Note: Jukebox features are slower but provide better transcription quality

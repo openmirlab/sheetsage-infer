@@ -1,0 +1,36 @@
+SheetSage-Infer
+Copyright (c) 2022 Chris Donahue (original SheetSage)
+Copyright (c) 2025 SheetSage-Infer contributors (this fork/repackaging)
+
+This repository has two different licenses depending on the artifact:
+
+1. CODE (everything under sheetsage/, tests/, examples/, this repo's own
+   source in general): MIT License. See LICENSE.
+
+2. WEIGHTS AND DATA downloaded at runtime via `sheetsage.assets` (the
+   entries in sheetsage/assets/*.json -- trained model checkpoints such as
+   SHEETSAGE_V02_HANDCRAFTED_*, and HookTheory-derived data/segments/MIDI
+   such as HOOKTHEORY_*): CC BY-NC-SA 3.0, because they are derived from
+   user contributions on HookTheory (https://forum.hooktheory.com/tos) and
+   inherit that non-commercial, share-alike restriction. These are fetched
+   on demand and are NOT distributed inside this package's source
+   distribution or wheel; the CC BY-NC-SA terms apply to what you download,
+   not to this repo's code.
+
+   The Jukebox checkpoints (JUKEBOX_VQVAE, JUKEBOX_LM in
+   sheetsage/assets/jukebox.json) are OpenAI's original Jukebox weights,
+   distributed under OpenAI's terms -- see
+   https://github.com/openai/jukebox for the upstream license.
+
+Third-party dependencies retain their own licenses, notably:
+  - jukebox_infer (github.com/openmirlab/jukebox-infer): MIT
+  - madmom (github.com/CPJKU/madmom): BSD-2-Clause source code, but its
+    bundled pretrained models (including the DBNDownBeatTracker model this
+    project's beat-tracking path uses -- see sheetsage/beat_track.py) are
+    separately CC BY-NC-SA 4.0, same restriction as (2) above.
+  - librosa, torch, numpy, scipy, and other PyPI dependencies: see their
+    respective project licenses.
+
+This NOTICE exists to make the licensing split explicit and machine-
+discoverable; it does not modify LICENSE, which remains the authoritative
+license grant for this repository's own code.

@@ -1,3 +1,18 @@
+"""Main transcription pipeline: audio -> LeadSheet (melody + chords).
+
+`sheetsage()` is the public entry point (also exposed as a CLI via `main()`
+/ `python -m sheetsage.infer`): it downbeat-detects, splits long audio into
+model-sized chunks, extracts either handcrafted (CPU) or Jukebox (GPU)
+features per chunk, runs the transcription transducer, and assembles the
+per-chunk results into one `LeadSheet`. The private `_*` helpers below are
+single-call, sequential steps of that one pipeline (init model -> beat-track
+-> chunk -> extract features -> transcribe -> format) rather than
+independent utilities, so this stays one file instead of splitting further.
+
+Reads: .align, .assets, .beat_track, .modules, .representations, .theory,
+.utils; read by: examples/*, README.md Quick Start / CLI sections
+"""
+
 import json
 import logging
 import pathlib

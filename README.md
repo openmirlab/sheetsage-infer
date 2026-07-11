@@ -1,6 +1,6 @@
 # SheetSage-Infer
 
-**Inference-only version of SheetSage for music transcription with vendored Jukebox modules.**
+**Inference-only version of SheetSage for music transcription.**
 
 [![PyPI](https://img.shields.io/pypi/v/openmirlab-sheetsage-infer)](https://pypi.org/project/openmirlab-sheetsage-infer/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -18,8 +18,8 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 ## ✨ Features
 
-- ✅ **Vendored Jukebox Modules** - No external Jukebox dependency needed
-- ✅ **CPU & GPU Support** - Handcrafted features (CPU) or Jukebox embeddings (GPU)
+- ✅ **CPU & GPU Support** - Handcrafted features (CPU) or Jukebox embeddings (GPU, via
+  [`jukebox-infer`](https://pypi.org/project/jukebox-infer/))
 - ✅ **Multiple Export Formats** - LilyPond notation, MIDI files, PDF generation
 - ✅ **Audio from URLs** - Support for YouTube, Bandcamp, and other sources
 - ✅ **Simple API** - High-level `sheetsage()` function
@@ -36,12 +36,28 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 # Using pip
 pip install openmirlab-sheetsage-infer
 
-# Using uv (recommended - faster)
+# madmom is required at runtime; a bare `pip install` resolves it to PyPI's
+# madmom==0.16.1, which is broken (numpy incompatibilities). Install the
+# git HEAD fix explicitly:
+pip install git+https://github.com/CPJKU/madmom.git
+```
+
+```bash
+# Using uv (recommended - faster): picks up the git-madmom fix
+# automatically via this repo's [tool.uv.sources], no extra step needed
 uv pip install openmirlab-sheetsage-infer
 
 # Or add to your project with uv
 uv add openmirlab-sheetsage-infer
 ```
+
+> **Why the extra step?** `pyproject.toml` declares a bare `madmom` dependency
+> (so `pip`'s resolver is satisfied) plus a `[tool.uv.sources]` pin to git
+> HEAD (so `uv` resolves it correctly). Plain `pip install` has no equivalent
+> to `[tool.uv.sources]`, so it silently installs the broken PyPI release
+> unless you install the git version yourself, as above. We plan to replace
+> this dependency with `madmom-infer` (our maintained, PyPI-published
+> replacement) once it ships; see `pyproject.toml` for the tracking `TODO`.
 
 **For Development:**
 
@@ -49,6 +65,9 @@ uv add openmirlab-sheetsage-infer
 git clone https://github.com/openmirlab/sheetsage-infer.git
 cd sheetsage-infer
 pip install -e ".[dev]"
+pip install git+https://github.com/CPJKU/madmom.git  # see note above
+# Or, with uv (handles madmom automatically):
+uv sync --extra dev
 ```
 
 ### Prerequisites
@@ -178,14 +197,14 @@ sheetsage-infer/
 │   │   └── modules.py            # Transformer architectures
 │   ├── representations/          # Feature extractors
 │   │   ├── handcrafted.py       # CPU-based mel-spectrograms
-│   │   ├── jukebox.py            # Jukebox embedding interface
-│   │   └── jukebox_modules/     # Vendored Jukebox code
+│   │   └── jukebox.py            # Jukebox embedding interface (imports jukebox-infer)
 │   └── theory/                   # Music theory classes
 │       ├── lead_sheet.py         # LeadSheet class with export methods
 │       ├── basic.py              # Basic music theory primitives
 │       ├── internal.py           # Internal theory classes
 │       ├── theorytab.py          # TheoryTab integration
 │       └── utils.py              # Theory utilities
+├── tests/                        # Import smoke tests + env-guarded regression fixtures
 ├── examples/                     # Example scripts
 │   ├── basic_transcription.py    # Basic usage
 │   ├── jukebox_transcription.py  # GPU-based transcription
@@ -195,15 +214,15 @@ sheetsage-infer/
 ├── hooktheory_data/              # Test data
 │   ├── Hooktheory_Test_MIDI.tar.gz
 │   └── Hooktheory_Test_Segments.json
-├── docs/                         # Documentation
-│   └── generated/               # Generated documentation
 ├── .github/                      # GitHub configuration
 │   └── workflows/
-│       └── publish.yml           # PyPI publishing workflow
-├── pyproject.toml               # Project configuration
-├── requirements.txt             # Python dependencies
+│       └── publish.yml           # PyPI publishing workflow (runs tests before build)
+├── pyproject.toml               # Project configuration (single source of truth for deps)
 ├── uv.lock                      # UV lock file
-├── LICENSE                      # MIT License
+├── CHANGELOG.md                 # Notable changes
+├── CLAUDE.md                    # Orientation for AI coding agents working in this repo
+├── LICENSE                      # MIT License (code)
+├── NOTICE                       # License layering: code (MIT) vs weights/data (CC BY-NC-SA)
 └── README.md                    # This file
 ```
 
@@ -217,8 +236,8 @@ sheetsage-infer/
 
 | Feature | Original | This Version |
 |---------|----------|--------------|
-| **Jukebox Dependency** | External, complex install | Vendored, works out of box |
-| **Test Coverage** | Limited | Test suite included |
+| **Jukebox Dependency** | External, complex install | `pip install`-able via [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) |
+| **Test Coverage** | Limited | Import smoke tests + env-guarded regression fixtures |
 | **Python Support** | 3.12+ only | 3.10, 3.11, 3.12 |
 | **Build System** | Hatch | Setuptools (standard) |
 | **Dependency Pins** | Loose | Explicit versions |
@@ -233,7 +252,9 @@ sheetsage-infer/
 
 ### What We Changed
 
-- **Vendored Jukebox Modules**: Eliminates complex external dependency
+- **Jukebox via `jukebox-infer`**: Uses the published, org-maintained
+  [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) package instead of
+  vendoring a copy of the Jukebox codebase
 - **Library-First Design**: Optimized for `pip install` and programmatic use
 - **Better Dependency Management**: Explicit version pins and compatibility
 
@@ -257,7 +278,7 @@ This work introduced hierarchical music transcription with melody and harmony ex
 
 ### About This Implementation
 
-This package was created to continue the excellent work by providing easier deployment and vendored Jukebox modules, while preserving 100% of the original model quality and algorithms.
+This package was created to continue the excellent work by providing easier deployment (via `pip`-installable dependencies, including [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) for Jukebox features), while preserving 100% of the original model quality and algorithms.
 
 **What we maintain:**
 - PyTorch 2.0+ compatibility
@@ -291,14 +312,18 @@ Please cite using the following bibtex entry:
 
 ## 📄 License
 
-**MIT License** (same as original SheetSage)
+Licensing is two-tier — see [NOTICE](NOTICE) for the full breakdown:
 
-Copyright (c) 2024 Chris Donahue (Original SheetSage)
-Copyright (c) 2025 (SheetSage-Infer modifications)
-
-See [LICENSE](LICENSE) for details.
-
-This project includes code adapted from [SheetSage](https://github.com/chrisdonahue/sheetsage) (MIT License, Copyright 2024 Chris Donahue).
+- **Code** (this repository, including code adapted from
+  [SheetSage](https://github.com/chrisdonahue/sheetsage)): **MIT License**.
+  Copyright (c) 2022 Chris Donahue (Original SheetSage); Copyright (c) 2025
+  SheetSage-Infer contributors. See [LICENSE](LICENSE) for details.
+- **Weights and data** downloaded at runtime via `sheetsage.assets` (trained
+  model checkpoints, HookTheory-derived segments/MIDI) are **CC BY-NC-SA 3.0**,
+  since they derive from user contributions on HookTheory. madmom's bundled
+  DBN downbeat-tracking model is similarly CC BY-NC-SA (separate from
+  madmom's own BSD-2-Clause source code). These are fetched on demand, not
+  bundled in this package's source distribution or wheel.
 
 ---
 
@@ -306,6 +331,12 @@ This project includes code adapted from [SheetSage](https://github.com/chrisdona
 
 - **Inference only** - No training capabilities
 - **Jukebox features require GPU** - 12GB+ VRAM recommended for Jukebox embeddings
+- **Jukebox features require ≥60s of (reported) total audio length** - the 5B
+  prior's conditioning asserts total length is within `[60s, 600s)`; this is
+  an inherent Jukebox architecture constraint (not something this project's
+  code controls), so very short clips will raise an `AssertionError` on the
+  `use_jukebox=True` path even though the CPU (handcrafted-features) path has
+  no such floor
 - **LilyPond required for PDF** - Optional dependency for PDF generation
 - **Time signatures** - Currently supports 4/4 and 3/4 only
 - **Audio length** - Best results with segments 30-300 seconds

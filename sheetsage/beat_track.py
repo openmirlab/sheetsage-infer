@@ -1,3 +1,15 @@
+"""Downbeat/beat detection: madmom DBN tracker with a librosa fallback.
+
+`madmom()` is the function `infer.py` calls; it tries madmom's
+DBNDownBeatTrackingProcessor first (best quality, needs the git-installed
+madmom -- see README/pyproject for the PyPI-vs-git install note) and falls
+back to librosa's beat tracker (logged as a warning) if madmom's CLI/model
+isn't usable in the current environment.
+
+Reads: madmom (optional, see pyproject [tool.uv.sources]), librosa, scipy;
+read by: sheetsage.infer
+"""
+
 import logging
 import math
 import shutil

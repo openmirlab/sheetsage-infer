@@ -1,3 +1,16 @@
+"""Model-weight asset registry: resolves a named asset to a checksum-verified
+local file, downloading it into `CACHE_DIR` on first use.
+
+Each `sheetsage/assets/*.json` (hooktheory, jukebox, rwc, sheetsage, test)
+is a manifest of {name: {url, checksum, ...}} entries; `retrieve_asset(name)`
+looks a name up across all manifests and returns its local path. These
+downloaded weights are CC BY-NC-SA (see LICENSE/NOTICE), unlike this
+package's MIT-licensed code.
+
+Reads: sheetsage/assets/*.json, .utils (compute_checksum); read by:
+sheetsage.representations.handcrafted, sheetsage.infer (_init_model)
+"""
+
 import json
 import logging
 import pathlib

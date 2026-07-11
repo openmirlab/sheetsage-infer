@@ -1,22 +1,51 @@
+"""Jukebox-based neural feature extractor (GPU, optional).
+
+`JukeboxEmbeddings` codifies audio into VQ-VAE codes then extracts top-level
+prior activations, following the original SheetSage pattern, adapted here
+with a CUDA-OOM -> CPU fallback and ffprobe-based total-length estimation
+that upstream `jukebox_infer` does not need (it has no length-hint concept).
+Previously this vendored a ~5.4k LOC fork of jukebox_infer under
+`jukebox_modules/`; it now imports the published `jukebox_infer` package
+directly (dependency already declared in pyproject.toml).
+
+Reads: jukebox_infer.{hparams,make_models,utils.torch_utils}; read by:
+sheetsage.representations.__init__ (JukeboxEmbeddings), sheetsage.infer
+"""
+
 import logging
-import os
-import sys
 import warnings
 
 import librosa
 import numpy as np
 import torch as t
+from jukebox_infer.hparams import Hyperparams
+from jukebox_infer.make_models import make_model
+from jukebox_infer.prior import conditioners as _jukebox_infer_conditioners
+from jukebox_infer.utils.torch_utils import empty_cache
 
 from ..utils import get_approximate_audio_length
 
-# Add jukebox_modules to path if it exists locally
-_jukebox_modules_path = os.path.join(os.path.dirname(__file__), "jukebox_modules")
-if os.path.exists(_jukebox_modules_path) and _jukebox_modules_path not in sys.path:
-    sys.path.insert(0, os.path.dirname(__file__))
+# --- Upstream bug workaround (jukebox_infer==0.1.1) -------------------------
+# `make_vqvae` computes `hps.sample_length` via `np.prod(...)`-derived
+# arithmetic, which taints it (and everything downstream: z_shapes, n_time)
+# as `numpy.float64` instead of a plain int. `RangeEmbedding.__init__` stores
+# that value verbatim, and `RangeEmbedding.forward` later does
+# `t.arange(...).view(1, n_time)`, which raises `TypeError` because
+# `torch.Tensor.view` rejects `numpy.float64` (no `__index__`). This is a
+# real bug in jukebox_infer (not a formatting difference) -- the vendored
+# jukebox_modules fork we replaced had independently discovered and fixed it
+# by casting `n_time` to `int` in `RangeEmbedding.__init__`. We restore that
+# fix here as a minimal monkeypatch rather than re-vendoring the module.
+# TODO(jukebox-infer): fix upstream (cast `n_time` to `int` in
+# `RangeEmbedding.__init__`) and drop this shim once a release ships it.
+_orig_range_embedding_init = _jukebox_infer_conditioners.RangeEmbedding.__init__
 
-from jukebox_modules.hparams import Hyperparams
-from jukebox_modules.make_models import make_model
-from jukebox_modules.utils.torch_utils import empty_cache
+
+def _patched_range_embedding_init(self, n_time, *args, **kwargs):
+    _orig_range_embedding_init(self, int(n_time), *args, **kwargs)
+
+
+_jukebox_infer_conditioners.RangeEmbedding.__init__ = _patched_range_embedding_init
 
 # Constants from SheetSage pattern
 _SAMPLE_RATE = 44100  # Hz

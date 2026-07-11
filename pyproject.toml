@@ -32,7 +32,16 @@ classifiers = [
 ]
 dependencies = [
     "torch>=2.0.0",
-    "jukebox-infer>=0.1.0",
+    "jukebox-infer>=0.1.1",
+    # NOTE (install honesty): "madmom" here bare-resolves to the broken PyPI
+    # 0.16.1 release under plain `pip install`. We actually need the git
+    # HEAD fix (see [tool.uv.sources] below), which `uv` picks up
+    # automatically but plain `pip` cannot -- pip users must additionally
+    # run the git-install step documented in README.md's Installation
+    # section. TODO: swap this for `madmom-infer` (our maintained
+    # replacement, github.com/openmirlab/madmom-infer) once it is published
+    # to PyPI -- Phase 1+2 are done locally but it isn't released yet, so
+    # this dependency swap cannot ship until then.
     "madmom",
     "librosa>=0.11.0",
     "numpy>=2.0.0",
@@ -73,6 +82,11 @@ include = ["sheetsage*"]
 sheetsage = ["assets/*.json"]
 
 [tool.uv.sources]
+# `uv` resolves the bare "madmom" dependency above to this git HEAD, which
+# fixes numpy>=1.24 incompatibilities that PyPI's madmom==0.16.1 does not
+# have. Plain `pip install` ignores [tool.uv.sources] entirely, so pip
+# users must run the equivalent `pip install git+https://...` step by hand
+# -- see README.md's Installation section.
 madmom = {git = "https://github.com/CPJKU/madmom.git"}
 
 [tool.pytest.ini_options]
@@ -106,8 +120,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # Allow unused imports and star imports in __init__.py
-"sheetsage/representations/jukebox_modules/**" = ["E741", "N806", "N802", "E731", "B011", "B905", "F841", "E722", "I001", "F401", "N812", "C408", "W291", "W292", "W293", "B007", "B904", "F821", "E402"]  # Vendored code - ignore style issues
-"sheetsage/representations/jukebox.py" = ["E402"]  # Imports after sys.path.insert are intentional
 "sheetsage/modules/modules.py" = ["N812"]  # PyTorch convention uses F for functional
 "examples/**" = ["F401"]  # Example files may have unused imports for demonstration
 "tests/**" = ["B004", "B017", "N806", "F401", "I001"]  # Test files - allow some style flexibility

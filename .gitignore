@@ -197,6 +197,8 @@ Desktop.ini
 *.tflite
 *.npy
 *.npz
+# ...except committed regression-test fixtures (small, intentionally versioned):
+!tests/fixtures/*.npy
 
 # Audio files (if generated during testing/inference)
 *.wav

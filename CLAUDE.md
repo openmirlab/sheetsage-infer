@@ -5,8 +5,12 @@ sheet: melody + chords). Packaged for `pip install openmirlab-sheetsage-infer`.
 
 ## Orientation
 
-- `sheetsage/infer.py` -- the pipeline (`sheetsage()`): beat-track -> chunk -> extract features
-  -> transcribe -> assemble `LeadSheet`. Start here.
+- `sheetsage/infer.py` -- the public entry point (`sheetsage()` + the `main()` CLI): beat-track
+  -> chunk -> extract features -> transcribe -> assemble `LeadSheet`. Start here.
+- `sheetsage/pipeline/` -- the enums/constants (`types.py`) and the private `_*` step helpers
+  (`steps.py`) that `sheetsage()` calls, one per pipeline stage; `infer.py` imports and
+  re-exports all of them, so every name that used to live in `infer.py` (enums, constants,
+  `_init_extractor`, `_beat_tracking_with_hints`, etc.) is still importable from there.
 - `sheetsage/representations/` -- feature extractors: `handcrafted.py` (CPU, always available),
   `jukebox.py` (GPU, optional, imports the `jukebox_infer` package).
 - `sheetsage/theory/` -- music-theory classes (`Note`, `Chord`, `LeadSheet`, LilyPond/MIDI export).

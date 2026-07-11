@@ -182,7 +182,8 @@ See `examples/` directory for usage examples:
 ```
 sheetsage-infer/
 ├── sheetsage/                    # Main package
-│   ├── infer.py                 # Main transcription pipeline
+│   ├── infer.py                 # Main transcription pipeline (public sheetsage()/CLI)
+│   ├── pipeline/                 # Pipeline enums/constants + step helpers (used by infer.py)
 │   ├── align.py                 # Beat-to-time alignment
 │   ├── beat_track.py             # Beat detection
 │   ├── utils.py                 # LilyPond engraving, audio I/O

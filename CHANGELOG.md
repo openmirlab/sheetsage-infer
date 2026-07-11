@@ -3,6 +3,18 @@
 All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Internal
+
+- Split `infer.py`'s pipeline steps into `sheetsage/pipeline/` -- no behavior change. The four
+  enums and module-level constants moved to `sheetsage/pipeline/types.py`; the private `_*`
+  step helpers (`_init_extractor`, `_init_model`, `_closest_idx`, `_beat_tracking_with_hints`,
+  `_split_into_chunks`, `_extract_features`, `_transcribe_chunks`, `_format_lead_sheet`) moved
+  to `sheetsage/pipeline/steps.py`, verbatim. `infer.py` now keeps only the public `sheetsage()`
+  function and the `main()` CLI, and re-exports every moved name so existing imports from
+  `sheetsage.infer` keep working unchanged.
+
 ## [0.2.0] - 2026-07-11
 
 ### Fixed

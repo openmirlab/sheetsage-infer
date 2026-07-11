@@ -120,6 +120,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]  # Allow unused imports and star imports in __init__.py
+"sheetsage/infer.py" = ["F401"]  # Re-exports sheetsage.pipeline's names for backward-compat imports
 "sheetsage/modules/modules.py" = ["N812"]  # PyTorch convention uses F for functional
 "examples/**" = ["F401"]  # Example files may have unused imports for demonstration
 "tests/**" = ["B004", "B017", "N806", "F401", "I001"]  # Test files - allow some style flexibility

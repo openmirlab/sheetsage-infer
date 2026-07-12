@@ -5,6 +5,51 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-07-12
+
+### Changed
+
+- **Package renamed: `openmirlab-sheetsage-infer` -> `sheetsage-infer`.** The PyPI name
+  `sheetsage-infer` was free and the org's trusted-publisher config was moved to it in the same
+  change window (see `pyproject.toml`'s `[project.urls]` and the constitution's packaging
+  article). `openmirlab-sheetsage-infer` is deprecated as of this release and will not receive
+  further updates. The import name is unchanged (`import sheetsage`).
+- **`madmom` replaced by [`madmom-infer`](https://pypi.org/project/madmom-infer/).** The bare
+  `madmom` PyPI dependency (broken 0.16.1 release) plus its `[tool.uv.sources]` git-HEAD pin are
+  gone; `sheetsage/beat_track.py` now depends on plain, `pip install`-able `madmom-infer>=0.1.0`.
+  This also changes *how* it's called: the original `madmom` package installed a
+  `DBNDownBeatTracker` console script that `beat_track.py` invoked via `subprocess`;
+  `madmom-infer` is a pure-Python/numpy library with no console script, so `beat_track.py` now
+  calls its Python API directly (`RNNDownBeatProcessor` + `DBNDownBeatTrackingProcessor`).
+  Verified bit-identical against real upstream `madmom` (git HEAD) on the bundled `TEST_WAV`
+  asset: same beat times, same first-downbeat index, same detected beats-per-bar. One gap
+  bridged in the process: `madmom-infer` has no ffmpeg-backed resampler, so non-44.1kHz audio is
+  now resampled with `librosa` before being handed to it (not bit-identical to `madmom`'s ffmpeg
+  resample, but avoids a hard crash on non-44.1kHz input where `madmom-infer` would otherwise
+  raise `NotImplementedError`; doesn't affect `TEST_WAV`, which is 44.1kHz native).
+- `.github/workflows/publish.yml` no longer needs the `numpy`+`cython`-first,
+  `--no-build-isolation` git-`madmom` install dance -- `pip install -e ".[dev]"` alone now
+  resolves every dependency from PyPI.
+- README/CLAUDE.md: removed the `madmom` install-workaround sections entirely (plain
+  `pip install` / `uv add` now just works); added the rename notice above.
+
+### Fixed
+
+- **`tests/test_lead_sheet_regression.py`'s fixture was recorded against a silently-degraded
+  path, not real madmom DBN tracking.** Investigating why this test's output changed after the
+  swap surfaced that the *previously recorded* fixture (0.2.0) matches this project's own
+  `librosa` beat-tracking **fallback** exactly (3/4 time, tempo 120, first-downbeat assumed at
+  index 0 -- `_librosa_fallback`'s documented behavior), not the DBN's real detection for this
+  audio (4/4 time, tempo 170, first downbeat at index 3 -- confirmed against real upstream
+  `madmom` git HEAD, byte-for-byte identical beat times to the new `madmom-infer` path). In
+  other words: whatever environment recorded the 0.2.0 fixture never actually exercised the
+  advertised premium madmom DBN path -- it silently fell back to the librosa heuristic tracker
+  the whole time, and the regression test was unknowingly pinning that degraded output. The
+  fixture (`tests/fixtures/lead_sheet_test_wav_ref.ly`) is re-recorded against the now-working
+  `madmom-infer` DBN path; `tests/_env_fixtures.py`'s environment fingerprint now also records
+  `madmom_infer`'s version so a future madmom-infer release that shifts its DBN decode
+  invalidates (skips, not silently passes) this fixture the same way a torch/numpy bump does.
+
 ### Removed
 
 - Google Colab quickstart notebook (`examples/sheetsage_infer_colab.ipynb`) --

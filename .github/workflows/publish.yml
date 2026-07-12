@@ -37,16 +37,6 @@ jobs:
 
       - name: Install package + test dependencies
         run: |
-          # numpy must land before madmom, whose setup.py imports it at build
-          # time (a well-known madmom install gotcha -- see README's
-          # Installation section for the same two-step pattern).
-          # madmom gotchas (the reason madmom-infer exists): plain pip would
-          # resolve madmom from PyPI (0.16.1, 2018: needs Cython at build time,
-          # numpy-2 incompatible). Install cython+numpy first, then madmom from
-          # git with --no-build-isolation, THEN the package -- its madmom
-          # requirement is already satisfied so pip never touches PyPI's.
-          pip install "numpy>=2.0.0" cython
-          pip install --no-build-isolation "git+https://github.com/CPJKU/madmom"
           pip install -e ".[dev]"
 
       - name: Run test gate

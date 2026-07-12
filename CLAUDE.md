@@ -1,7 +1,8 @@
 # sheetsage-infer
 
 Inference-only fork of [SheetSage](https://github.com/chrisdonahue/sheetsage) (audio -> lead
-sheet: melody + chords). Packaged for `pip install openmirlab-sheetsage-infer`.
+sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously published as
+`openmirlab-sheetsage-infer` through 0.2.0; that name is now deprecated).
 
 ## Orientation
 
@@ -16,16 +17,18 @@ sheet: melody + chords). Packaged for `pip install openmirlab-sheetsage-infer`.
 - `sheetsage/theory/` -- music-theory classes (`Note`, `Chord`, `LeadSheet`, LilyPond/MIDI export).
 - `sheetsage/assets.py` -- resolves named model weights / test fixtures to checksum-verified
   local files, downloaded on first use into `~/.sheetsage` (see `sheetsage/assets/*.json`).
-- `sheetsage/beat_track.py` -- madmom DBN downbeat tracker with a librosa fallback.
+- `sheetsage/beat_track.py` -- madmom-infer's DBN downbeat tracker with a librosa fallback.
 
 ## Known constraints (read before touching install/dependency config)
 
-- **madmom**: the bare `madmom` PyPI release (0.16.1) is broken under plain `pip install`; this
-  project needs the git HEAD fix. `uv` picks this up automatically via `[tool.uv.sources]` in
-  `pyproject.toml`; plain `pip` users must separately run
-  `pip install git+https://github.com/CPJKU/madmom.git`. See README's Installation section.
-  A TODO in `pyproject.toml` tracks swapping to `madmom-infer` (org-maintained replacement) once
-  it's published to PyPI -- it is not yet (Phase 1+2 done locally only).
+- **madmom-infer**: as of 0.2.1, `madmom` (the git-HEAD-only PyPI-broken dependency) was
+  replaced by [`madmom-infer`](https://pypi.org/project/madmom-infer/), a plain PyPI package --
+  `pip install` works with no extra steps. `beat_track.py` calls madmom-infer's Python API
+  directly (`RNNDownBeatProcessor` + `DBNDownBeatTrackingProcessor`), not a CLI binary (the
+  original `madmom` package shipped a `DBNDownBeatTracker` console script; madmom-infer is a
+  pure-Python library with no console script, so the old subprocess-based call was rewritten).
+  One gap this bridges: madmom-infer has no ffmpeg-backed resampler, so non-44.1kHz audio is
+  resampled with librosa before being handed to it (see `beat_track.py`'s module docstring).
 - **jukebox_infer**: `sheetsage/representations/jukebox.py` imports the real, published
   `jukebox_infer` package (not vendored). It carries a small documented monkeypatch working
   around a real upstream bug (`RangeEmbedding` not casting `n_time` to `int`, which surfaces as

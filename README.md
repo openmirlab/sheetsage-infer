@@ -2,11 +2,17 @@
 
 **Inference-only version of SheetSage for music transcription.**
 
-[![PyPI](https://img.shields.io/pypi/v/openmirlab-sheetsage-infer)](https://pypi.org/project/openmirlab-sheetsage-infer/)
+[![PyPI](https://img.shields.io/pypi/v/sheetsage-infer)](https://pypi.org/project/sheetsage-infer/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 AI-powered music transcription system that converts audio to lead sheets (melody + chord symbols) using deep learning models.
+
+> **Renamed from `openmirlab-sheetsage-infer`.** Releases through 0.2.0 were published
+> as `openmirlab-sheetsage-infer` on PyPI; that name is now deprecated and will not
+> receive further releases. Starting with 0.2.1, this package publishes as
+> **`sheetsage-infer`** -- update your `pip install` / `uv add` commands accordingly.
+> The import name is unchanged (`import sheetsage`).
 
 ---
 
@@ -34,30 +40,20 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 ```bash
 # Using pip
-pip install openmirlab-sheetsage-infer
-
-# madmom is required at runtime; a bare `pip install` resolves it to PyPI's
-# madmom==0.16.1, which is broken (numpy incompatibilities). Install the
-# git HEAD fix explicitly:
-pip install git+https://github.com/CPJKU/madmom.git
+pip install sheetsage-infer
 ```
 
 ```bash
-# Using uv (recommended - faster): picks up the git-madmom fix
-# automatically via this repo's [tool.uv.sources], no extra step needed
-uv pip install openmirlab-sheetsage-infer
+# Using uv (recommended - faster)
+uv pip install sheetsage-infer
 
 # Or add to your project with uv
-uv add openmirlab-sheetsage-infer
+uv add sheetsage-infer
 ```
 
-> **Why the extra step?** `pyproject.toml` declares a bare `madmom` dependency
-> (so `pip`'s resolver is satisfied) plus a `[tool.uv.sources]` pin to git
-> HEAD (so `uv` resolves it correctly). Plain `pip install` has no equivalent
-> to `[tool.uv.sources]`, so it silently installs the broken PyPI release
-> unless you install the git version yourself, as above. We plan to replace
-> this dependency with `madmom-infer` (our maintained, PyPI-published
-> replacement) once it ships; see `pyproject.toml` for the tracking `TODO`.
+madmom was replaced by [`madmom-infer`](https://pypi.org/project/madmom-infer/) (our
+maintained, PyPI-published replacement) as of 0.2.1 -- plain `pip install` now works
+with no extra steps or git installs.
 
 **For Development:**
 
@@ -65,8 +61,7 @@ uv add openmirlab-sheetsage-infer
 git clone https://github.com/openmirlab/sheetsage-infer.git
 cd sheetsage-infer
 pip install -e ".[dev]"
-pip install git+https://github.com/CPJKU/madmom.git  # see note above
-# Or, with uv (handles madmom automatically):
+# Or, with uv:
 uv sync --extra dev
 ```
 
@@ -379,7 +374,8 @@ For issues and questions:
 
 - **Original SheetSage**: https://github.com/chrisdonahue/sheetsage
 - **This Repository**: https://github.com/openmirlab/sheetsage-infer
-- **PyPI Package**: https://pypi.org/project/openmirlab-sheetsage-infer/
+- **PyPI Package**: https://pypi.org/project/sheetsage-infer/ (previously
+  `openmirlab-sheetsage-infer`, deprecated as of 0.2.1)
 
 ---
 

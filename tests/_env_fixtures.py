@@ -5,6 +5,12 @@ only valid in the exact env they were recorded in -- torch/librosa/numpy
 versions and CPU vs GPU all affect floating-point results at the last few
 bits, and librosa itself has changed mel-spectrogram output across versions
 (see test_handcrafted_regression.py for a concrete, confirmed example).
+`madmom_infer`'s version is fingerprinted too, added in 0.2.1 when `madmom`
+was replaced by `madmom-infer`: the lead-sheet regression's beat tracking
+now runs through it, so a future madmom-infer release changing its DBN
+decode should invalidate that fixture the same way a torch/numpy bump does.
+`madmom_infer` isn't imported anywhere else in this test suite, so importing
+it here is safe -- it's a required (non-optional) dependency.
 Per project convention, such fixtures carry a recorded `*_env.json` sidecar;
 tests compare the current environment's fingerprint against it and SKIP
 (not fail) on mismatch, since a mismatch means "not comparable" rather than
@@ -21,6 +27,7 @@ import pathlib
 import platform
 
 import librosa
+import madmom_infer
 import numpy as np
 import torch
 
@@ -32,6 +39,7 @@ def current_env():
         "torch": torch.__version__,
         "librosa": librosa.__version__,
         "numpy": np.__version__,
+        "madmom_infer": madmom_infer.__version__,
         "python": platform.python_version(),
         "platform": platform.platform(),
         "device": "cpu",

@@ -4,9 +4,10 @@ Guards against the two structural issues this test suite was added to catch
 regressions on: (1) `sheetsage.representations.jukebox` importing the real
 `jukebox_infer` package (previously a vendored fork with a missing
 `jukebox_modules.data` submodule that made `use_jukebox=True` crash at
-import time -- see CHANGELOG), and (2) `madmom` resolving to *something*
-importable in this environment (it is git-installed, not the broken PyPI
-0.16.1 default -- see pyproject.toml's install-honesty comments).
+import time -- see CHANGELOG), and (2) `madmom_infer.features.downbeats`
+exposing the two classes `sheetsage.beat_track` needs (`RNNDownBeatProcessor`,
+`DBNDownBeatTrackingProcessor`) -- as of 0.2.1 this is a plain PyPI dependency,
+no git install or install-honesty workaround needed (see CHANGELOG).
 """
 
 import importlib
@@ -38,11 +39,17 @@ def test_import_theory():
     importlib.import_module("sheetsage.theory")
 
 
-def test_import_madmom():
-    """madmom must resolve to the git-installed fix, not PyPI's broken 0.16.1."""
-    import madmom
+def test_import_beat_track():
+    """sheetsage.beat_track must import cleanly (madmom-infer is a plain pip dependency now)."""
+    importlib.import_module("sheetsage.beat_track")
 
-    assert madmom.__version__ != "0.16.1", (
-        "madmom resolved to the broken PyPI 0.16.1 release -- expected the git "
-        "HEAD version pinned in pyproject.toml's [tool.uv.sources]"
+
+def test_import_madmom_infer():
+    """madmom-infer must expose the two classes beat_track.py's DBN path calls."""
+    from madmom_infer.features.downbeats import (
+        DBNDownBeatTrackingProcessor,
+        RNNDownBeatProcessor,
     )
+
+    assert DBNDownBeatTrackingProcessor is not None
+    assert RNNDownBeatProcessor is not None

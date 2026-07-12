@@ -5,6 +5,12 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+
+- Google Colab quickstart notebook (`examples/sheetsage_infer_colab.ipynb`) --
+  maintaining a separate notebook environment alongside the PyPI package was
+  more upkeep than the audience justified. No README/docs referenced it.
+
 ### Internal
 
 - Split `infer.py`'s pipeline steps into `sheetsage/pipeline/` -- no behavior change. The four

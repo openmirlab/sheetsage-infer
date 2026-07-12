@@ -37,6 +37,22 @@ sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously 
 - **Licensing is two-tier**: code is MIT; weights and HookTheory-derived data downloaded via
   `sheetsage.assets` are CC BY-NC-SA (as is madmom's bundled DBN downbeat model). See `NOTICE`.
 
+## Documentation conformance
+
+README reviewed 2026-07-12 against the org's documentation-conformance shape
+(Why-this-exists -> Acknowledgments -> Citation -> Features -> Scope ->
+Install -> Quick Start -> ... -> "will NEVER bundle" -> Development ->
+License -> Support). One citation error was found and fixed: the README's
+Citation section previously read "SheetSage: A Hierarchical Transformer for
+Audio to Lead Sheet Transcription" (Donahue, ISMIR 2024) -- a nonexistent
+title/venue/year. Checked against the arXiv abstract page
+(https://arxiv.org/abs/2212.01884), the real paper is "Melody Transcription
+via Generative Pre-Training" by Chris Donahue, John Thickstun, and Percy
+Liang, ISMIR 2022. The `NOTICE`/`LICENSE` copyright year (2022) was already
+correct -- it matches `chrisdonahue/sheetsage`'s actual repo-creation date
+(2022-06-10, verified via `gh api repos/chrisdonahue/sheetsage`) -- so only
+the Citation bibtex needed correcting, not the copyright year.
+
 ## Testing
 
 `tests/` has import smoke tests, bit-exact regression fixtures (env-guarded: they SKIP rather

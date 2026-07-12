@@ -16,9 +16,79 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 ---
 
-## 📌 Overview
+## Why this exists
 
-**SheetSage-Infer** is an inference-only version of [SheetSage](https://github.com/chrisdonahue/sheetsage) for music transcription, optimized for easy deployment with vendored Jukebox modules.
+[SheetSage](https://github.com/chrisdonahue/sheetsage) is Chris Donahue's
+audio-to-lead-sheet transcription system, introduced in the ISMIR 2022 paper
+*Melody Transcription via Generative Pre-Training* (see [Citation](#citation)
+below). The original repository targets Python 3.12+ only, builds with Hatch,
+and depends on Jukebox and madmom in ways that make it hard to install as a
+library: Jukebox required vendoring the OpenAI Jukebox codebase directly, and
+madmom's own PyPI release has for years been git-HEAD-only / broken.
+
+**SheetSage-Infer** is an inference-only repackaging aimed at library use:
+same models, same theory classes, same output formats, but published as an
+ordinary `pip install`-able package with explicit dependency pins, support
+for Python 3.10-3.12, and its two hardest dependencies swapped for
+OpenMIRLab's own maintained, PyPI-published replacements
+([`jukebox-infer`](https://pypi.org/project/jukebox-infer/) and
+[`madmom-infer`](https://pypi.org/project/madmom-infer/)) instead of a
+vendored copy and a broken upstream package.
+
+## Acknowledgments
+
+SheetSage-Infer is an independent repackaging built on top of Chris Donahue's
+research. It is not affiliated with or endorsed by the original author.
+
+- **Original research & repository**: [SheetSage](https://github.com/chrisdonahue/sheetsage)
+  was created by **Chris Donahue** (repository created 2022-06-10, per
+  GitHub). See [Citation](#citation) below for the paper's full author list
+  (Donahue, Thickstun, and Liang).
+- **Source repository**: [github.com/chrisdonahue/sheetsage](https://github.com/chrisdonahue/sheetsage)
+- **Weights & data hosts**: SheetSage's own trained checkpoints are fetched
+  from its S3 bucket (`sheetsage.s3.amazonaws.com`) for the handcrafted-feature
+  models, and from a third-party HuggingFace mirror
+  ([`mku121/sheetsage`](https://huggingface.co/mku121/sheetsage), originally
+  distributed via mega.nz) for the Jukebox-feature models. HookTheory-derived
+  training/eval data comes from
+  [github.com/chrisdonahue/sheetsage-data](https://github.com/chrisdonahue/sheetsage-data).
+  The Jukebox model itself (`JUKEBOX_VQVAE`, `JUKEBOX_LM`) is OpenAI's
+  original release, hosted at `openaipublic.azureedge.net` and mirrored on
+  the same HuggingFace repo.
+- **[`jukebox-infer`](https://pypi.org/project/jukebox-infer/)**: OpenMIRLab's
+  maintained, PyPI-published replacement for vendoring OpenAI's Jukebox
+  codebase directly.
+- **[`madmom-infer`](https://pypi.org/project/madmom-infer/)**: OpenMIRLab's
+  maintained, PyPI-published replacement for `madmom` (whose own PyPI release
+  has long been git-HEAD-only/broken). The underlying
+  [madmom](https://github.com/CPJKU/madmom) project and its bundled DBN
+  downbeat-tracking model are by the original madmom project (Institute of
+  Computational Perception, JKU Linz / CPJKU) -- see that repository for its
+  own author/contributor list.
+
+## Citation
+
+Please cite using the following bibtex entry:
+
+```bibtex
+@inproceedings{donahue2022melody,
+  title={Melody Transcription via Generative Pre-Training},
+  author={Donahue, Chris and Thickstun, John and Liang, Percy},
+  booktitle={Proceedings of the 23rd International Society for Music Information Retrieval Conference (ISMIR)},
+  year={2022}
+}
+```
+
+*(Corrected 2026-07-12: this README previously cited a nonexistent title,
+"SheetSage: A Hierarchical Transformer for Audio to Lead Sheet Transcription"
+(Donahue, ISMIR 2024). The real paper, verified against its
+[arXiv page](https://arxiv.org/abs/2212.01884), is "Melody Transcription via
+Generative Pre-Training" by Donahue, Thickstun, and Liang, published at
+ISMIR 2022. The copyright year in [NOTICE](NOTICE)/[LICENSE](LICENSE), 2022,
+was already correct -- it matches the original repository's creation date --
+so only the Citation entry needed fixing.)*
+
+**If you use SheetSage-Infer in your research, please cite the original paper above.** This package is a maintenance fork to ensure easier deployment and continued compatibility - all credit for the models, algorithms, and research belongs to the original author.
 
 ---
 
@@ -29,6 +99,42 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 - ✅ **Multiple Export Formats** - LilyPond notation, MIDI files, PDF generation
 - ✅ **Audio from URLs** - Support for YouTube, Bandcamp, and other sources
 - ✅ **Simple API** - High-level `sheetsage()` function
+
+---
+
+## Scope
+
+**In scope:**
+- Inference-only transcription: audio -> lead sheet (melody + chord symbols),
+  via handcrafted CPU features or Jukebox GPU embeddings
+- LilyPond / MIDI / PDF export via the `LeadSheet` API
+- Library-first packaging: pip-installable, explicit dependency pins,
+  Python 3.10-3.12
+- Swapping the original's hard-to-install dependencies (vendored Jukebox,
+  PyPI-broken madmom) for maintained PyPI replacements (`jukebox-infer`,
+  `madmom-infer`)
+
+**Out of scope, forever:**
+- Training or fine-tuning SheetSage's models -- this is an inference-only
+  fork; see [SheetSage](https://github.com/chrisdonahue/sheetsage) for
+  training code
+- Redistributing SheetSage's trained weights or HookTheory-derived data --
+  these remain CC BY-NC-SA (non-commercial, share-alike) and are downloaded
+  at runtime, never bundled (see
+  ["What this project will NEVER bundle"](#what-this-project-will-never-bundle))
+- Time signatures beyond 4/4 and 3/4 (inherited limitation of the original
+  model)
+
+**Known constraints:**
+- Jukebox features require a GPU with ≥12GB VRAM
+- Jukebox features require ≥60s of (reported) total audio length -- the 5B
+  prior's conditioning asserts total length is within `[60s, 600s)`; this is
+  an inherent Jukebox architecture constraint (not something this project's
+  code controls), so very short clips raise an `AssertionError` on the
+  `use_jukebox=True` path even though the CPU (handcrafted-features) path
+  has no such floor
+- LilyPond is required for PDF export only (optional dependency)
+- Best transcription results on 30-300 second segments
 
 ---
 
@@ -224,85 +330,64 @@ sheetsage-infer/
 
 ---
 
-## 🔄 Changes from Original SheetSage
+## What this project will NEVER bundle
 
-**SheetSage-Infer** has been modified from the [original SheetSage](https://github.com/chrisdonahue/sheetsage) to make it more suitable for library use and easier to maintain.
+sheetsage-infer downloads trained model weights and HookTheory-derived data
+at runtime via `sheetsage.assets` (`sheetsage/assets/*.json` manifests,
+resolved by `retrieve_asset()` in `sheetsage/assets.py`) into a local cache
+directory (`~/.sheetsage` by default). None of these are ever committed to
+this repository or bundled into the PyPI sdist/wheel:
 
-### Key Improvements
+- **SheetSage's own trained checkpoints** (handcrafted-feature and
+  Jukebox-feature harmony/melody models) are fetched from SheetSage's S3
+  bucket or a third-party HuggingFace mirror on first use, checksum-verified
+  against the manifest before being trusted.
+- **HookTheory-derived training/eval data** (segments, MIDI) is fetched from
+  `github.com/chrisdonahue/sheetsage-data` on first use. Because it's derived
+  from user contributions on HookTheory (see HookTheory's
+  [ToS](https://forum.hooktheory.com/tos)), it is **CC BY-NC-SA 3.0** --
+  non-commercial, share-alike -- a materially different, more restrictive
+  license than this repo's own MIT code license. See [NOTICE](NOTICE).
+- **The Jukebox model weights** (`JUKEBOX_VQVAE`, `JUKEBOX_LM`) are OpenAI's
+  original release, fetched from OpenAI's own CDN (or the HuggingFace mirror)
+  under OpenAI's Jukebox terms -- see
+  [github.com/openai/jukebox](https://github.com/openai/jukebox) for the
+  upstream license. This package does not modify or relicense them.
+- **madmom's bundled DBN downbeat-tracking model** (used via `madmom-infer`)
+  is separately CC BY-NC-SA 4.0, distinct from madmom's own BSD-2-Clause
+  source code.
 
-| Feature | Original | This Version |
-|---------|----------|--------------|
-| **Jukebox Dependency** | External, complex install | `pip install`-able via [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) |
-| **Test Coverage** | Limited | Import smoke tests + env-guarded regression fixtures |
-| **Python Support** | 3.12+ only | 3.10, 3.11, 3.12 |
-| **Build System** | Hatch | Setuptools (standard) |
-| **Dependency Pins** | Loose | Explicit versions |
-
-### What We Maintain
-
-- ✅ All core transcription functionality
-- ✅ Same neural network models
-- ✅ Same output formats (LeadSheet, LilyPond, MIDI)
-- ✅ Same API interface for `sheetsage()` function
-- ✅ Same theory classes (Note, Chord, Melody, Harmony, etc.)
-
-### What We Changed
-
-- **Jukebox via `jukebox-infer`**: Uses the published, org-maintained
-  [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) package instead of
-  vendoring a copy of the Jukebox codebase
-- **Library-First Design**: Optimized for `pip install` and programmatic use
-- **Better Dependency Management**: Explicit version pins and compatibility
-
----
-
-## 🙏 Acknowledgments
-
-### Original Research by Chris Donahue
-
-**SheetSage-Infer** is built upon the excellent work of [SheetSage](https://github.com/chrisdonahue/sheetsage) by Chris Donahue. The original SheetSage represents a major advancement in music transcription, achieving state-of-the-art results through hierarchical transformer architectures.
-
-### Research Paper
-
-**[SheetSage: A Hierarchical Transformer for Audio to Lead Sheet Transcription](https://github.com/chrisdonahue/sheetsage)**
-
-This work introduced hierarchical music transcription with melody and harmony extraction, enabling high-quality lead sheet generation from audio.
-
-### Original Author
-
-- **Chris Donahue** - Original SheetSage creator
-
-### About This Implementation
-
-This package was created to continue the excellent work by providing easier deployment (via `pip`-installable dependencies, including [`jukebox-infer`](https://pypi.org/project/jukebox-infer/) for Jukebox features), while preserving 100% of the original model quality and algorithms.
-
-**What we maintain:**
-- PyTorch 2.0+ compatibility
-- Modern dependency management
-- Inference-only packaging
-
-**What remains unchanged:**
-- All model architectures (100% original)
-- All transcription algorithms (100% original)
-- All model weights (100% original)
-- All output formats (100% original)
+If you redistribute anything built with this package -- transcriptions
+derived from HookTheory data, a model fine-tuned on the downloaded
+checkpoints, etc. -- check the license of whichever asset you actually used;
+this package's own MIT license only covers its own code, not what it
+downloads on your behalf. See [NOTICE](NOTICE) for the full breakdown.
 
 ---
 
-## 📄 Citation
+## Development
 
-Please cite using the following bibtex entry:
+We welcome contributions! Please:
 
-```bibtex
-@inproceedings{donahue2024sheetsage,
-  title={SheetSage: A Hierarchical Transformer for Audio to Lead Sheet Transcription},
-  author={Donahue, Chris},
-  booktitle={ISMIR},
-  year={2024}
-}
+1. Follow the code style (ruff/black)
+2. Add tests for new features
+3. Submit PRs with clear descriptions
+
+```bash
+# Install dependencies
+pip install -e ".[dev]"
+# Or, with uv:
+uv sync --extra dev
+
+# Run tests
+uv run pytest tests/
+
+# Format and lint code
+uv run ruff format . && uv run ruff check .
 ```
 
-**If you use SheetSage-Infer in your research, please cite the original SheetSage paper above.** This package is a maintenance fork to ensure easier deployment and continued compatibility - all credit for the models, algorithms, and research belongs to the original author.
+See [`CLAUDE.md`](CLAUDE.md) for architecture notes, known constraints, and
+orientation for AI coding agents working in this repo.
 
 ---
 
@@ -323,55 +408,10 @@ Licensing is two-tier — see [NOTICE](NOTICE) for the full breakdown:
 
 ---
 
-## ⚠️ Limitations
-
-- **Inference only** - No training capabilities
-- **Jukebox features require GPU** - 12GB+ VRAM recommended for Jukebox embeddings
-- **Jukebox features require ≥60s of (reported) total audio length** - the 5B
-  prior's conditioning asserts total length is within `[60s, 600s)`; this is
-  an inherent Jukebox architecture constraint (not something this project's
-  code controls), so very short clips will raise an `AssertionError` on the
-  `use_jukebox=True` path even though the CPU (handcrafted-features) path has
-  no such floor
-- **LilyPond required for PDF** - Optional dependency for PDF generation
-- **Time signatures** - Currently supports 4/4 and 3/4 only
-- **Audio length** - Best results with segments 30-300 seconds
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please:
-
-1. Follow the code style (ruff/black)
-2. Add tests for new features
-3. Submit PRs with clear descriptions
-
-### Development Setup
-
-```bash
-# Install dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest tests/
-
-# Format and lint code
-ruff format . && ruff check .
-```
-
----
-
 ## 📞 Support
 
-For issues and questions:
 - **GitHub Issues**: [github.com/openmirlab/sheetsage-infer/issues](https://github.com/openmirlab/sheetsage-infer/issues)
 - **Examples**: `examples/` directory
-
----
-
-## 🔗 Links
-
 - **Original SheetSage**: https://github.com/chrisdonahue/sheetsage
 - **This Repository**: https://github.com/openmirlab/sheetsage-infer
 - **PyPI Package**: https://pypi.org/project/sheetsage-infer/ (previously

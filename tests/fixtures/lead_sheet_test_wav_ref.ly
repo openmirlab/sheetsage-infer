@@ -8,7 +8,7 @@
     \set majorSevenSymbol = \markup { maj7 }
     \set additionalPitchPrefix = #"add"
     \chordmode {
-        g16*36
+        d16*32:7
     }
 }
 
@@ -16,9 +16,9 @@
     {
         \clef treble
         \key c \major
-        \time 3/4
-        \tempo 4 = 120
-        r4. b'8. d''8.~ | d''4 d''4 d''4~ | d''2 g'4
+        \time 4/4
+        \tempo 4 = 170
+        d''8 c''8 fis''8 e''4 d''4. | d''8 c''4 e''4. fis''4
     }
 }
 

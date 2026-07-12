@@ -1,6 +1,6 @@
 [project]
-name = "openmirlab-sheetsage-infer"
-version = "0.2.0"
+name = "sheetsage-infer"
+version = "0.2.1"
 description = "Minimal inference-only version of SheetSage for music transcription"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -33,16 +33,7 @@ classifiers = [
 dependencies = [
     "torch>=2.0.0",
     "jukebox-infer>=0.1.1",
-    # NOTE (install honesty): "madmom" here bare-resolves to the broken PyPI
-    # 0.16.1 release under plain `pip install`. We actually need the git
-    # HEAD fix (see [tool.uv.sources] below), which `uv` picks up
-    # automatically but plain `pip` cannot -- pip users must additionally
-    # run the git-install step documented in README.md's Installation
-    # section. TODO: swap this for `madmom-infer` (our maintained
-    # replacement, github.com/openmirlab/madmom-infer) once it is published
-    # to PyPI -- Phase 1+2 are done locally but it isn't released yet, so
-    # this dependency swap cannot ship until then.
-    "madmom",
+    "madmom-infer>=0.1.0",
     "librosa>=0.11.0",
     "numpy>=2.0.0",
     "scipy>=1.11.0",
@@ -80,14 +71,6 @@ include = ["sheetsage*"]
 
 [tool.setuptools.package-data]
 sheetsage = ["assets/*.json"]
-
-[tool.uv.sources]
-# `uv` resolves the bare "madmom" dependency above to this git HEAD, which
-# fixes numpy>=1.24 incompatibilities that PyPI's madmom==0.16.1 does not
-# have. Plain `pip install` ignores [tool.uv.sources] entirely, so pip
-# users must run the equivalent `pip install git+https://...` step by hand
-# -- see README.md's Installation section.
-madmom = {git = "https://github.com/CPJKU/madmom.git"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

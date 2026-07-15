@@ -422,3 +422,10 @@ Licensing is two-tier — see [NOTICE](NOTICE) for the full breakdown:
 **Made with ❤️ for the ML community**
 
 Based on the excellent work by Chris Donahue and the SheetSage project.
+# Lifecycle API
+
+Use `SheetSageSession` when an explicit lifecycle is required:
+`load()` → ready-only `infer()` → `release()`/`close()`. Sessions are
+independent; the package-owned `sheetsage/config/checkpoints.toml` records
+checkpoint URLs and provenance. The existing `sheetsage()` one-shot function
+remains available for backward compatibility.

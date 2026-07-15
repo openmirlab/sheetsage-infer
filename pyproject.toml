@@ -70,7 +70,7 @@ build-backend = "setuptools.build_meta"
 include = ["sheetsage*"]
 
 [tool.setuptools.package-data]
-sheetsage = ["assets/*.json"]
+sheetsage = ["assets/*.json", "config/*.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -115,4 +115,3 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 check_untyped_defs = true
-

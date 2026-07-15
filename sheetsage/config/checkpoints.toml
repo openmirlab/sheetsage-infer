@@ -1,0 +1,18 @@
+# Runtime checkpoint catalog owned by sheetsage-infer.
+[models.sheetsage_handcrafted_melody]
+url = "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/sheetsage/SHEETSAGE_V02_HANDCRAFTED_MELODY_MODEL"
+sha256 = ""
+size_bytes = 0
+provenance = "SheetSage v0.2 release assets"
+
+[models.sheetsage_handcrafted_harmony]
+url = "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/sheetsage/SHEETSAGE_V02_HANDCRAFTED_HARMONY_MODEL"
+sha256 = ""
+size_bytes = 0
+provenance = "SheetSage v0.2 release assets"
+
+[models.jukebox]
+url = "https://openaipublic.azureedge.net/jukebox/models/5b/prior_level_2.pth.tar"
+sha256 = "89a1dd14f5b2f9b16b3e73b53fa2138cc89fd96bb13249b4267fea471de92672"
+size_bytes = 0
+provenance = "OpenAI Jukebox release, consumed through jukebox-infer"

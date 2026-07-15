@@ -18,12 +18,15 @@ import warnings
 import librosa
 import numpy as np
 import torch as t
-from jukebox_infer.hparams import Hyperparams
-from jukebox_infer.make_models import make_model
-from jukebox_infer.prior import conditioners as _jukebox_infer_conditioners
-from jukebox_infer.utils.torch_utils import empty_cache
 
+from .._jukebox import get_backend
 from ..utils import get_approximate_audio_length
+
+_jukebox_backend = get_backend()
+Hyperparams = _jukebox_backend.Hyperparams
+make_model = _jukebox_backend.make_model
+_jukebox_infer_conditioners = _jukebox_backend.conditioners
+empty_cache = _jukebox_backend.empty_cache
 
 # --- Upstream bug workaround (jukebox_infer==0.1.1) -------------------------
 # `make_vqvae` computes `hps.sample_length` via `np.prod(...)`-derived

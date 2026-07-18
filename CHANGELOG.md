@@ -5,6 +5,14 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`sheetsage.assets.get_asset_checksum(tag)`.** `get_asset_tags()` only ever exposed the set
+  of tag names, never the checksum each one resolves to, so a downstream caller that needs to
+  publish a checkpoint's identity (for example Phonon's provider wrapper reporting real device +
+  per-model observability) had no public way to read it without reaching into the private
+  `_ASSETS` dict. Raises `ValueError` for an unknown tag.
+
 ## [0.2.1] - 2026-07-12
 
 ### Changed

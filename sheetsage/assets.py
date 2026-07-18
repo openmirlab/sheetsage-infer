@@ -55,6 +55,23 @@ def get_asset_tags():
     return set(_ASSETS.keys())
 
 
+def get_asset_checksum(tag):
+    """Return a tagged asset's checksum without downloading or verifying the file itself.
+
+    For callers (e.g. Phonon's provider wrapper) that need to publish a checkpoint's
+    identity for observability purposes but never touch the file directly -- `get_asset_tags`
+    only exposes the set of tag names, not the checksum each one resolves to.
+
+    Raises
+    ------
+    :class:`ValueError`
+       Unknown asset tag.
+    """
+    if tag not in _ASSETS:
+        raise ValueError(f"Unknown asset tag: {tag}")
+    return _ASSETS[tag]["checksum"]
+
+
 def _download_from_url(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE, log=True):
     if log:
         logging.info(f"Downloading from: {url}")

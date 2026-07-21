@@ -230,6 +230,36 @@ lead_sheet, beats, beat_times = sheetsage(
 
 **Note**: Jukebox features require GPU with ≥12GB VRAM. Vendored modules work without external installation.
 
+### Device and reusable sessions
+
+Every model-loading path accepts `device="auto"`, `"cpu"`, `"cuda"`, or `"cuda:N"`.
+For compatibility, `sheetsage()` and the CLI with no `--device` retain their historic
+choices: CPU for handcrafted features and CUDA for Jukebox. Pass `device="auto"` to opt
+into CUDA-when-available, otherwise CPU. An explicit CUDA request that is unavailable or
+invalid raises; it is never silently moved to CPU. New `SheetSageSession` instances default
+to `device="auto"`. Jukebox CUDA out-of-memory errors remain errors with device context.
+
+For repeated transcription, load a session once. `infer()` only runs an already-loaded
+pipeline, while `release()`/`close()` drop resident model memory but keep downloaded
+checkpoint files on disk:
+
+```python
+from sheetsage import SheetSageSession
+
+with SheetSageSession(device="auto", use_jukebox=False) as session:
+    first = session.infer("first.wav")
+    second = session.infer("second.wav")
+```
+
+The existing `sheetsage()` function remains a lazy, backward-compatible one-shot API.
+`session.cache_info()` reports the exact checkpoint paths the loader resolves without
+triggering downloads. The packaged `sheetsage/config/checkpoints.toml` is the runtime
+catalog for all SheetSage assets; it records URL, HuggingFace fallback, provenance, license,
+source revision, update date, and an explicit integrity algorithm plus digest. The inherited
+CFG digests are SHA-1; model and STEP artifacts use SHA-256. Override any artifact URL generically with
+`SHEETSAGE_ASSET_URL_<TAG>`; cache location remains configurable with
+`SHEETSAGE_CACHE_DIR`.
+
 ### Command-Line Interface
 
 ```bash

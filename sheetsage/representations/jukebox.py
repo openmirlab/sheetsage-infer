@@ -23,6 +23,7 @@ from jukebox_infer.make_models import make_model
 from jukebox_infer.prior import conditioners as _jukebox_infer_conditioners
 from jukebox_infer.utils.torch_utils import empty_cache
 
+from ..device import resolve_device
 from ..utils import get_approximate_audio_length
 
 # --- Upstream bug workaround (jukebox_infer==0.1.1) -------------------------
@@ -88,7 +89,7 @@ class JukeboxEmbeddings:
             auto_download: If True, automatically download missing checkpoints
         """
         self.model_name = model_name
-        self.device = device if isinstance(device, t.device) else t.device(device)
+        self.device = resolve_device(device)
         self.auto_download = auto_download
 
         # Initialize models
@@ -110,21 +111,13 @@ class JukeboxEmbeddings:
 
         try:
             self.vqvae, self.priors = _build_models(self.device)
-        except RuntimeError as e:
-            if (
-                "out of memory" in str(e).lower()
-                and isinstance(self.device, t.device)
-                and self.device.type == "cuda"
-            ):
-                logging.warning(
-                    "CUDA out of memory while loading Jukebox (device=%s). "
-                    "Falling back to CPU – this will be much slower.",
-                    self.device,
-                )
-                self.device = t.device("cpu")
-                self.vqvae, self.priors = _build_models(self.device)
-            else:
-                raise
+        except RuntimeError as exc:
+            if "out of memory" in str(exc).lower() and self.device.type == "cuda":
+                raise RuntimeError(
+                    f"CUDA out of memory while loading Jukebox on {self.device}; "
+                    "reduce memory use or choose device='cpu' explicitly."
+                ) from exc
+            raise
 
         # Use top-level prior (deepest layer) for embeddings
         self.prior = self.priors[-1]  # Level 2 for 5B model

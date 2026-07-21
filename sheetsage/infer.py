@@ -65,6 +65,8 @@ def sheetsage(
     status_change_callback=lambda s: logging.info(s.name),
     return_intermediaries=False,
     tqdm=lambda x: x,
+    device=None,
+    _components=None,
 ):
     """Main driver function for Sheet Sage: music audio -> lead sheet.
 
@@ -108,6 +110,9 @@ def sheetsage(
        If specified, calls this method upon changes in `Status`.
     return_intermediaries : bool
        If True, returns intermediate high-level results.
+    device : {None, "auto", "cpu", "cuda", "cuda:N"}
+       `None` preserves the historical backend defaults: CPU for handcrafted
+       features and CUDA for Jukebox. Pass `"auto"` for explicit auto-selection.
 
     Returns
     -------
@@ -137,6 +142,11 @@ def sheetsage(
     if beat_detection_padding < 0:
         raise ValueError("Beat detection padding cannot be negative")
     input_feats = InputFeats.JUKEBOX if use_jukebox else InputFeats.HANDCRAFTED
+    from .device import resolve_device
+
+    if device is None:
+        device = "cuda" if use_jukebox else "cpu"
+    device = resolve_device(device)
 
     # Disambiguate between URL and file path for string inputs and retrieve URL
     audio_path_or_bytes = audio_path_bytes_or_url
@@ -188,13 +198,24 @@ def sheetsage(
     if use_jukebox:
         logging.info("Feature extraction w/ Jukebox could take several minutes.")
     chunks_features = _extract_features(
-        audio_path_or_bytes, input_feats, tertiaries_times, chunks_tertiaries, tqdm
+        audio_path_or_bytes,
+        input_feats,
+        tertiaries_times,
+        chunks_tertiaries,
+        tqdm,
+        extractor=None if _components is None else _components.extractor,
+        device=device,
     )
 
     # Transcribe chunks
     status_change_callback(Status.TRANSCRIBING)
     melody_logits, harmony_logits = _transcribe_chunks(
-        chunks_features, input_feats, detect_melody, detect_harmony
+        chunks_features,
+        input_feats,
+        detect_melody,
+        detect_harmony,
+        device=device,
+        components=_components,
     )
 
     # Create lead sheet
@@ -272,6 +293,11 @@ def main():
         "--use_jukebox",
         action="store_true",
         help="If set, improves transcription quality by using OpenAI Jukebox (requires GPU w/ >=12GB VRAM).",
+    )
+    parser.add_argument(
+        "--device",
+        default=None,
+        help="Model device: auto, cpu, cuda, or cuda:N (default: historical backend choice).",
     )
     parser.add_argument(
         "--measures_per_chunk",
@@ -360,6 +386,7 @@ def main():
         harmony_threshold=args.harmony_threshold,
         legacy_behavior=args.legacy_behavior,
         tqdm=tqdm,
+        device=args.device,
     )
 
     # Create output directory

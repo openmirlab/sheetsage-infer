@@ -11,7 +11,7 @@ Reads: .types, ..align, ..assets, ..beat_track, ..modules, ..representations,
 
 import json
 import tempfile
-from functools import lru_cache as cache
+from dataclasses import dataclass
 
 import numpy as np
 import torch
@@ -50,19 +50,17 @@ from .types import (
 )
 
 
-@cache
-def _init_extractor(input_feats):
+def _init_extractor(input_feats, device="auto"):
     if input_feats == InputFeats.HANDCRAFTED:
         extractor = Handcrafted()
     elif input_feats == InputFeats.JUKEBOX:
-        extractor = JukeboxEmbeddings()
+        extractor = JukeboxEmbeddings(device=device)
     else:
         raise ValueError()
     return extractor
 
 
-@cache
-def _init_model(task, input_feats, model):
+def _init_model(task, input_feats, model, device="cpu"):
     if model == Model.LINEAR:
         # NOTE: Just need to catalogue these configs / weights
         raise NotImplementedError()
@@ -108,13 +106,37 @@ def _init_model(task, input_feats, model):
     else:
         raise ValueError()
 
-    device = torch.device("cpu")
+    device = torch.device(device)
     model.to(device)
     model.load_state_dict(
         torch.load(retrieve_asset(f"{asset_prefix}_MODEL", log=False), map_location=device)
     )
     model.eval()
     return model
+
+
+@dataclass
+class PipelineComponents:
+    extractor: object
+    melody_model: object | None
+    harmony_model: object | None
+
+
+def load_components(input_feats, detect_melody, detect_harmony, device):
+    """Construct the session-owned feature extractor and requested transducers once."""
+    return PipelineComponents(
+        extractor=_init_extractor(input_feats, device),
+        melody_model=(
+            _init_model(Task.MELODY, input_feats, Model.TRANSFORMER, device)
+            if detect_melody
+            else None
+        ),
+        harmony_model=(
+            _init_model(Task.HARMONY, input_feats, Model.TRANSFORMER, device)
+            if detect_harmony
+            else None
+        ),
+    )
 
 
 def _closest_idx(x, lst):
@@ -299,12 +321,14 @@ def _split_into_chunks(
     return chunks
 
 
-def _extract_features(audio_path_or_bytes, input_feats, tertiaries_times, chunks_tertiaries, tqdm):
+def _extract_features(
+    audio_path_or_bytes, input_feats, tertiaries_times, chunks_tertiaries, tqdm, extractor=None, device="auto"
+):
     tertiary_diff_frames = np.diff(tertiaries_times) * _INPUT_TO_FRAME_RATE[input_feats]
     if np.any(tertiary_diff_frames.astype(np.int64) == 0):
         raise ValueError("Tempo too fast for beat-informed feature resampling")
 
-    extractor = _init_extractor(input_feats)
+    extractor = extractor or _init_extractor(input_feats, device)
     chunks_features = []
     with tempfile.NamedTemporaryFile("wb") as f:
         if isinstance(audio_path_or_bytes, bytes):
@@ -341,19 +365,19 @@ def _extract_features(audio_path_or_bytes, input_feats, tertiaries_times, chunks
     return chunks_features
 
 
-def _transcribe_chunks(chunks_features, input_feats, detect_melody, detect_harmony):
+def _transcribe_chunks(chunks_features, input_feats, detect_melody, detect_harmony, device="cpu", components=None):
     melody_logits = None
     if detect_melody:
-        melody_model = _init_model(Task.MELODY, input_feats, Model.TRANSFORMER)
+        melody_model = components.melody_model if components else _init_model(Task.MELODY, input_feats, Model.TRANSFORMER, device)
         melody_logits = []
 
     harmony_logits = None
     if detect_harmony:
-        harmony_model = _init_model(Task.HARMONY, input_feats, Model.TRANSFORMER)
+        harmony_model = components.harmony_model if components else _init_model(Task.HARMONY, input_feats, Model.TRANSFORMER, device)
         harmony_logits = []
 
     if detect_melody or detect_harmony:
-        device = torch.device("cpu")
+        device = torch.device(device)
         with torch.no_grad():
             for src in chunks_features:
                 src_len = src.shape[0]
@@ -361,8 +385,8 @@ def _transcribe_chunks(chunks_features, input_feats, detect_melody, detect_harmo
                 src = src[:, np.newaxis]
                 src = torch.tensor(src).float()
                 src_len = torch.tensor(src_len).long().view(-1)
-                src.to(device)
-                src_len.to(device)
+                src = src.to(device)
+                src_len = src_len.to(device)
 
                 if detect_melody:
                     chunk_melody_logits = melody_model(src, src_len, None, None)

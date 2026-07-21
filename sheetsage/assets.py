@@ -1,11 +1,11 @@
 """Model-weight asset registry: resolves a named asset to a checksum-verified
 local file, downloading it into `CACHE_DIR` on first use.
 
-Each `sheetsage/assets/*.json` (hooktheory, jukebox, rwc, sheetsage, test)
-is a manifest of {name: {url, checksum, ...}} entries; `retrieve_asset(name)`
-looks a name up across all manifests and returns its local path. These
-downloaded weights are CC BY-NC-SA (see LICENSE/NOTICE), unlike this
-package's MIT-licensed code.
+The packaged `config/checkpoints.toml` is the runtime source for every
+SheetSage checkpoint entry; the remaining `sheetsage/assets/*.json` manifests
+cover datasets and third-party Jukebox assets. `retrieve_asset(name)` resolves
+a named entry and returns its local path. These downloaded weights are
+CC BY-NC-SA (see LICENSE/NOTICE), unlike this package's MIT-licensed code.
 
 Reads: sheetsage/assets/*.json, .utils (compute_checksum); read by:
 sheetsage.representations.handcrafted, sheetsage.infer (_init_model)
@@ -13,12 +13,19 @@ sheetsage.representations.handcrafted, sheetsage.infer (_init_model)
 
 import json
 import logging
+import os
 import pathlib
 import shutil
 import urllib.request
+import re
 
 from . import CACHE_DIR, LIB_DIR
 from .utils import compute_checksum
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10
+    import tomli as tomllib
 
 _DEFAULT_CHUNK_SIZE = 4096
 _ASSETS = None
@@ -32,6 +39,8 @@ def _init_assets():
     _ASSETS = {}
     asset_paths = set()
     for json_path in sorted(pathlib.Path(LIB_DIR, "assets").rglob("*.json")):
+        if json_path.name == "sheetsage.json":
+            continue
         with open(json_path) as f:
             d = json.load(f)
         for _tag, asset in d.items():
@@ -46,6 +55,30 @@ def _init_assets():
             asset_paths.add(asset["path"])
             asset["path_abs"] = pathlib.Path(CACHE_DIR, asset["path"])
         _ASSETS.update(d)
+
+    checkpoint_path = pathlib.Path(LIB_DIR, "config", "checkpoints.toml")
+    with open(checkpoint_path, "rb") as f:
+        checkpoint_artifacts = tomllib.load(f)["artifacts"]
+    for key, artifact in checkpoint_artifacts.items():
+        required = {
+            "tag", "path", "url", "license", "provenance", "source_revision", "updated_at",
+            "integrity_algorithm", "integrity_digest",
+        }
+        if missing := required - artifact.keys():
+            raise ValueError(f"Checkpoint {key} is missing required fields: {sorted(missing)}")
+        algorithm = artifact["integrity_algorithm"]
+        digest = artifact["integrity_digest"]
+        digest_lengths = {"md5": 32, "sha1": 40, "sha256": 64}
+        if algorithm not in digest_lengths or not re.fullmatch(r"[0-9a-f]+", digest):
+            raise ValueError(f"Checkpoint {key} has invalid integrity metadata")
+        if len(digest) != digest_lengths[algorithm]:
+            raise ValueError(f"Checkpoint {key} has an invalid {algorithm} digest")
+        tag = artifact["tag"]
+        artifact["url"] = os.environ.get(f"SHEETSAGE_ASSET_URL_{tag}", artifact["url"])
+        artifact["checksum"] = digest
+        artifact["path"] = pathlib.PurePosixPath(artifact["path"])
+        artifact["path_abs"] = pathlib.Path(CACHE_DIR, artifact["path"])
+        _ASSETS[tag] = artifact
 
 
 _init_assets()
@@ -70,6 +103,13 @@ def get_asset_checksum(tag):
     if tag not in _ASSETS:
         raise ValueError(f"Unknown asset tag: {tag}")
     return _ASSETS[tag]["checksum"]
+
+
+def resolve_asset_path(tag):
+    """Return the local path the loader uses for a named asset, without downloading."""
+    if tag not in _ASSETS:
+        raise ValueError(f"Unknown asset tag: {tag}")
+    return _ASSETS[tag]["path_abs"]
 
 
 def _download_from_url(url, dest_path, chunk_size=_DEFAULT_CHUNK_SIZE, log=True):
@@ -176,7 +216,7 @@ def retrieve_asset(tag, delete_wrong=False, chunk_size=_DEFAULT_CHUNK_SIZE, log=
     if tag not in _ASSETS:
         raise ValueError()
     asset = _ASSETS[tag]
-    path = asset["path_abs"]
+    path = resolve_asset_path(tag)
     checksum = asset["checksum"]
     if log:
         logging.info(f"Verifying asset: {tag}")

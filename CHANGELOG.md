@@ -7,6 +7,18 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **Explicit device and reusable session contract.** `sheetsage()`, `SheetSageSession`, and
+  the CLI accept `auto`, `cpu`, `cuda`, and `cuda:N`; `auto` resolves explicitly and invalid or
+  unavailable explicit CUDA now raises. Legacy one-shot/CLI calls retain CPU handcrafted and CUDA
+  Jukebox defaults, while new sessions default to `auto`. Sessions construct their extractor and transducers once,
+  reuse them across `infer()` calls, and release resident memory without removing checkpoints.
+  `cache_info()` now reports the same asset paths used by loading. Jukebox CUDA OOM no longer
+  silently falls back to CPU.
+- **Runtime checkpoint catalog.** Packaged `sheetsage/config/checkpoints.toml` is now the
+  source of truth for all SheetSage assets, preserving URL and HuggingFace fallback legs with
+  license/provenance, revision, and update metadata. It retains every legacy digest with an
+  explicit algorithm: SHA-1 for CFG assets and SHA-256 for models, moments, and STEP artifacts.
+
 - **`sheetsage.assets.get_asset_checksum(tag)`.** `get_asset_tags()` only ever exposed the set
   of tag names, never the checksum each one resolves to, so a downstream caller that needs to
   publish a checkpoint's identity (for example Phonon's provider wrapper reporting real device +

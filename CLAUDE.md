@@ -62,6 +62,25 @@ actually matches first), and an opt-in GPU Jukebox smoke test
 (`SHEETSAGE_RUN_JUKEBOX_TESTS=1 uv run pytest tests/test_jukebox_smoke.py`). Run the default
 suite with `uv run pytest tests/`.
 
+## Device and lifecycle contract
+
+All model-loading public paths (`sheetsage()`, `SheetSageSession`, and the CLI) accept
+`device="auto"`, `"cpu"`, `"cuda"`, and `"cuda:N"`. `sheetsage()` and CLI calls with no
+device preserve the historic CPU-handcrafted/CUDA-Jukebox selection; `auto` is explicit opt-in.
+New sessions default to `auto`. `sheetsage.device.resolve_device()` resolves explicit `auto`
+and rejects invalid or unavailable CUDA. Never add a fallback that changes an explicit request,
+including after CUDA OOM.
+
+`SheetSageSession.load()` constructs session-owned extractor/transducer components once;
+`infer()` only consumes those components. `release()` and `close()` clear those references
+without deleting downloaded assets. `cache_info()` uses `assets.resolve_asset_path()`, the
+same resolver used by `retrieve_asset()`. `sheetsage/config/checkpoints.toml` is packaged and
+is the runtime source of truth for all SheetSage assets. It preserves every URL/HuggingFace
+resolver leg and records the existing checksum with its explicit algorithm (including SHA-1 CFG
+digests and SHA-256 model/STEP digests); it supports generic `SHEETSAGE_ASSET_URL_<TAG>` overrides.
+Focused contract coverage is
+`uv run pytest tests/test_device_session.py`; complete verification remains `uv run pytest tests/`.
+
 When changing `sheetsage/representations/jukebox.py`, `make_models.py`-adjacent code, or
 anything in the feature-extraction path: re-run the CPU regression test at minimum, and the GPU
 smoke test if you have a free GPU -- a prior campaign found the Jukebox path silently broken

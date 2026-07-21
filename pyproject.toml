@@ -44,6 +44,7 @@ dependencies = [
     "pretty-midi>=0.2.11",
     "tqdm>=4.0.0",
     "resampy>=0.4.0",  # Required by librosa for audio resampling
+    "tomli>=2.0.0; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]

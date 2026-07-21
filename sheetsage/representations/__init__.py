@@ -8,8 +8,8 @@ try:
     from .jukebox import JukeboxEmbeddings as _JukeboxEmbeddings
 
     class JukeboxEmbeddings(_JukeboxEmbeddings):
-        def __init__(self):
-            super().__init__(model_name="5b", device="cuda", num_layers=53, auto_download=True)
+        def __init__(self, device="auto"):
+            super().__init__(model_name="5b", device=device, num_layers=53, auto_download=True)
 except ImportError:
     # Jukebox not available
     class JukeboxEmbeddings:

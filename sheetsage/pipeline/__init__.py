@@ -15,6 +15,7 @@ from .steps import (
     _format_lead_sheet,
     _init_extractor,
     _init_model,
+    load_components,
     _split_into_chunks,
     _transcribe_chunks,
 )
@@ -54,6 +55,7 @@ __all__ = [
     "_format_lead_sheet",
     "_init_extractor",
     "_init_model",
+    "load_components",
     "_split_into_chunks",
     "_transcribe_chunks",
 ]

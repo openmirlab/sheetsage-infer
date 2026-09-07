@@ -45,6 +45,11 @@ dependencies = [
     "tqdm>=4.0.0",
     "resampy>=0.4.0",  # Required by librosa for audio resampling
     "tomli>=2.0.0; python_version < '3.11'",
+    # sheetsage.assets._download_from_huggingface's fallback leg imports this at call time and
+    # raises ImportError if it is missing -- it was never declared, so every checkpoint whose
+    # url leg fails (all seven SHEETSAGE_V02_HANDCRAFTED_* since the S3 bucket started 403ing)
+    # had no working fallback despite the config declaring one.
+    "huggingface-hub>=0.20.0",
 ]
 
 [project.optional-dependencies]

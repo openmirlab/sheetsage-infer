@@ -13,8 +13,11 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `huggingface_repo`/`huggingface_filename` when the URL leg fails — the jukebox artifacts have
   carried this since the last release, the handcrafted ones never did. All seven now point at a
   mirror with byte-identical, checksum-verified copies of the original files (verified against
-  every `integrity_digest` already in this file). No code changed; `_download` already tries
-  both legs.
+  every `integrity_digest` already in this file).
+- **The HuggingFace fallback leg was unreachable.** `_download_from_huggingface` imports
+  `huggingface_hub` at call time, but this package never declared it as a dependency, so the
+  fallback above raised `ImportError` instead of running -- found while verifying the fix above
+  end to end. Added `huggingface-hub>=0.20.0` to `dependencies`.
 
 ### Added
 

@@ -12,6 +12,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "oafmelspec_moments.npy"
 
 [artifacts.sheetsage_v02_handcrafted_melody_cfg]
 tag = "SHEETSAGE_V02_HANDCRAFTED_MELODY_CFG"
@@ -24,6 +26,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_00_e0830_oafmelspecnorm/7d82e6839e582936ea428a823a0d868075a52dc5.cfg.json"
 
 [artifacts.sheetsage_v02_handcrafted_melody_model]
 tag = "SHEETSAGE_V02_HANDCRAFTED_MELODY_MODEL"
@@ -36,6 +40,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_00_e0830_oafmelspecnorm/model.pt"
 
 [artifacts.sheetsage_v02_handcrafted_harmony_cfg]
 tag = "SHEETSAGE_V02_HANDCRAFTED_HARMONY_CFG"
@@ -48,6 +54,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_02_e0908_oafmelspecnorm/5b739ce5efa2b6d4d70c5f1feac802684f0ee6f4.cfg.json"
 
 [artifacts.sheetsage_v02_handcrafted_melody_step]
 tag = "SHEETSAGE_V02_HANDCRAFTED_MELODY_STEP"
@@ -60,6 +68,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_00_e0830_oafmelspecnorm/step.pkl"
 
 [artifacts.sheetsage_v02_handcrafted_harmony_step]
 tag = "SHEETSAGE_V02_HANDCRAFTED_HARMONY_STEP"
@@ -72,6 +82,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_02_e0908_oafmelspecnorm/step.pkl"
 
 [artifacts.sheetsage_v02_handcrafted_harmony_model]
 tag = "SHEETSAGE_V02_HANDCRAFTED_HARMONY_MODEL"
@@ -84,6 +96,8 @@ license = "CC BY-NC-SA 3.0"
 provenance = "SheetSage v0.2 release assets"
 source_revision = "v0.2"
 updated_at = "2026-07-21"
+huggingface_repo = "bernie40916/phonon-sheetsage-v02-handcrafted"
+huggingface_filename = "0919_02_e0908_oafmelspecnorm/model.pt"
 
 [artifacts.sheetsage_v02_jukebox_melody_cfg]
 tag = "SHEETSAGE_V02_JUKEBOX_MELODY_CFG"

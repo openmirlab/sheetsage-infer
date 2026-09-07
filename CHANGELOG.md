@@ -5,6 +5,17 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Handcrafted checkpoints now have a HuggingFace fallback.** `sheetsage.s3.amazonaws.com`
+  (the `url` leg for all seven `SHEETSAGE_V02_HANDCRAFTED_*` artifacts) now returns HTTP 403 for
+  every file, matching #44/#45/#31 upstream. `retrieve_asset` already falls back to
+  `huggingface_repo`/`huggingface_filename` when the URL leg fails — the jukebox artifacts have
+  carried this since the last release, the handcrafted ones never did. All seven now point at a
+  mirror with byte-identical, checksum-verified copies of the original files (verified against
+  every `integrity_digest` already in this file). No code changed; `_download` already tries
+  both legs.
+
 ### Added
 
 - **Explicit device and reusable session contract.** `sheetsage()`, `SheetSageSession`, and

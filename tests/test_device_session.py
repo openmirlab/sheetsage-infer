@@ -23,6 +23,11 @@ def test_explicit_unavailable_or_invalid_cuda_raises(monkeypatch):
         resolve_device("not-a-device")
 
 
+def test_explicit_mps_uses_unsupported_device_rejection():
+    with pytest.raises(ValueError, match="Unsupported device"):
+        resolve_device("mps")
+
+
 @pytest.mark.parametrize(
     ("use_jukebox", "expected"),
     [(False, "cpu"), (True, "cuda")],

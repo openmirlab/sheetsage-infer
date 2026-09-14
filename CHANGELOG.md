@@ -18,6 +18,13 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `huggingface_hub` at call time, but this package never declared it as a dependency, so the
   fallback above raised `ImportError` instead of running -- found while verifying the fix above
   end to end. Added `huggingface-hub>=0.20.0` to `dependencies`.
+- **Legacy manifest drifted out of sync with the HuggingFace-fallback fix above.**
+  `sheetsage/assets/sheetsage.json` (the pre-`checkpoints.toml` manifest kept only for
+  `test_checkpoint_catalog_preserves_legacy_resolver_legs`'s consistency check, not read at
+  runtime) never got the `huggingface_repo`/`huggingface_filename` fields the two fixes above
+  added to `checkpoints.toml` for the seven handcrafted artifacts, so that test started failing
+  on this branch. Added the matching fields to the legacy manifest; no runtime behavior change
+  (`_ASSETS` is built from `checkpoints.toml` alone).
 
 ### Added
 

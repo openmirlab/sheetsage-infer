@@ -23,6 +23,7 @@ Reads: madmom_infer.features.downbeats (optional, see pyproject), librosa,
 scipy; read by: sheetsage.infer
 """
 
+import inspect
 import logging
 import math
 import tempfile
@@ -88,6 +89,14 @@ def _librosa_fallback(sr, audio, beats_per_bar=None, beats_per_minute_hint=None)
     return first_downbeat, detected_beats_per_bar, beat_times
 
 
+def _processor_supports_fast_viterbi(processor):
+    """Return whether a DBN processor explicitly accepts ``fast_viterbi``."""
+    try:
+        return "fast_viterbi" in inspect.signature(processor).parameters
+    except (TypeError, ValueError):  # pragma: no cover - unusual callable
+        return False
+
+
 def _madmom_infer_dbn(sr, audio, beats_per_bar_normalized, beats_per_minute_hint):
     """Run madmom-infer's RNN + DBN downbeat tracker; returns the parsed result.
 
@@ -128,6 +137,9 @@ def _madmom_infer_dbn(sr, audio, beats_per_bar_normalized, beats_per_minute_hint
     if beats_per_minute_hint is not None:
         dbn_kwargs["min_bpm"] = beats_per_minute_hint * math.pow(2, -0.5)
         dbn_kwargs["max_bpm"] = beats_per_minute_hint * math.pow(2, 0.5)
+
+    if _processor_supports_fast_viterbi(DBNDownBeatTrackingProcessor):
+        dbn_kwargs["fast_viterbi"] = True
 
     result = np.asarray(DBNDownBeatTrackingProcessor(**dbn_kwargs)(activations))
 

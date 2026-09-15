@@ -29,6 +29,9 @@ sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously 
   pure-Python library with no console script, so the old subprocess-based call was rewritten).
   One gap this bridges: madmom-infer has no ffmpeg-backed resampler, so non-44.1kHz audio is
   resampled with librosa before being handed to it (see `beat_track.py`'s module docstring).
+  `beat_track.py` also opts into madmom-infer's exact `fast_viterbi` decoder when the installed
+  `DBNDownBeatTrackingProcessor` signature explicitly exposes it; 0.2.0-compatible processors
+  keep the legacy constructor call.
 - **jukebox_infer**: `sheetsage/representations/jukebox.py` imports the real, published
   `jukebox_infer` package (not vendored). It carries a small documented monkeypatch working
   around a real upstream bug (`RangeEmbedding` not casting `n_time` to `int`, which surfaces as

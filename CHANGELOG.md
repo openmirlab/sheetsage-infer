@@ -7,6 +7,11 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **DBN decoding uses the exact Viterbi accelerator when available.** The beat-tracking consumer
+  forwards `fast_viterbi=True` only to madmom-infer processors whose constructor explicitly
+  supports it, while retaining the legacy constructor and decoded output for 0.2.0-compatible
+  installations.
+
 - **Handcrafted checkpoints now have a HuggingFace fallback.** `sheetsage.s3.amazonaws.com`
   (the `url` leg for all seven `SHEETSAGE_V02_HANDCRAFTED_*` artifacts) now returns HTTP 403 for
   every file, matching #44/#45/#31 upstream. `retrieve_asset` already falls back to

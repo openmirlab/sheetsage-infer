@@ -97,13 +97,26 @@ including after CUDA OOM.
 
 `SheetSageSession.load()` constructs session-owned extractor/transducer components once;
 `infer()` only consumes those components. `release()` and `close()` clear those references
-without deleting downloaded assets. `cache_info()` uses `assets.resolve_asset_path()`, the
+without deleting downloaded assets. States are `new`, `ready`, `failed`, `released`, and
+`closed`. Failed/interrupted imports, device resolution, or component construction clear
+owned components/resolved device, report `failed`, and re-raise the original exception;
+retry is allowed. Repeated successful `load()` does not rebuild. `release()` reports
+`released` and permits reload, but never revives `closed`. `close()` and context exit are
+terminal and idempotent. This does not alter loader-owned partial locals, model construction
+order, the per-call beat processor, cache policy, or one-shot inference behavior.
+`cache_info()` uses `assets.resolve_asset_path()`, the
 same resolver used by `retrieve_asset()`. `sheetsage/config/checkpoints.toml` is packaged and
 is the runtime source of truth for all SheetSage assets. It preserves every URL/HuggingFace
 resolver leg and records the existing checksum with its explicit algorithm (including SHA-1 CFG
 digests and SHA-256 model/STEP digests); it supports generic `SHEETSAGE_ASSET_URL_<TAG>` overrides.
 Focused contract coverage is
-`uv run pytest tests/test_device_session.py`; complete verification remains `uv run pytest tests/`.
+`uv run pytest tests/test_device_session.py tests/test_session_lifecycle.py`; complete
+verification remains `uv run pytest tests/ tools/test_dataset_examples.py` from a checkout.
+Lifecycle tests first reproduced seven failures, then passed with failed/released state
+reporting and reference cleanup. The committed CPU baseline replay remains exact. Two real
+inferences on one loaded session also match every baseline output field, construct one
+extractor/two transducers exactly once, and make no download attempts. GPU numerical parity
+and the per-call beat-processor lifecycle are outside this change.
 
 When changing `sheetsage/representations/jukebox.py`, `make_models.py`-adjacent code, or
 anything in the feature-extraction path: re-run the CPU regression test at minimum, and the GPU

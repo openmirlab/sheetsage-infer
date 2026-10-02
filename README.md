@@ -252,6 +252,14 @@ with SheetSageSession(device="auto", use_jukebox=False) as session:
 ```
 
 The existing `sheetsage()` function remains a lazy, backward-compatible one-shot API.
+Session `status` is `new`, `ready`, `failed`, `released`, or `closed`. A failed or
+interrupted load clears session-owned references, reports `failed`, and re-raises the
+original error; `load()` can retry. `release()` is reloadable, including before the first
+load. `close()` is terminal and idempotent; calling `release()` afterward cannot reopen it.
+Leaving a context closes the session even when its body raises. The session retains the
+SheetSage feature extractor and melody/harmony transducers across calls; the existing
+per-call beat-tracking processor construction remains unchanged.
+
 `session.cache_info()` reports the exact checkpoint paths the loader resolves without
 triggering downloads. The packaged `sheetsage/config/checkpoints.toml` is the runtime
 catalog for all SheetSage assets; it records URL, HuggingFace fallback, provenance, license,
@@ -479,3 +487,5 @@ Use `SheetSageSession` when an explicit lifecycle is required:
 independent; the package-owned `sheetsage/config/checkpoints.toml` records
 checkpoint URLs and provenance. The existing `sheetsage()` one-shot function
 remains available for backward compatibility.
+Failed loads report `failed` and can retry; released sessions report `released` and can
+reload. Closed sessions remain terminal, including after another `release()` call.

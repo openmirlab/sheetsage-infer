@@ -37,3 +37,12 @@ silence stopped after about 0.5–0.9 seconds. This supports a practical real-mo
 with independently acquired cached assets, but no environment-skipped test is counted as
 numerical verification. Package/model hashes, package versions, Torch build settings,
 platform, input hashes, array shapes/dtypes/RMS/finite checks, and timings live in the JSON.
+
+# Dataset-boundary checks
+
+`python -m pytest tests/test_dataset_boundary.py tools/test_dataset_examples.py` checks
+the installed registry and repository-only dataset examples without network access.
+The example catalogs retain their original hashes; their helper verifies downloaded/cached
+bytes before use. Both downloading examples use it; the local-JSON transcription example
+remains unchanged. Run `python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz`
+after building to reject dataset catalogs, helpers, or payloads in either archive.

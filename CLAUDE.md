@@ -18,6 +18,9 @@ sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously 
 - `sheetsage/assets.py` -- resolves named model weights / test fixtures to checksum-verified
   local files, downloaded on first use into `~/.sheetsage` (see `sheetsage/assets/*.json`).
 - `sheetsage/beat_track.py` -- madmom-infer's DBN downbeat tracker with a librosa fallback.
+- `examples/dataset_assets.py` and `examples/dataset_catalogs/` -- repository-only dataset
+  acquisition; both HookTheory downloading examples use this helper. Neither helper nor
+  catalogs ship in wheel or sdist. Runtime never imports examples/tools.
 
 ## Known constraints (read before touching install/dependency config)
 
@@ -64,6 +67,24 @@ output -- don't "fix" a skip by loosening a fixture's tolerance without checking
 actually matches first), and an opt-in GPU Jukebox smoke test
 (`SHEETSAGE_RUN_JUKEBOX_TESTS=1 uv run pytest tests/test_jukebox_smoke.py`). Run the default
 suite with `uv run pytest tests/`.
+
+The dataset boundary is checked by `tests/test_dataset_boundary.py`: all 22 former
+HookTheory/RWC tags are rejected while all 24 inference/test tags retain their checksums.
+Run repository example tests explicitly with `python -m pytest tools/test_dataset_examples.py`;
+they mock downloads and verify catalog-byte preservation, both consumers, cache/checksum
+behavior, and manual-only failures. These tests are repository-only like their subjects.
+`MANIFEST.in` excludes examples and historical dataset/output directories from the sdist;
+package discovery already excludes them from the wheel. Preserve these exclusions when
+changing build backends. Verify both archives with
+`python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz`.
+
+`tests/fixtures/cpu_boundary_baseline/` is immutable original-runtime evidence at `b37c457`.
+See `tools/README.md` for exact CPU replay on cached real/silent inputs, all returned fields,
+complete environment and checkpoint hashes. Both repeated real calls and independent-process
+replay are exact. Silence currently fails at beat detection; this stage does not change it.
+The old guarded tests still skip here; only explicit successful replay counts as parity.
+Dataset manifests moved byte-for-byte; no lifecycle, inference-model, numerical-dependency,
+Python-support, or weight-hosting changes belong to this boundary stage.
 
 ## Device and lifecycle contract
 

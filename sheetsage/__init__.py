@@ -9,6 +9,7 @@ else:
     CACHE_DIR = pathlib.Path(pathlib.Path.home(), ".sheetsage")
 CACHE_DIR = CACHE_DIR.resolve()
 
+from .__about__ import __version__
 from .session import SheetSageSession
 
 
@@ -18,4 +19,4 @@ def load_tests(loader, standard_tests, pattern):
     standard_tests.addTests(package_tests)
     return standard_tests
 
-__all__ = ["CACHE_DIR", "SheetSageSession"]
+__all__ = ["CACHE_DIR", "SheetSageSession", "__version__"]

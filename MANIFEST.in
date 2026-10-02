@@ -1,5 +1,0 @@
-# Dataset examples are repository-only and never part of the inference archive.
-prune examples
-prune hooktheory_data
-prune hooktheory_transcription_results
-exclude tools/test_dataset_examples.py

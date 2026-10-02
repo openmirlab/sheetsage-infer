@@ -414,6 +414,13 @@ downloads on your behalf. See [NOTICE](NOTICE) for the full breakdown.
 
 ## Development
 
+Hatchling builds the wheel from the source archive. `sheetsage/__about__.py` owns the
+version, re-exported as `sheetsage.__version__`. Source archives include runtime tests,
+verification tools, and derived-output fixtures; dataset examples/catalogs remain checkout-only.
+`tools/verify_installed.py CHECKOUT` checks an installed wheel from outside the checkout:
+all runtime/assets match source, and all pre-delivery bytes remain identical except the
+explicit version re-export. Python support, dependencies, and model assets are unchanged.
+
 The immutable current CPU baseline and exact replay command are documented in
 [tools/README.md](tools/README.md). It compares every returned intermediate and decoded
 field on real audio and preserves the current silence failure. Historical environment-guarded

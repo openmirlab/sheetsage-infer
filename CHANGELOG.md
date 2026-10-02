@@ -7,6 +7,10 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Build with Hatchling and a single `sheetsage/__about__.py` version owner, exported as
+  `sheetsage.__version__`. Preserve runtime/assets and dataset exclusions in wheel and sdist;
+  ship verification tools and immutable derived fixtures in the source archive.
+
 - Remove HookTheory/RWC training and evaluation dataset tags from the installed asset API
   and CLI. Their unchanged catalogs and checksum-verified helper now serve repository-only
   examples and are excluded from both source and wheel distributions. Model/test asset

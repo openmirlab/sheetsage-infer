@@ -7,6 +7,12 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Gate delivery on Python 3.10–3.12 fresh CPU installs, contract tests, wheel-from-sdist and
+  installed-byte checks; publishing depends on this matrix. Add explicit cached portable CPU
+  verification with exact decoded outputs and float diagnostics, retaining exact baseline replay.
+  Hosted model coverage remains unavailable until access to the seven configured handcrafted
+  assets is resolved (unauthenticated S3 403 / Hugging Face 401); no cache or weights are published.
+
 - Build with Hatchling and a single `sheetsage/__about__.py` version owner, exported as
   `sheetsage.__version__`. Preserve runtime/assets and dataset exclusions in wheel and sdist;
   ship verification tools and immutable derived fixtures in the source archive.

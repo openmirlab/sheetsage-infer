@@ -139,3 +139,16 @@ and test fixtures, including the explicitly included immutable CPU baseline NPZ.
 `tools/verify_installed.py CHECKOUT` checks every installed source/asset byte against final
 source and that manifest; only the two explicit version re-export additions in `__init__.py`
 are normalized. The new `__about__.py` is the only additional runtime file.
+
+The reusable `.github/workflows/verify.yml` runs Python 3.10–3.12 contracts, fresh CPU installs,
+`pip check`, scoped verification-tool lint, archive checks, and installed-wheel identity.
+The publish workflow depends on it. Do not describe this matrix as model parity: existing
+historical environment guards and optional GPU coverage remain explicit skips.
+`capture_cpu_baseline.py --portable --cpu-assets-only --installed` is an opt-in cached real
+CPU verifier: exact decoded/segment/error/status outputs, shape/dtype/finite/nonzero checks,
+repeat equality, and measured float differences. Default replay still requires exact arrays.
+All 13 configured SheetSage digests must match the immutable baseline; available cached bytes
+are independently verified, while six unused Jukebox files may be absent only in CPU mode.
+Seven handcrafted assets are required. Unauthenticated S3 returned 403 and HF fallback 401
+for all seven on 2026-10-03; do not add a hosted model job that skips this missing prerequisite,
+mirror weights, or upload private caches. Hosting/access requires a separate decision.

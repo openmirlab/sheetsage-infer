@@ -22,7 +22,6 @@ import soundfile as sf
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 
 ORIGINAL = "b37c4579a788123e408b80d011f876631daa101f"
 
@@ -43,8 +42,8 @@ def plain(value):
     return value
 
 
-def capture():
-    from sheetsage import assets
+def capture(*, cpu_assets_only=False):
+    from sheetsage import LIB_DIR, assets
     from sheetsage.infer import sheetsage
     from sheetsage.representations import Handcrafted
 
@@ -55,14 +54,16 @@ def capture():
     def no_download(*args, **kwargs):
         raise RuntimeError("Baseline requires independently cached assets; downloads disabled")
     assets._download = no_download
-    source = {str(p.relative_to(ROOT)): digest(p.read_bytes())
-              for p in sorted((ROOT / "sheetsage").rglob("*"))
+    source = {"sheetsage/" + str(p.relative_to(LIB_DIR)): digest(p.read_bytes())
+              for p in sorted(LIB_DIR.rglob("*"))
               if p.is_file() and p.suffix in (".py", ".json", ".toml")}
     checkpoints = {}
     for tag, item in assets._ASSETS.items():
         if not tag.startswith("SHEETSAGE_"):
             continue
         path = item["path_abs"]
+        if cpu_assets_only and "_JUKEBOX_" in tag and not path.is_file():
+            continue
         raw = path.read_bytes()
         algorithm = item.get("integrity_algorithm", "sha256")
         assert hashlib.new(algorithm, raw).hexdigest() == item["checksum"], tag
@@ -145,7 +146,17 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--record", action="store_true")
     parser.add_argument("--reference", type=Path)
+    parser.add_argument("--cpu-assets-only", action="store_true",
+                        help="Permit absent unused Jukebox transducer assets; verify any present")
+    parser.add_argument("--portable", action="store_true",
+                        help="Require exact discrete/segment outputs; report float differences without an equality claim")
+    parser.add_argument("--installed", action="store_true",
+                        help="Use the installed package instead of prepending the source checkout")
     args = parser.parse_args()
+    if args.record and (args.cpu_assets_only or args.portable or args.installed):
+        parser.error("--record requires the complete original source/profile")
+    if not args.installed:
+        sys.path.insert(0, str(ROOT))
     if args.record:
         head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
         changes = subprocess.check_output(["git", "diff", "HEAD", "--", "sheetsage"], cwd=ROOT)
@@ -155,18 +166,57 @@ def main():
         parser.error("replay requires --reference; use --record only before production edits")
     if args.output.exists():
         parser.error("output directory must not already exist")
-    metadata, arrays = capture()
+    if args.installed:
+        from sheetsage import LIB_DIR
+        assert not LIB_DIR.resolve().is_relative_to(ROOT), LIB_DIR
+    metadata, arrays = capture(cpu_assets_only=args.cpu_assets_only)
     if args.reference:
         reference = json.loads((args.reference / "metadata.json").read_text())
+        from sheetsage import assets
+        configured = {tag: item for tag, item in assets._ASSETS.items()
+                      if tag.startswith("SHEETSAGE_")}
+        assert set(configured) == set(reference["checkpoint_sha256"])
+        for tag, item in configured.items():
+            recorded = reference["checkpoint_sha256"][tag]
+            assert item["checksum"] == recorded["manifest_digest"], tag
+            assert item.get("integrity_algorithm", "sha256") == recorded["manifest_algorithm"], tag
+            if tag in metadata["checkpoint_sha256"]:
+                assert metadata["checkpoint_sha256"][tag]["sha256"] == recorded["sha256"], tag
+        assert metadata["input_file"]["sha256"] == reference["input_file"]["sha256"]
+        for name, case in metadata["cases"].items():
+            assert case["decoded_sha256"] == reference["cases"][name]["decoded_sha256"], name
+        metadata["optional_uncached_jukebox_assets"] = sorted(
+            set(configured) - set(metadata["checkpoint_sha256"]))
+        diagnostics = {}
         with np.load(args.reference / "arrays.npz", allow_pickle=False) as expected:
             assert set(expected.files) == set(arrays)
             for key, value in arrays.items():
-                np.testing.assert_array_equal(value, expected[key], err_msg=key)
+                if args.portable:
+                    assert value.shape == expected[key].shape, key
+                    assert value.dtype == expected[key].dtype, key
+                    assert np.isfinite(value).all(), key
+                    assert np.sqrt(np.mean(value.astype(float) ** 2)) > 0, key
+                    if "segment_beats" in key:
+                        np.testing.assert_array_equal(value, expected[key], err_msg=key)
+                    delta = value.astype(float) - expected[key].astype(float)
+                    diagnostics[key] = {
+                        "exact": bool(np.array_equal(value, expected[key])),
+                        "max_absolute_difference": float(np.max(np.abs(delta))),
+                        "relative_rms_difference": float(np.sqrt(np.mean(delta ** 2)) /
+                            max(np.sqrt(np.mean(expected[key].astype(float) ** 2)), 1e-30)),
+                    }
+                    if key.startswith("real/1/"):
+                        np.testing.assert_array_equal(value, arrays[key.replace("real/1/", "real/0/")])
+                else:
+                    np.testing.assert_array_equal(value, expected[key], err_msg=key)
         for name, case in metadata["cases"].items():
             for actual, expected in zip(case["runs"], reference["cases"][name]["runs"], strict=True):
                 assert {k: v for k, v in actual.items() if k != "seconds"} == {
                     k: v for k, v in expected.items() if k != "seconds"}, name
-        metadata["exact_replay"] = True
+        metadata["exact_replay"] = not args.portable
+        if args.portable:
+            metadata["portable_discrete_replay"] = True
+            metadata["float_diagnostics"] = diagnostics
     args.output.mkdir(parents=True)
     np.savez_compressed(args.output / "arrays.npz", **arrays)
     (args.output / "metadata.json").write_text(json.dumps(metadata, indent=2, allow_nan=False) + "\n")

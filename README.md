@@ -363,7 +363,8 @@ sheetsage-infer/
 │   └── Hooktheory_Test_Segments.json
 ├── .github/                      # GitHub configuration
 │   └── workflows/
-│       └── publish.yml           # PyPI publishing workflow (runs tests before build)
+│       ├── verify.yml            # Python 3.10–3.12 delivery contract/build matrix
+│       └── publish.yml           # PyPI publishing, depends on verification
 ├── pyproject.toml               # Project configuration (single source of truth for deps)
 ├── uv.lock                      # UV lock file
 ├── CHANGELOG.md                 # Notable changes
@@ -413,6 +414,20 @@ downloads on your behalf. See [NOTICE](NOTICE) for the full breakdown.
 ---
 
 ## Development
+
+The read-only delivery workflow runs on pull requests and `master`, across Python 3.10–3.12:
+fresh CPU dependency installation, `pip check`, the complete current contract suite,
+wheel-from-sdist build, archive checks, and installed-wheel verification outside the checkout.
+Publishing depends on this matrix. It is **not an end-to-end model gate**: the two historical
+environment-guarded fixtures and optional GPU smoke can skip.
+
+Real CPU verification is a separate explicit cached-asset command in [tools/README.md](tools/README.md).
+It fails for missing assets. Exact replay remains available for the recorded numerical profile;
+portable mode requires exact decoded/segment results and reports every float-array difference.
+On 2026-10-03, all seven configured handcrafted S3 URLs returned HTTP 403 and their existing
+Hugging Face fallbacks returned HTTP 401 without credentials. A hosted real-model gate needs
+a separately approved access/hosting arrangement for those seven unchanged assets; no weights
+or private caches are uploaded by these workflows.
 
 Hatchling builds the wheel from the source archive. `sheetsage/__about__.py` owns the
 version, re-exported as `sheetsage.__version__`. Source archives include runtime tests,

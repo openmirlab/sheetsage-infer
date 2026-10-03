@@ -3,7 +3,7 @@ local file, downloading it into `CACHE_DIR` on first use.
 
 The packaged `config/checkpoints.toml` is the runtime source for every
 SheetSage checkpoint entry; the remaining `sheetsage/assets/*.json` manifests
-cover datasets and third-party Jukebox assets. `retrieve_asset(name)` resolves
+cover test fixtures and third-party Jukebox assets. `retrieve_asset(name)` resolves
 a named entry and returns its local path. These downloaded weights are
 CC BY-NC-SA (see LICENSE/NOTICE), unlike this package's MIT-licensed code.
 

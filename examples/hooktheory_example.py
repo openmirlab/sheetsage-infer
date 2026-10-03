@@ -17,16 +17,19 @@ import sys
 import tarfile
 import tempfile
 
+if __package__:
+    from .dataset_assets import retrieve_dataset_asset as retrieve_asset
+else:
+    from dataset_assets import retrieve_dataset_asset as retrieve_asset
+
 # Try to import sheetsage (may fail if dependencies not installed)
 SHEETSAGE_AVAILABLE = False
-retrieve_asset = None
 sheetsage = None
 engrave = None
 create_beat_to_time_fn = None
 
 try:
     from sheetsage.align import create_beat_to_time_fn
-    from sheetsage.assets import retrieve_asset
     from sheetsage.infer import sheetsage
     from sheetsage.utils import engrave
 
@@ -34,19 +37,6 @@ try:
 except ImportError as e:
     print(f"Warning: Could not import sheetsage: {e}")
     print("This script will download Hooktheory data but cannot run transcription.")
-    # Try to import just assets module
-    try:
-        import pathlib
-        import sys
-
-        # Add parent directory to path
-        sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
-        from sheetsage.assets import retrieve_asset
-
-        print("✓ Assets module loaded (transcription will be skipped)")
-    except ImportError as e2:
-        print(f"Could not load assets module: {e2}")
-        retrieve_asset = None
 
 
 def download_hooktheory_segments(segment_type="TEST"):

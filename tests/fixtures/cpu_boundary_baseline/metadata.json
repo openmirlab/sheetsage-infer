@@ -1,0 +1,734 @@
+{
+  "original_source_commit": "b37c4579a788123e408b80d011f876631daa101f",
+  "source_sha256": {
+    "sheetsage/__init__.py": "28f7fb2788154303d858b375856563dd2bdc98ac208b562b1027afc210c1aaab",
+    "sheetsage/align.py": "8b4ecc73ab300e709c9c5815d118a6db2f3da723242fa49f617250aac9d63598",
+    "sheetsage/assets/hooktheory.json": "2ce75dc76605d2436ea30f41831c4e53dfc485d3585751b78ac9626ebcd4a246",
+    "sheetsage/assets/jukebox.json": "84c07cf6bc319d6663607d06457bfcf5b302f12a10097db66964d170dc20cbcf",
+    "sheetsage/assets/rwc.json": "44c5a00eef3e3d56ef2eb097f5c1e0f198cd633f1003ea98f65596b03f8421ff",
+    "sheetsage/assets/sheetsage.json": "7afe7f8ba28a60be2d4696486df1c2f820c208973af9e184b01d2d08214ab181",
+    "sheetsage/assets/test.json": "f24e17764a5e812192c891db5a63440ba44186300c6c397f3386d78ec10a7255",
+    "sheetsage/assets.py": "66db7cee7ba23786dbbb602b6e46b5938dcb2abba9fc6314324439936c9d4293",
+    "sheetsage/beat_track.py": "855c8f4d1aa22ad80442bac4767eb81b8c36f7e9b3487e46c27f69e07cc4b862",
+    "sheetsage/config/__init__.py": "d3663d89561ef10344ef73416404a2b4edd9759773f378711aa4500c0596fee8",
+    "sheetsage/config/checkpoints.toml": "3679024fd6fbdb218cb52f614486cb81d217aa284f20bfb3eea5d4600c541d8f",
+    "sheetsage/device.py": "6c43bbcb77be84bdc3a144f247c4e117f9424d9c20ec0b5a0f15bedb4066f0b0",
+    "sheetsage/infer.py": "6d31ccf7c3ee87a9cd673dbf773af2912cb217e66d9cdaac89b7d2c680dfbeda",
+    "sheetsage/modules/__init__.py": "d151dbbd467b96515dd5effbfc97564dac58302bda47a29b50969825eaae9902",
+    "sheetsage/modules/modules.py": "1ecf2c7f6eab0d1d8cdda167806d6881c98b67245c95facb88259faa350616c9",
+    "sheetsage/pipeline/__init__.py": "4e4c12c74da5fcf048fbb9d7996bcb00ef6155f1c75d82a128fe6aa98992bbde",
+    "sheetsage/pipeline/steps.py": "7649640f912c7306e30e67ae31999c0a385d5930dc4fda900e83f3231318a229",
+    "sheetsage/pipeline/types.py": "985a35ff963e8c7176a9881582e8a000c02865b0dd99221eb75af06296bd774e",
+    "sheetsage/representations/__init__.py": "26359c319b559a7ef114e1e449d8554f91fa8ce9074f82e01cb920e5f61949c3",
+    "sheetsage/representations/base.py": "4c8aa5d83ffe49841240053c54b138eefd984dbe6876e2f8e833f72f181e59ca",
+    "sheetsage/representations/handcrafted.py": "3d6de9654812c9057cbfe232c16d8cc8ef1d6d00bc4773d46ac28788b3a47beb",
+    "sheetsage/representations/jukebox.py": "fbee91ce45a64a45bd9f96ff50808f81eef9a75eb24136e391adb9eb5df9bb24",
+    "sheetsage/session.py": "9b24a4cfddfad774088deb24d5586b795f02b135b70afc2ec8697779e4669988",
+    "sheetsage/theory/__init__.py": "a767c7e229cd91e540939486e1200a877b61a279eb886f046a5e845b8d14dd64",
+    "sheetsage/theory/basic.py": "e16c4c6b0e38dc6635e35eff0ae0c656698fba4ffdaf0f5b6fcc14f0dba5bebc",
+    "sheetsage/theory/internal.py": "128d87c0f3f775f100720e3e811e88dc177934e1fdc70ad974658b4a229bac2d",
+    "sheetsage/theory/lead_sheet.py": "b0d490ec44dbcc38e7c214981828ed3e7a9a0c8467b20378cd1196d239a92c26",
+    "sheetsage/theory/theorytab.py": "6fb8ef9aa2437f8f9a1eb4a9d93c460f8c54f63fa35808e6cf478275a8dab523",
+    "sheetsage/theory/utils.py": "025fc5882976e4dd711ec06eb5f55414deb1c9849851bcf035e0a6ff16af60d4",
+    "sheetsage/utils.py": "4d40dbc64218821e094348985abc45680a615f8a1b96ff112eed8aff2786ae96"
+  },
+  "environment": {
+    "python": "3.11.13 (main, Jul  8 2025, 20:59:57) [Clang 20.1.4 ]",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+    "packages": {
+      "pathspec": "1.1.1",
+      "pycparser": "2.23",
+      "cuda-pathfinder": "1.5.6",
+      "cuda-toolkit": "13.0.3.0",
+      "nvidia-nvjitlink": "13.3.33",
+      "typing_extensions": "4.15.0",
+      "mpmath": "1.3.0",
+      "nvidia-nvshmem-cu13": "3.4.5",
+      "llvmlite": "0.45.1",
+      "Jinja2": "3.1.6",
+      "networkx": "3.6",
+      "filelock": "3.20.0",
+      "validators": "0.35.0",
+      "nvidia-cusolver": "12.0.4.66",
+      "setuptools": "83.0.0",
+      "soxr": "1.0.0",
+      "nvidia-cufile": "1.15.1.6",
+      "msgpack": "1.1.2",
+      "idna": "3.11",
+      "nvidia-cusolver-cu12": "11.7.3.90",
+      "resampy": "0.4.3",
+      "fsspec": "2025.10.0",
+      "madmom-infer": "0.2.0",
+      "importlib_resources": "6.5.2",
+      "decorator": "5.2.1",
+      "jukebox-infer": "0.1.1",
+      "cuda-bindings": "13.3.1",
+      "ruff": "0.15.21",
+      "urllib3": "2.5.0",
+      "sheetsage-infer": "0.2.1",
+      "pretty_midi": "0.2.11",
+      "requests": "2.32.5",
+      "joblib": "1.5.2",
+      "nvidia-cuda-nvrtc": "13.0.88",
+      "mypy": "2.2.0",
+      "numba": "0.62.1",
+      "audioread": "3.1.0",
+      "httpcore": "1.0.9",
+      "pytest": "9.1.1",
+      "threadpoolctl": "3.6.0",
+      "nvidia-curand-cu12": "10.3.9.90",
+      "narwhals": "2.23.0",
+      "nvidia-nvshmem-cu12": "3.3.20",
+      "nvidia-cudnn-cu13": "9.20.0.48",
+      "Pygments": "2.20.0",
+      "pytest-cov": "7.1.0",
+      "sympy": "1.14.0",
+      "nvidia-cuda-runtime": "13.0.96",
+      "soundfile": "0.13.1",
+      "nvidia-nvtx": "13.0.85",
+      "lazy_loader": "0.4",
+      "mido": "1.3.3",
+      "nvidia-cuda-cupti": "13.0.85",
+      "PyYAML": "6.0.3",
+      "triton": "3.5.1",
+      "nvidia-cusparse": "12.6.3.3",
+      "openmirlab-sheetsage-infer": "0.2.0",
+      "ast_serialize": "0.6.0",
+      "pillow": "12.0.0",
+      "nvidia-cublas-cu12": "12.8.4.1",
+      "nvidia-cusparselt-cu13": "0.8.1",
+      "certifi": "2025.11.12",
+      "hf-xet": "1.6.0",
+      "h11": "0.16.0",
+      "click": "8.5.0",
+      "nvidia-curand": "10.4.0.35",
+      "MarkupSafe": "3.0.3",
+      "huggingface_hub": "1.30.0",
+      "nvidia-cudnn-cu12": "9.10.2.21",
+      "nvidia-cublas": "13.1.1.3",
+      "madmom": "0.17.dev0",
+      "nvidia-nccl-cu13": "2.29.7",
+      "cffi": "2.0.0",
+      "anyio": "4.14.2",
+      "pooch": "1.8.2",
+      "tqdm": "4.67.1",
+      "numpy": "2.3.5",
+      "Unidecode": "1.4.0",
+      "platformdirs": "4.5.0",
+      "nvidia-cusparselt-cu12": "0.7.1",
+      "librt": "0.13.0",
+      "nvidia-nvtx-cu12": "12.8.90",
+      "nvidia-cufile-cu12": "1.13.1.3",
+      "nvidia-cufft-cu12": "11.3.3.83",
+      "nvidia-nccl-cu12": "2.27.5",
+      "nvidia-nvjitlink-cu12": "12.8.93",
+      "scikit-learn": "1.7.2",
+      "mypy_extensions": "1.1.0",
+      "six": "1.17.0",
+      "nvidia-cuda-nvrtc-cu12": "12.8.93",
+      "packaging": "25.0",
+      "charset-normalizer": "3.4.4",
+      "librosa": "0.11.0",
+      "nvidia-cufft": "12.0.0.61",
+      "torch": "2.9.1+cu128",
+      "nvidia-cuda-cupti-cu12": "12.8.90",
+      "nvidia-cusparse-cu12": "12.5.8.93",
+      "scipy": "1.15.3",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.0",
+      "nvidia-cuda-runtime-cu12": "12.8.90",
+      "httpx": "0.28.1",
+      "coverage": "7.15.0"
+    },
+    "torch_build": "2.9.1+cu128",
+    "torch_config": "PyTorch built with:\n  - GCC 13.3\n  - C++ Version: 201703\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.7.1 (Git Hash 8d263e693366ef8db40acc569cc7d8edf644556d)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - CUDA Runtime 12.8\n  - NVCC architecture flags: -gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_90,code=sm_90;-gencode;arch=compute_100,code=sm_100;-gencode;arch=compute_120,code=sm_120\n  - CuDNN 91.0.2  (built against CUDA 12.9)\n    - Built with CuDNN 90.8\n  - Magma 2.6.1\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, COMMIT_SHA=5811a8d7da873dd699ff6687092c225caffcf1bb, CUDA_VERSION=12.8, CUDNN_VERSION=9.8.0, CXX_COMPILER=/opt/rh/gcc-toolset-13/root/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-dangling-reference -Wno-error=dangling-reference -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.9.1, USE_CUDA=ON, USE_CUDNN=ON, USE_CUSPARSELT=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF, \n",
+    "device": "cpu",
+    "torch_threads": 1,
+    "torch_interop_threads": 14,
+    "seed": 0
+  },
+  "checkpoint_sha256": {
+    "SHEETSAGE_V02_HANDCRAFTED_MOMENTS": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/oafmelspec_moments.npy",
+      "size": 1960,
+      "sha256": "81d20995052676ca4cd60afd2657c8fa0c10e21c0895b39cda85fe3f4d1255e5",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "81d20995052676ca4cd60afd2657c8fa0c10e21c0895b39cda85fe3f4d1255e5"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_MELODY_CFG": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_00_e0830_oafmelspecnorm/7d82e6839e582936ea428a823a0d868075a52dc5.cfg.json",
+      "size": 403,
+      "sha256": "63218e644c25418ca2d415176a303de052c68eddbf1cdac031b06ce3a9f4e415",
+      "manifest_algorithm": "sha1",
+      "manifest_digest": "7d82e6839e582936ea428a823a0d868075a52dc5"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_MELODY_MODEL": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_00_e0830_oafmelspecnorm/model.pt",
+      "size": 59496040,
+      "sha256": "70f10a4146da8f1294597516622901d93621c5cd1bbb4e9dc831f9c43c081ef4",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "70f10a4146da8f1294597516622901d93621c5cd1bbb4e9dc831f9c43c081ef4"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_HARMONY_CFG": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_02_e0908_oafmelspecnorm/5b739ce5efa2b6d4d70c5f1feac802684f0ee6f4.cfg.json",
+      "size": 402,
+      "sha256": "22b1d3ac9fa9e408254dbf07faadce35f1ae48bc8513e5357be49db55fe17b6f",
+      "manifest_algorithm": "sha1",
+      "manifest_digest": "5b739ce5efa2b6d4d70c5f1feac802684f0ee6f4"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_MELODY_STEP": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_00_e0830_oafmelspecnorm/step.pkl",
+      "size": 6,
+      "sha256": "287bdfc444a79ebee76722726d29f57169d2170c95363ed122866ea534206006",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "287bdfc444a79ebee76722726d29f57169d2170c95363ed122866ea534206006"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_HARMONY_STEP": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_02_e0908_oafmelspecnorm/step.pkl",
+      "size": 6,
+      "sha256": "06fa1073e4fea8a9af2e5560e11f67fc91b6089d218d872f0b70cad5318fd583",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "06fa1073e4fea8a9af2e5560e11f67fc91b6089d218d872f0b70cad5318fd583"
+    },
+    "SHEETSAGE_V02_HANDCRAFTED_HARMONY_MODEL": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0919_02_e0908_oafmelspecnorm/model.pt",
+      "size": 59512452,
+      "sha256": "d7f6dae6902618ba285d78459010a5388002efcd685f1f2ce334297eec6c799f",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "d7f6dae6902618ba285d78459010a5388002efcd685f1f2ce334297eec6c799f"
+    },
+    "SHEETSAGE_V02_JUKEBOX_MELODY_CFG": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_00_e0830_jukebox53/e968ecb8349156b2e9761ae61606454988fa614d.cfg.json",
+      "size": 398,
+      "sha256": "7a2271d0e579eb5ecd0a67c485a507a28f086da00cf80ecff4941de92ea864d3",
+      "manifest_algorithm": "sha1",
+      "manifest_digest": "e968ecb8349156b2e9761ae61606454988fa614d"
+    },
+    "SHEETSAGE_V02_JUKEBOX_MELODY_MODEL": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_00_e0830_jukebox53/model.pt",
+      "size": 68857462,
+      "sha256": "e4a2cbce0a5a027e05ac753d72794ca723be2d18312f07daa0e43980d054249e",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "e4a2cbce0a5a027e05ac753d72794ca723be2d18312f07daa0e43980d054249e"
+    },
+    "SHEETSAGE_V02_JUKEBOX_HARMONY_CFG": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_01_e0908_jukebox53/f94f45ed03c8696f187a8bfded0f0d65476b4d48.cfg.json",
+      "size": 397,
+      "sha256": "4f9d7210842c42578ab886e4ab78dfcd26b55c050fbab4ebc79b92b6c4558379",
+      "manifest_algorithm": "sha1",
+      "manifest_digest": "f94f45ed03c8696f187a8bfded0f0d65476b4d48"
+    },
+    "SHEETSAGE_V02_JUKEBOX_HARMONY_MODEL": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_01_e0908_jukebox53/model.pt",
+      "size": 68873868,
+      "sha256": "a8d4641852c1efeae707a6fcf7d6ecddc7e2f33fa8c9753495684ae5b2e352bd",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "a8d4641852c1efeae707a6fcf7d6ecddc7e2f33fa8c9753495684ae5b2e352bd"
+    },
+    "SHEETSAGE_V02_JUKEBOX_MELODY_STEP": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_00_e0830_jukebox53/step.pkl",
+      "size": 6,
+      "sha256": "4443a859b4d1fd6f93a5b4351a0056522a12a771f2912b8c308e985c7a0695f1",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "4443a859b4d1fd6f93a5b4351a0056522a12a771f2912b8c308e985c7a0695f1"
+    },
+    "SHEETSAGE_V02_JUKEBOX_HARMONY_STEP": {
+      "path": "/home/worzpro/.sheetsage/sheetsage/v0.2/0920_01_e0908_jukebox53/step.pkl",
+      "size": 6,
+      "sha256": "05f8ed82a062f152fc805dbf3e78996fa3b24d23b719ce90f4f3656e1b292a49",
+      "manifest_algorithm": "sha256",
+      "manifest_digest": "05f8ed82a062f152fc805dbf3e78996fa3b24d23b719ce90f4f3656e1b292a49"
+    }
+  },
+  "madmom_assets_sha256": {
+    "downbeats/2016/downbeats_blstm_1.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_1.pkl",
+      "size": 409619,
+      "sha256": "b02c4b8aa963069449422fd5cc55bd4077105fe268b0d83036b7d68b5520f38d"
+    },
+    "downbeats/2016/downbeats_blstm_2.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_2.pkl",
+      "size": 409619,
+      "sha256": "6fa9d138ed84bed14ab5ef6f81f3a7e1a125ff8c571a255f6ce91ccf93390eee"
+    },
+    "downbeats/2016/downbeats_blstm_3.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_3.pkl",
+      "size": 409619,
+      "sha256": "adf6a3e3bf345a9172e8252a511dae28622afe26ee653354c0d4c9e37de8f89a"
+    },
+    "downbeats/2016/downbeats_blstm_4.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_4.pkl",
+      "size": 409619,
+      "sha256": "a4f9a09b1588ca74b0157251364650d3fe81e383019b5986941415e08b37fcde"
+    },
+    "downbeats/2016/downbeats_blstm_5.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_5.pkl",
+      "size": 409619,
+      "sha256": "e40aea9b8221babaf14a9211a48dccc3ebcecdf8bcd6d62d60f0949445de9bb6"
+    },
+    "downbeats/2016/downbeats_blstm_6.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_6.pkl",
+      "size": 409619,
+      "sha256": "89b6854c5d6b2381687731aedc9bce6c84894021d1c2eeb60d161cefe997d68c"
+    },
+    "downbeats/2016/downbeats_blstm_7.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_7.pkl",
+      "size": 409619,
+      "sha256": "371a319a66d32bee6ab8d4a15f6ae9e4ee22ff97b4276736bab93d9a994c06c1"
+    },
+    "downbeats/2016/downbeats_blstm_8.pkl": {
+      "path": "/home/worzpro/.cache/madmom_infer/models/downbeats/2016/downbeats_blstm_8.pkl",
+      "size": 409619,
+      "sha256": "a0d20e1922872a3e5b74df451d8b5701de6ca88d9f5739f313fb2991d7a84c77"
+    }
+  },
+  "input_file": {
+    "path": "/home/worzpro/.sheetsage/test/test1_44100.wav",
+    "sha256": "ff8bf45609bfd5fd759af718b1e44e5544a5783c316156b6b7450ec48652718c"
+  },
+  "options": {
+    "device": "cpu",
+    "return_intermediaries": true
+  },
+  "cases": {
+    "real": {
+      "shape": [
+        202311,
+        2
+      ],
+      "sample_rate": 44100,
+      "decoded_sha256": "73923c49426d91f387525249f3498f5a58483ba0edd57bb2b1581447a039f5d2",
+      "rms": 0.06765538084825146,
+      "runs": [
+        {
+          "lead_sheet": [
+            [
+              [
+                0,
+                [
+                  4,
+                  2,
+                  2
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  170
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  0,
+                  [
+                    2,
+                    2,
+                    1,
+                    2,
+                    2,
+                    2
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  2,
+                  [
+                    4,
+                    3,
+                    3
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                2,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                2,
+                2,
+                [
+                  0,
+                  5
+                ]
+              ],
+              [
+                4,
+                2,
+                [
+                  6,
+                  5
+                ]
+              ],
+              [
+                6,
+                4,
+                [
+                  4,
+                  5
+                ]
+              ],
+              [
+                10,
+                6,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                16,
+                2,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                18,
+                4,
+                [
+                  0,
+                  5
+                ]
+              ],
+              [
+                22,
+                6,
+                [
+                  4,
+                  5
+                ]
+              ],
+              [
+                28,
+                4,
+                [
+                  6,
+                  5
+                ]
+              ]
+            ],
+            32
+          ],
+          "lilypond": "#(set-default-paper-size \"letter\")\n\n\n\n<<\n\n\\new ChordNames {\n    \\set majorSevenSymbol = \\markup { maj7 }\n    \\set additionalPitchPrefix = #\"add\"\n    \\chordmode {\n        d16*32:7\n    }\n}\n\n\\new Staff {\n    {\n        \\clef treble\n        \\key c \\major\n        \\time 4/4\n        \\tempo 4 = 170\n        d''8 c''8 fis''8 e''4 d''4. | d''8 c''4 e''4. fis''4\n    }\n}\n\n>>\n\n\\version \"2.18.2\"",
+          "chunks": [
+            {
+              "start": 12,
+              "stop": 45,
+              "step": null
+            }
+          ],
+          "melody_chunks": 1,
+          "harmony_chunks": 1,
+          "seconds": 3.015440287999809,
+          "statuses": [
+            "DETECTING_BEATS",
+            "EXTRACTING_FEATURES",
+            "TRANSCRIBING",
+            "FORMATTING",
+            "DONE"
+          ]
+        },
+        {
+          "lead_sheet": [
+            [
+              [
+                0,
+                [
+                  4,
+                  2,
+                  2
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  170
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  0,
+                  [
+                    2,
+                    2,
+                    1,
+                    2,
+                    2,
+                    2
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                [
+                  2,
+                  [
+                    4,
+                    3,
+                    3
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                2,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                2,
+                2,
+                [
+                  0,
+                  5
+                ]
+              ],
+              [
+                4,
+                2,
+                [
+                  6,
+                  5
+                ]
+              ],
+              [
+                6,
+                4,
+                [
+                  4,
+                  5
+                ]
+              ],
+              [
+                10,
+                6,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                16,
+                2,
+                [
+                  2,
+                  5
+                ]
+              ],
+              [
+                18,
+                4,
+                [
+                  0,
+                  5
+                ]
+              ],
+              [
+                22,
+                6,
+                [
+                  4,
+                  5
+                ]
+              ],
+              [
+                28,
+                4,
+                [
+                  6,
+                  5
+                ]
+              ]
+            ],
+            32
+          ],
+          "lilypond": "#(set-default-paper-size \"letter\")\n\n\n\n<<\n\n\\new ChordNames {\n    \\set majorSevenSymbol = \\markup { maj7 }\n    \\set additionalPitchPrefix = #\"add\"\n    \\chordmode {\n        d16*32:7\n    }\n}\n\n\\new Staff {\n    {\n        \\clef treble\n        \\key c \\major\n        \\time 4/4\n        \\tempo 4 = 170\n        d''8 c''8 fis''8 e''4 d''4. | d''8 c''4 e''4. fis''4\n    }\n}\n\n>>\n\n\\version \"2.18.2\"",
+          "chunks": [
+            {
+              "start": 12,
+              "stop": 45,
+              "step": null
+            }
+          ],
+          "melody_chunks": 1,
+          "harmony_chunks": 1,
+          "seconds": 2.5169310737401247,
+          "statuses": [
+            "DETECTING_BEATS",
+            "EXTRACTING_FEATURES",
+            "TRANSCRIBING",
+            "FORMATTING",
+            "DONE"
+          ]
+        }
+      ],
+      "feature_seconds": 2.9124976908788085,
+      "feature_rate": 31.25
+    },
+    "silence": {
+      "shape": [
+        202311,
+        2
+      ],
+      "sample_rate": 44100,
+      "decoded_sha256": "10010d7b8aa56f1b7c78ca1b4c459849cb72facecb3afac88dd3f09cc1e7e58f",
+      "rms": 0.0,
+      "runs": [
+        {
+          "error_type": "ValueError",
+          "error": "Audio too short to detect time signature",
+          "seconds": 0.9161154367029667,
+          "statuses": [
+            "DETECTING_BEATS"
+          ]
+        },
+        {
+          "error_type": "ValueError",
+          "error": "Audio too short to detect time signature",
+          "seconds": 0.4917043447494507,
+          "statuses": [
+            "DETECTING_BEATS"
+          ]
+        }
+      ],
+      "encoded_sha256": "c3c405d410012f67bb719aaa7f869d8bfb65c199c157430926e285b154a008f0",
+      "feature_seconds": 0.14126535411924124,
+      "feature_rate": 31.25
+    }
+  },
+  "arrays": {
+    "real/handcrafted": {
+      "shape": [
+        144,
+        229
+      ],
+      "dtype": "float32",
+      "sha256": "110feb199a464d8f136f194cef80c2e3c5548eb86c72c59f58534b208417672d",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 36.55781122875143
+    },
+    "real/0/segment_beats": {
+      "shape": [
+        13
+      ],
+      "dtype": "int64",
+      "sha256": "f7773af9e79702ecf80499c0b96bc2f89570d9dfcd1f287409b65346441ea5f8",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 4.795831523312719
+    },
+    "real/0/segment_beats_times": {
+      "shape": [
+        13
+      ],
+      "dtype": "float64",
+      "sha256": "1c35038134e5e7c62b0d030e0f221151e98c5bb85285b46d2cf558f7a9a55e16",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.667048209884132
+    },
+    "real/0/melody_logits/0": {
+      "shape": [
+        32,
+        89
+      ],
+      "dtype": "float32",
+      "sha256": "bd615be1dd6b630c0b8a3918075d02c54f39fa0defdc2a9c071d23059e425fbe",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.173476580203065
+    },
+    "real/0/harmony_logits/0": {
+      "shape": [
+        32,
+        97
+      ],
+      "dtype": "float32",
+      "sha256": "6a71cebd3ead16d52600bacdaee8286f0a135f63c72e73e1184fad2ab50b892c",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.4874662243576395
+    },
+    "real/1/segment_beats": {
+      "shape": [
+        13
+      ],
+      "dtype": "int64",
+      "sha256": "f7773af9e79702ecf80499c0b96bc2f89570d9dfcd1f287409b65346441ea5f8",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 4.795831523312719
+    },
+    "real/1/segment_beats_times": {
+      "shape": [
+        13
+      ],
+      "dtype": "float64",
+      "sha256": "1c35038134e5e7c62b0d030e0f221151e98c5bb85285b46d2cf558f7a9a55e16",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.667048209884132
+    },
+    "real/1/melody_logits/0": {
+      "shape": [
+        32,
+        89
+      ],
+      "dtype": "float32",
+      "sha256": "bd615be1dd6b630c0b8a3918075d02c54f39fa0defdc2a9c071d23059e425fbe",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.173476580203065
+    },
+    "real/1/harmony_logits/0": {
+      "shape": [
+        32,
+        97
+      ],
+      "dtype": "float32",
+      "sha256": "6a71cebd3ead16d52600bacdaee8286f0a135f63c72e73e1184fad2ab50b892c",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 2.4874662243576395
+    },
+    "silence/handcrafted": {
+      "shape": [
+        144,
+        229
+      ],
+      "dtype": "float32",
+      "sha256": "5a7f6a20d24c2ab6c15e501e9dfd19b61866006eea2d2df54fa8ef2a6bff1317",
+      "finite": true,
+      "nan_count": 0,
+      "rms": 100.0
+    }
+  }
+}

@@ -13,13 +13,14 @@ import json
 import pathlib
 import tarfile
 import tempfile
-import urllib.request
 
-# Hooktheory data URLs (from assets/hooktheory.json)
-HOOKTHEORY_URLS = {
-    "TEST_SEGMENTS": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/hooktheory/Hooktheory_Test_Segments.json",
-    "TEST_MIDI": "https://github.com/chrisdonahue/sheetsage-data/raw/refs/heads/main/hooktheory/Hooktheory_Test_MIDI.tar.gz",
-}
+if __package__:
+    from .dataset_assets import get_dataset_asset, retrieve_dataset_asset
+else:
+    from dataset_assets import get_dataset_asset, retrieve_dataset_asset
+
+HOOKTHEORY_URLS = {name: get_dataset_asset(f"HOOKTHEORY_{name}")["url"]
+                  for name in ("TEST_SEGMENTS", "TEST_MIDI")}
 
 
 def download_file(url, output_path):
@@ -30,7 +31,8 @@ def download_file(url, output_path):
     pathlib.Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        urllib.request.urlretrieve(url, output_path)
+        name = next(name for name, value in HOOKTHEORY_URLS.items() if value == url)
+        retrieve_dataset_asset(f"HOOKTHEORY_{name}", output_path=output_path)
         print("✓ Downloaded successfully")
         return output_path
     except Exception as e:
@@ -86,6 +88,7 @@ def main():
             print("Failed to download segments. Exiting.")
             return
     else:
+        retrieve_dataset_asset("HOOKTHEORY_TEST_SEGMENTS", output_path=segments_path)
         print(f"✓ Using existing file: {segments_path}")
 
     # Step 2: Load and display segments
@@ -134,6 +137,7 @@ def main():
             print("Failed to download MIDI archive. Exiting.")
             return
     else:
+        retrieve_dataset_asset("HOOKTHEORY_TEST_MIDI", output_path=midi_tar_path)
         print(f"✓ Using existing file: {midi_tar_path}")
 
     # Step 5: Extract sample MIDI

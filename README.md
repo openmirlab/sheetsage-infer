@@ -301,7 +301,14 @@ Transcription speed depends on audio length and feature extraction method:
 
 ## 📚 Examples
 
-See `examples/` directory for usage examples:
+The `examples/` directory requires a repository checkout and is excluded from both
+source and wheel distributions. Its HookTheory/RWC dataset catalogs and acquisition
+helper are separate from the installed inference package. `sheetsage.assets` exposes
+only model and test-fixture assets; former `HOOKTHEORY*` and `RWC_*` tags are no longer
+runtime download options. Dataset examples retain checksum verification and use
+`SHEETSAGE_CACHE_DIR` / `~/.sheetsage` unless given an output path.
+
+See `examples/` for usage examples:
 - `basic_transcription.py` - Basic usage
 - `jukebox_transcription.py` - GPU-based transcription
 - `hooktheory_example.py` - Working with Hooktheory data
@@ -320,9 +327,7 @@ sheetsage-infer/
 │   ├── utils.py                 # LilyPond engraving, audio I/O
 │   ├── assets.py                 # Asset management
 │   ├── assets/                   # Asset JSON files
-│   │   ├── hooktheory.json
 │   │   ├── jukebox.json
-│   │   ├── rwc.json
 │   │   ├── sheetsage.json
 │   │   └── test.json
 │   ├── modules/                  # Neural network models
@@ -338,6 +343,8 @@ sheetsage-infer/
 │       └── utils.py              # Theory utilities
 ├── tests/                        # Import smoke tests + env-guarded regression fixtures
 ├── examples/                     # Example scripts
+│   ├── dataset_assets.py         # Repository-only, checksum-verified dataset acquisition
+│   ├── dataset_catalogs/         # Preserved HookTheory/RWC catalogs; not distributed
 │   ├── basic_transcription.py    # Basic usage
 │   ├── jukebox_transcription.py  # GPU-based transcription
 │   ├── hooktheory_example.py     # Hooktheory data examples
@@ -362,18 +369,20 @@ sheetsage-infer/
 
 ## What this project will NEVER bundle
 
-sheetsage-infer downloads trained model weights and HookTheory-derived data
+sheetsage-infer downloads trained model weights and test fixtures
 at runtime via `sheetsage.assets` (`sheetsage/assets/*.json` manifests,
 resolved by `retrieve_asset()` in `sheetsage/assets.py`) into a local cache
-directory (`~/.sheetsage` by default). None of these are ever committed to
-this repository or bundled into the PyPI sdist/wheel:
+directory (`~/.sheetsage` by default). Model weights and dataset payloads are not
+bundled into the PyPI sdist/wheel. Historical repository data/examples are excluded
+from these distributions as well:
 
 - **SheetSage's own trained checkpoints** (handcrafted-feature and
   Jukebox-feature harmony/melody models) are fetched from SheetSage's S3
   bucket or a third-party HuggingFace mirror on first use, checksum-verified
   against the manifest before being trusted.
-- **HookTheory-derived training/eval data** (segments, MIDI) is fetched from
-  `github.com/chrisdonahue/sheetsage-data` on first use. Because it's derived
+- **HookTheory-derived training/eval data** (segments, MIDI) can be fetched explicitly
+  by the repository-only examples from `github.com/chrisdonahue/sheetsage-data`.
+  Dataset acquisition is not part of the installed inference package. Because it's derived
   from user contributions on HookTheory (see HookTheory's
   [ToS](https://forum.hooktheory.com/tos)), it is **CC BY-NC-SA 3.0** --
   non-commercial, share-alike -- a materially different, more restrictive
@@ -396,6 +405,17 @@ downloads on your behalf. See [NOTICE](NOTICE) for the full breakdown.
 ---
 
 ## Development
+
+The immutable current CPU baseline and exact replay command are documented in
+[tools/README.md](tools/README.md). It compares every returned intermediate and decoded
+field on real audio and preserves the current silence failure. Historical environment-guarded
+fixtures remain unchanged; their skips do not count as a successful baseline replay.
+
+```bash
+python -m pytest tests/ tools/test_dataset_examples.py
+python -m build
+python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz
+```
 
 We welcome contributions! Please:
 
@@ -429,8 +449,8 @@ Licensing is two-tier — see [NOTICE](NOTICE) for the full breakdown:
   [SheetSage](https://github.com/chrisdonahue/sheetsage)): **MIT License**.
   Copyright (c) 2022 Chris Donahue (Original SheetSage); Copyright (c) 2025
   SheetSage-Infer contributors. See [LICENSE](LICENSE) for details.
-- **Weights and data** downloaded at runtime via `sheetsage.assets` (trained
-  model checkpoints, HookTheory-derived segments/MIDI) are **CC BY-NC-SA 3.0**,
+- **SheetSage weights** downloaded at runtime via `sheetsage.assets`, and
+  **HookTheory data** acquired separately by repository examples, are **CC BY-NC-SA 3.0**,
   since they derive from user contributions on HookTheory. madmom's bundled
   DBN downbeat-tracking model is similarly CC BY-NC-SA (separate from
   madmom's own BSD-2-Clause source code). These are fetched on demand, not

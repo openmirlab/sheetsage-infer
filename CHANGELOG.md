@@ -5,6 +5,14 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Remove HookTheory/RWC training and evaluation dataset tags from the installed asset API
+  and CLI. Their unchanged catalogs and checksum-verified helper now serve repository-only
+  examples and are excluded from both source and wheel distributions. Model/test asset
+  tags and inference outputs remain unchanged, verified against a committed real/silence
+  CPU baseline with all returned intermediate fields.
+
 ### Fixed
 
 - **DBN decoding uses the exact Viterbi accelerator when available.** The beat-tracking consumer

@@ -12,32 +12,35 @@ class SheetSageSession:
         self.defaults = dict(defaults)
         self._components = None
         self._resolved_device = None
-        self._ready = False
-        self._closed = False
+        self._status = "new"
 
     @property
     def status(self):
-        if self._closed:
-            return "closed"
-        return "ready" if self._ready else "new"
+        return self._status
 
     def load(self):
-        if self._closed:
+        if self._status == "closed":
             raise RuntimeError("session is closed")
-        if self._ready:
+        if self._status == "ready":
             return self
-        from .device import resolve_device
-        from .pipeline import InputFeats, load_components
+        try:
+            from .device import resolve_device
+            from .pipeline import InputFeats, load_components
 
-        self._resolved_device = resolve_device(self.device)
-        input_feats = InputFeats.JUKEBOX if self.use_jukebox else InputFeats.HANDCRAFTED
-        self._components = load_components(
-            input_feats,
-            True,
-            True,
-            self._resolved_device,
-        )
-        self._ready = True
+            self._resolved_device = resolve_device(self.device)
+            input_feats = InputFeats.JUKEBOX if self.use_jukebox else InputFeats.HANDCRAFTED
+            self._components = load_components(
+                input_feats,
+                True,
+                True,
+                self._resolved_device,
+            )
+        except BaseException:
+            self._components = None
+            self._resolved_device = None
+            self._status = "failed"
+            raise
+        self._status = "ready"
         return self
 
     def infer(self, audio_path_bytes_or_url, **kwargs):
@@ -59,11 +62,12 @@ class SheetSageSession:
     def release(self):
         self._components = None
         self._resolved_device = None
-        self._ready = False
+        if self._status != "closed":
+            self._status = "released"
 
     def close(self):
         self.release()
-        self._closed = True
+        self._status = "closed"
 
     def cache_info(self):
         from .assets import resolve_asset_path

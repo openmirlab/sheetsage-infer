@@ -15,6 +15,10 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Make session failures and releases observable as `failed` and `released`. Failed or
+  interrupted loads clear session-owned references and can retry; successful loads remain
+  reusable. Preserve terminal, idempotent close/context exit and exact CPU inference outputs.
+
 - **DBN decoding uses the exact Viterbi accelerator when available.** The beat-tracking consumer
   forwards `fast_viterbi=True` only to madmom-infer processors whose constructor explicitly
   supports it, while retaining the legacy constructor and decoded output for 0.2.0-compatible

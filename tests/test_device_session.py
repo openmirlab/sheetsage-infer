@@ -79,7 +79,7 @@ def test_release_discards_components_and_a_later_load_rebuilds(monkeypatch):
     session = SheetSageSession(device="cpu").load()
     first = session._components
     session.release()
-    assert session.status == "new"
+    assert session.status == "released"
     assert session._components is None
     session.load()
     assert len(builds) == 2

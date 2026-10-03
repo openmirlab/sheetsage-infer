@@ -73,9 +73,9 @@ HookTheory/RWC tags are rejected while all 24 inference/test tags retain their c
 Run repository example tests explicitly with `python -m pytest tools/test_dataset_examples.py`;
 they mock downloads and verify catalog-byte preservation, both consumers, cache/checksum
 behavior, and manual-only failures. These tests are repository-only like their subjects.
-`MANIFEST.in` excludes examples and historical dataset/output directories from the sdist;
-package discovery already excludes them from the wheel. Preserve these exclusions when
-changing build backends. Verify both archives with
+`pyproject.toml` declares explicit Hatchling sdist includes/excludes and a sheetsage-only
+wheel. Examples, dataset catalogs/helper, and historical dataset/output directories remain
+excluded from both formats. The repository-only example test is excluded from the sdist. Verify both archives with
 `python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz`.
 
 `tests/fixtures/cpu_boundary_baseline/` is immutable original-runtime evidence at `b37c457`.
@@ -129,3 +129,26 @@ end-to-end (see CHANGELOG's Unreleased section) precisely because nothing exerci
   them in sync when you restructure imports.
 - CHANGELOG.md: add entries under `[Unreleased]` for behavior changes, not just version bumps.
 - Commit messages / PRs: no emojis.
+
+## Delivery packaging
+
+`__about__.py` is the sole version literal, read by Hatchling and re-exported by `__init__.py`.
+`python -m build` must build its wheel from the sdist. Preserve all runtime JSON/TOML assets
+and test fixtures, including the explicitly included immutable CPU baseline NPZ.
+`tests/fixtures/delivery_baseline.json` records the lifecycle-stage wheel payload at `0a471250`.
+`tools/verify_installed.py CHECKOUT` checks every installed source/asset byte against final
+source and that manifest; only the two explicit version re-export additions in `__init__.py`
+are normalized. The new `__about__.py` is the only additional runtime file.
+
+The reusable `.github/workflows/verify.yml` runs Python 3.10–3.12 contracts, fresh CPU installs,
+`pip check`, scoped verification-tool lint, archive checks, and installed-wheel identity.
+The publish workflow depends on it. Do not describe this matrix as model parity: existing
+historical environment guards and optional GPU coverage remain explicit skips.
+`capture_cpu_baseline.py --portable --cpu-assets-only --installed` is an opt-in cached real
+CPU verifier: exact decoded/segment/error/status outputs, shape/dtype/finite/nonzero checks,
+repeat equality, and measured float differences. Default replay still requires exact arrays.
+All 13 configured SheetSage digests must match the immutable baseline; available cached bytes
+are independently verified, while six unused Jukebox files may be absent only in CPU mode.
+Seven handcrafted assets are required. Unauthenticated S3 returned 403 and HF fallback 401
+for all seven on 2026-10-03; do not add a hosted model job that skips this missing prerequisite,
+mirror weights, or upload private caches. Hosting/access requires a separate decision.

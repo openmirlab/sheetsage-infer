@@ -46,3 +46,48 @@ The example catalogs retain their original hashes; their helper verifies downloa
 bytes before use. Both downloading examples use it; the local-JSON transcription example
 remains unchanged. Run `python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz`
 after building to reject dataset catalogs, helpers, or payloads in either archive.
+
+# Delivery and portable CPU verification
+
+The delivery matrix runs every current contract test on Python 3.10–3.12, including the
+repository example tests, then builds a wheel from its sdist and verifies its installed
+payload outside the checkout. Historical environment-guarded and optional GPU tests retain
+their explicit skip reasons; matrix success is not an end-to-end model-parity claim.
+
+For a separately populated cache, run the real model without allowing downloads:
+
+```bash
+# Source checkout; fail if any required cached asset is absent or corrupt.
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python tools/capture_cpu_baseline.py \
+  --portable --cpu-assets-only --reference tests/fixtures/cpu_boundary_baseline \
+  /tmp/sheetsage-portable
+
+# Installed wheel, from an unrelated working directory:
+python /path/to/checkout/tools/verify_installed.py /path/to/checkout
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python /path/to/checkout/tools/capture_cpu_baseline.py \
+  --installed --portable --cpu-assets-only \
+  --reference /path/to/checkout/tests/fixtures/cpu_boundary_baseline /tmp/sheetsage-installed
+```
+
+Portable mode compares exact lead-sheet notes/chords, LilyPond, segments, beat indices/times,
+chunk slices, statuses, and silence errors. Every float array must have the recorded shape
+and dtype, finite/nonzero content, and identical repeated-call outputs. Maximum absolute and
+relative RMS differences against the immutable original arrays are diagnostic fields, not a
+relaxed numerical-equality assertion. Default mode (omit `--portable`) still requires exact
+arrays and remains the original-profile regression check; fixtures are never rewritten.
+
+Measured Python 3.11 / Torch 2.14.1+cpu outputs preserved every discrete result and feature/
+beat array. Logits differed by maximum absolute 2.861023e-6; relative RMS was 1.824877e-7 for
+melody and 1.923831e-7 for harmony. Exact comparison correctly failed for that profile.
+Original Torch 2.9.1+cu128 on explicit CPU still replays all ten arrays exactly.
+
+`--cpu-assets-only` requires the seven handcrafted artifacts, TEST_WAV and all eight madmom
+downbeat weights. All 13 configured SheetSage manifest digests must still match the original
+baseline; every present cache file is byte-hashed. Only the six unused Jukebox artifacts may
+be absent, and their names are recorded explicitly. This does not validate GPU/Jukebox inference.
+
+On 2026-10-03, unauthenticated probes returned S3 HTTP 403 and existing Hugging Face fallback
+HTTP 401 for **all seven** handcrafted files. TEST_WAV and official madmom weight probes
+returned 200. A clean hosted real-model lane therefore needs an independently authorized
+access or hosting solution for the seven configured artifacts. No workflow uploads caches,
+changes mirrors, or treats unavailable weights as a passing model check.

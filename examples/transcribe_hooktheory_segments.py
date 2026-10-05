@@ -13,6 +13,11 @@ from sheetsage.align import create_beat_to_time_fn
 from sheetsage.infer import sheetsage
 from sheetsage.utils import decode_audio, engrave
 
+if __package__:
+    from .dataset_assets import retrieve_dataset_asset
+else:
+    from dataset_assets import retrieve_dataset_asset
+
 
 def construct_youtube_url(audio_tag):
     """Convert audio_tag to YouTube URL."""
@@ -110,13 +115,14 @@ def transcribe_segment(segment_id, segment_data, output_dir, use_jukebox=False):
 
 def main():
     """Main function."""
-    segments_file = pathlib.Path("hooktheory_data/Hooktheory_Test_Segments.json")
     output_dir = pathlib.Path("hooktheory_transcription_results")
     num_segments = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     use_jukebox = sys.argv[2].lower() == "true" if len(sys.argv) > 2 else False
 
-    if not segments_file.exists():
-        print(f"ERROR: Segments file not found: {segments_file}")
+    try:
+        segments_file = retrieve_dataset_asset("HOOKTHEORY_TEST_SEGMENTS")
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: Could not retrieve HookTheory test segments: {exc}")
         return 1
 
     with open(segments_file, encoding='utf-8') as f:

@@ -19,8 +19,9 @@ sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously 
   local files, downloaded on first use into `~/.sheetsage` (see `sheetsage/assets/*.json`).
 - `sheetsage/beat_track.py` -- madmom-infer's DBN downbeat tracker with a librosa fallback.
 - `examples/dataset_assets.py` and `examples/dataset_catalogs/` -- repository-only dataset
-  acquisition; both HookTheory downloading examples use this helper. Neither helper nor
-  catalogs ship in wheel or sdist. Runtime never imports examples/tools.
+  acquisition; the HookTheory examples use this helper. Neither helper nor
+  catalogs ship in wheel or sdist. Dataset files and generated transcriptions are not
+  tracked. Runtime never imports examples/tools.
 
 ## Known constraints (read before touching install/dependency config)
 

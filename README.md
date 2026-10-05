@@ -1,8 +1,10 @@
 # SheetSage-Infer
 
+> **Current installation:** `pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git"`
+> OpenMIRLab no longer publishes new versions to PyPI. Any existing PyPI releases are historical snapshots.
+
 **Inference-only version of SheetSage for music transcription.**
 
-[![PyPI](https://img.shields.io/pypi/v/sheetsage-infer)](https://pypi.org/project/sheetsage-infer/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -10,8 +12,8 @@ AI-powered music transcription system that converts audio to lead sheets (melody
 
 > **Renamed from `openmirlab-sheetsage-infer`.** Releases through 0.2.0 were published
 > as `openmirlab-sheetsage-infer` on PyPI; that name is now deprecated and will not
-> receive further releases. Starting with 0.2.1, this package publishes as
-> **`sheetsage-infer`** -- update your `pip install` / `uv add` commands accordingly.
+> receive further releases. The maintained distribution is now the
+> **`sheetsage-infer`** GitHub repository; install from the source URL below.
 > The import name is unchanged (`import sheetsage`).
 
 ---
@@ -30,7 +32,7 @@ madmom's own PyPI release has for years been git-HEAD-only / broken.
 same models, same theory classes, same output formats, but published as an
 ordinary `pip install`-able package with explicit dependency pins, support
 for Python 3.10-3.12, and its two hardest dependencies swapped for
-OpenMIRLab's own maintained, PyPI-published replacements
+OpenMIRLab's own maintained Git repositories
 ([`jukebox-infer`](https://pypi.org/project/jukebox-infer/) and
 [`madmom-infer`](https://pypi.org/project/madmom-infer/)) instead of a
 vendored copy and a broken upstream package.
@@ -56,10 +58,10 @@ research. It is not affiliated with or endorsed by the original author.
   original release, hosted at `openaipublic.azureedge.net` and mirrored on
   the same HuggingFace repo.
 - **[`jukebox-infer`](https://pypi.org/project/jukebox-infer/)**: OpenMIRLab's
-  maintained, PyPI-published replacement for vendoring OpenAI's Jukebox
+  maintained replacement for vendoring OpenAI's Jukebox
   codebase directly.
 - **[`madmom-infer`](https://pypi.org/project/madmom-infer/)**: OpenMIRLab's
-  maintained, PyPI-published replacement for `madmom` (whose own PyPI release
+  maintained replacement for `madmom` (whose own PyPI release
   has long been git-HEAD-only/broken). The underlying
   [madmom](https://github.com/CPJKU/madmom) project and its bundled DBN
   downbeat-tracking model are by the original madmom project (Institute of
@@ -111,7 +113,7 @@ so only the Citation entry needed fixing.)*
 - Library-first packaging: pip-installable, explicit dependency pins,
   Python 3.10-3.12
 - Swapping the original's hard-to-install dependencies (vendored Jukebox,
-  PyPI-broken madmom) for maintained PyPI replacements (`jukebox-infer`,
+  PyPI-broken madmom) for maintained Git dependencies (`jukebox-infer`,
   `madmom-infer`)
 
 **Out of scope, forever:**
@@ -142,23 +144,23 @@ so only the Citation entry needed fixing.)*
 
 ### Installation
 
-**From PyPI:**
+**From GitHub:**
 
 ```bash
 # Using pip
-pip install sheetsage-infer
+pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git"
 ```
 
 ```bash
 # Using uv (recommended - faster)
-uv pip install sheetsage-infer
+uv pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git"
 
 # Or add to your project with uv
 uv add sheetsage-infer
 ```
 
 madmom was replaced by [`madmom-infer`](https://pypi.org/project/madmom-infer/) (our
-maintained, PyPI-published replacement) as of 0.2.1 -- plain `pip install` now works
+maintained replacement) as of 0.2.1 -- plain `pip install` now works
 with no extra steps or git installs.
 
 **For Development:**
@@ -364,7 +366,7 @@ sheetsage-infer/
 ├── .github/                      # GitHub configuration
 │   └── workflows/
 │       ├── verify.yml            # Python 3.10–3.12 delivery contract/build matrix
-│       └── publish.yml           # PyPI publishing, depends on verification
+│       └── release-check.yml     # release verification and build
 ├── pyproject.toml               # Project configuration (single source of truth for deps)
 ├── uv.lock                      # UV lock file
 ├── CHANGELOG.md                 # Notable changes

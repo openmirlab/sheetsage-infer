@@ -152,3 +152,7 @@ are independently verified, while six unused Jukebox files may be absent only in
 Seven handcrafted assets are required. Unauthenticated S3 returned 403 and HF fallback 401
 for all seven on 2026-10-03; do not add a hosted model job that skips this missing prerequisite,
 mirror weights, or upload private caches. Hosting/access requires a separate decision.
+
+## Distribution policy (2026-10-05)
+
+Install the current source from `https://github.com/openmirlab/sheetsage-infer`. GitHub release workflows verify and build distributions but do not upload to PyPI. Existing PyPI versions, where any exist, are historical snapshots. Update installation examples to use Git when changing this package.

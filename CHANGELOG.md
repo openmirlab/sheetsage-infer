@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — distribution policy
+
+- Stop publishing new versions to PyPI; GitHub source is the maintained installation channel. GitHub release CI continues to run verification and build checks.
+
 All notable changes to this project are documented here. Format loosely
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 

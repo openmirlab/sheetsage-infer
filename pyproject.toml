@@ -32,8 +32,8 @@ classifiers = [
 ]
 dependencies = [
     "torch>=2.0.0",
-    "jukebox-infer>=0.1.1",
-    "madmom-infer>=0.1.0",
+    "jukebox-infer @ git+https://github.com/openmirlab/jukebox-infer.git@3d140631ccdbebb13326baab0820028f4ab184d0",
+    "madmom-infer @ git+https://github.com/openmirlab/madmom-infer.git@a9ed04ec942dd6ec5309df7ce7f3783d1bb42575",
     "librosa>=0.11.0",
     "numpy>=2.0.0",
     "scipy>=1.11.0",
@@ -127,3 +127,6 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
 check_untyped_defs = true
+
+[tool.hatch.metadata]
+allow-direct-references = true

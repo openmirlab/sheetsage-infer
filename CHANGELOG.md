@@ -11,6 +11,10 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Remove checked-in HookTheory dataset copies and generated transcriptions. The
+  repository-only transcription example now downloads its test segments through
+  the checksum-verified dataset helper when invoked.
+
 - Gate delivery on Python 3.10–3.12 fresh CPU installs, contract tests, wheel-from-sdist and
   installed-byte checks; publishing depends on this matrix. Add explicit cached portable CPU
   verification with exact decoded outputs and float diagnostics, retaining exact baseline replay.

@@ -221,6 +221,8 @@ logs/
 *.out
 
 # Data directories (if generated locally)
+hooktheory_data/
+hooktheory_transcription_results/
 data/
 datasets/
 outputs/

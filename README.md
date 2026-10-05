@@ -316,6 +316,8 @@ helper are separate from the installed inference package. `sheetsage.assets` exp
 only model and test-fixture assets; former `HOOKTHEORY*` and `RWC_*` tags are no longer
 runtime download options. Dataset examples retain checksum verification and use
 `SHEETSAGE_CACHE_DIR` / `~/.sheetsage` unless given an output path.
+The HookTheory examples fetch data when invoked; the repository does not track
+downloaded datasets or generated transcriptions.
 
 See `examples/` for usage examples:
 - `basic_transcription.py` - Basic usage
@@ -359,9 +361,6 @@ sheetsage-infer/
 │   ├── hooktheory_example.py     # Hooktheory data examples
 │   ├── hooktheory_simple.py     # Simple Hooktheory example
 │   └── transcribe_hooktheory_segments.py  # Hooktheory segment transcription
-├── hooktheory_data/              # Test data
-│   ├── Hooktheory_Test_MIDI.tar.gz
-│   └── Hooktheory_Test_Segments.json
 ├── .github/                      # GitHub configuration
 │   └── workflows/
 │       ├── verify.yml            # Python 3.10–3.12 delivery contract/build matrix

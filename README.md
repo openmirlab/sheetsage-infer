@@ -33,8 +33,8 @@ same models, same theory classes, same output formats, but published as an
 ordinary `pip install`-able package with explicit dependency pins, support
 for Python 3.10-3.12, and its two hardest dependencies swapped for
 OpenMIRLab's own maintained Git repositories
-([`jukebox-infer`](https://pypi.org/project/jukebox-infer/) and
-[`madmom-infer`](https://pypi.org/project/madmom-infer/)) instead of a
+([`jukebox-infer`](https://github.com/openmirlab/jukebox-infer) and
+[`madmom-infer`](https://github.com/openmirlab/madmom-infer)) instead of a
 vendored copy and a broken upstream package.
 
 ## Acknowledgments
@@ -57,10 +57,10 @@ research. It is not affiliated with or endorsed by the original author.
   The Jukebox model itself (`JUKEBOX_VQVAE`, `JUKEBOX_LM`) is OpenAI's
   original release, hosted at `openaipublic.azureedge.net` and mirrored on
   the same HuggingFace repo.
-- **[`jukebox-infer`](https://pypi.org/project/jukebox-infer/)**: OpenMIRLab's
+- **[`jukebox-infer`](https://github.com/openmirlab/jukebox-infer)**: OpenMIRLab's
   maintained replacement for vendoring OpenAI's Jukebox
   codebase directly.
-- **[`madmom-infer`](https://pypi.org/project/madmom-infer/)**: OpenMIRLab's
+- **[`madmom-infer`](https://github.com/openmirlab/madmom-infer)**: OpenMIRLab's
   maintained replacement for `madmom` (whose own PyPI release
   has long been git-HEAD-only/broken). The underlying
   [madmom](https://github.com/CPJKU/madmom) project and its bundled DBN
@@ -97,7 +97,7 @@ so only the Citation entry needed fixing.)*
 ## ✨ Features
 
 - ✅ **CPU & GPU Support** - Handcrafted features (CPU) or Jukebox embeddings (GPU, via
-  [`jukebox-infer`](https://pypi.org/project/jukebox-infer/))
+  [`jukebox-infer`](https://github.com/openmirlab/jukebox-infer))
 - ✅ **Multiple Export Formats** - LilyPond notation, MIDI files, PDF generation
 - ✅ **Audio from URLs** - Support for YouTube, Bandcamp, and other sources
 - ✅ **Simple API** - High-level `sheetsage()` function
@@ -156,12 +156,11 @@ pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer
 uv pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git"
 
 # Or add to your project with uv
-uv add sheetsage-infer
+uv add "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git"
 ```
 
-madmom was replaced by [`madmom-infer`](https://pypi.org/project/madmom-infer/) (our
-maintained replacement) as of 0.2.1 -- plain `pip install` now works
-with no extra steps or git installs.
+madmom was replaced by [`madmom-infer`](https://github.com/openmirlab/madmom-infer) (our
+maintained replacement) as of 0.2.1 -- the pinned Git dependency installs automatically.
 
 **For Development:**
 
@@ -496,7 +495,7 @@ Licensing is two-tier — see [NOTICE](NOTICE) for the full breakdown:
 - **Examples**: `examples/` directory
 - **Original SheetSage**: https://github.com/chrisdonahue/sheetsage
 - **This Repository**: https://github.com/openmirlab/sheetsage-infer
-- **PyPI Package**: https://pypi.org/project/sheetsage-infer/ (previously
+- **Historical PyPI project**: https://pypi.org/project/sheetsage-infer/ (previously
   `openmirlab-sheetsage-infer`, deprecated as of 0.2.1)
 
 ---

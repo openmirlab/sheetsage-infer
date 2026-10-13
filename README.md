@@ -1,6 +1,6 @@
 # SheetSage-Infer
 
-Inference-only music transcription with **SheetSage1** and experimental
+Inference-only music transcription with **SheetSage1** and
 **SheetSage2**: a shared Python API for melody, chords, beats, key and meter,
 plus timed song sections with V2. Native notation and model-specific outputs
 remain available.
@@ -37,24 +37,20 @@ endorsement. Cite the relevant original work using [Citation](#citation).
 ## Installation
 
 Requires Python >=3.10 (tested on 3.10–3.12) and FFmpeg on `PATH`. LilyPond is
-optional for V1 PDF export. Install the backend you need:
+optional for V1 PDF export. The default installation includes both backends:
 
 ```bash
-# SheetSage1
 python -m pip install "sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git@master"
-
-# Both backends
-python -m pip install "sheetsage-infer[sheetsage2] @ git+https://github.com/openmirlab/sheetsage-infer.git@master"
 ```
 
 For a uv project, use `uv add` with the same dependency string. Lock the resolved
-Git commit for reproducibility; the tested integration merge is
-`7f90ab3433f3934926b6c5c9eab81206aa9faf6e` (replace `@master` with that SHA).
+Git commit for reproducibility. The former `[sheetsage2]` extra remains an empty
+compatibility alias. Model imports and weight downloads remain lazy.
 
 The pinned Jukebox dependency requires **Torch >=2.13**, including for a fresh
 V2 install. V2 also requires TorchAudio >=2.8 and Transformers >=4.45.2,<5;
 see the [Transformers compatibility note](docs/compatibility/sheetsage2-transformers.md).
-For CPU-only V2, install compatible CPU Torch/TorchAudio builds **before** the
+For CPU-only installs, install compatible CPU Torch/TorchAudio builds **before** the
 package command above:
 
 ```bash
@@ -194,9 +190,8 @@ python -m sheetsage.infer audio.mp3 --segment_start_hint 30 --segment_end_hint 6
 python -m sheetsage.infer --help
 ```
 
-## Experimental SheetSage2
+## Native SheetSage2
 
-Install the `sheetsage2` extra as shown in [Installation](#installation).
 For native outputs and options, call the independent backend directly:
 
 ```python
@@ -297,7 +292,7 @@ Cite the original work for the backend you use:
 ```bash
 git clone https://github.com/openmirlab/sheetsage-infer.git
 cd sheetsage-infer
-python -m pip install -e '.[dev,sheetsage2]' build
+python -m pip install -e '.[dev]' build
 python -m pytest tests/ tools/test_dataset_examples.py
 python -m build
 python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz

@@ -31,7 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "torch>=2.0.0",
+    "torch>=2.13.0",  # Also required by the pinned jukebox-infer dependency
     "jukebox-infer @ git+https://github.com/openmirlab/jukebox-infer.git@3d140631ccdbebb13326baab0820028f4ab184d0",
     "madmom-infer @ git+https://github.com/openmirlab/madmom-infer.git@a9ed04ec942dd6ec5309df7ce7f3783d1bb42575",
     "librosa>=0.11.0",
@@ -49,22 +49,20 @@ dependencies = [
     # raises ImportError if it is missing -- it was never declared, so every checkpoint whose
     # url leg fails (all seven SHEETSAGE_V02_HANDCRAFTED_* since the S3 bucket started 403ing)
     # had no working fallback despite the config declaring one.
-    "huggingface-hub>=0.20.0",
-]
-
-[project.optional-dependencies]
-sheetsage2 = [
-    "torch>=2.8.0",  # SheetSage2's upstream inference baseline
+    "huggingface-hub>=0.36.0",
     "torchaudio>=2.8.0",
     # v5 removes BartDecoder(embed_tokens=...), used by pinned upstream code.
     # Remove ceiling after upstream migration + parity; tracked in
     # docs/compatibility/sheetsage2-transformers.md.
     "transformers>=4.45.2,<5",
-    "huggingface-hub>=0.36.0",
     "safetensors>=0.5.3",
     "mir-eval>=0.8.2",  # upstream MIDI export uses chord.encode, not evaluation
     "mido>=1.3.3",
 ]
+
+[project.optional-dependencies]
+# Compatibility alias: both backends are included in the default install.
+sheetsage2 = []
 youtube = [
     "yt-dlp>=2025.11.0",
 ]

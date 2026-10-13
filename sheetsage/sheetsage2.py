@@ -1,7 +1,7 @@
-"""Experimental SheetSage2 transcription with an independent model lifetime.
+"""SheetSage2 transcription with an independent model lifetime.
 
 Loads checksum-verified upstream code at runtime and preserves its rich output
-without converting it to SheetSage1's LeadSheet. Optional dependencies remain
+without converting it to SheetSage1's LeadSheet. Model dependencies remain
 lazy; no upstream source or weights are distributed here.
 Reads: sheetsage2_checkpoints, device, transformers; read by: public callers.
 """
@@ -56,8 +56,9 @@ class SheetSage2Session:
                 from transformers import AutoModel
             except ImportError as exc:
                 raise ImportError(
-                    'SheetSage2 requires the optional backend: pip install ".[sheetsage2]" '
-                    'from this checkout to install sheetsage-infer[sheetsage2].'
+                    'SheetSage2 dependencies are missing or incompatible. '
+                    'Reinstall the package with dependencies: pip install --upgrade '
+                    '"sheetsage-infer @ git+https://github.com/openmirlab/sheetsage-infer.git@master"'
                 ) from exc
             except OSError as exc:
                 raise ImportError(

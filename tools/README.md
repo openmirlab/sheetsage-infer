@@ -92,7 +92,7 @@ returned 200. A clean hosted real-model lane therefore needs an independently au
 access or hosting solution for the seven configured artifacts. No workflow uploads caches,
 changes mirrors, or treats unavailable weights as a passing model check.
 
-# Experimental SheetSage2 parity
+# SheetSage2 parity
 
 `verify_sheetsage2.py` loads the pinned upstream model and `SheetSage2Session`
 independently from a populated package cache. It compares full deterministic

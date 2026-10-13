@@ -62,7 +62,7 @@ class SheetSage2Options:
 
     native_output_dir saves upstream artifacts, not the shared JSON/MIDI exports.
     Sampling rate applies only to array/tensor inputs. Rendering remains available
-    only outside this experimental integration.
+    only outside this integration.
     """
 
     cache_dir: str | PathLike | None = None

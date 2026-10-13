@@ -1,4 +1,4 @@
-"""Offline contracts for the experimental SheetSage2 adapter."""
+"""Offline contracts for the SheetSage2 adapter."""
 
 import builtins
 import subprocess
@@ -174,7 +174,8 @@ def test_release_allows_reload_and_close_is_terminal_and_context_exit_closes(mon
     assert session.status == "closed"
 
 
-def test_missing_optional_dependency_has_actionable_install_hint(monkeypatch):
+@pytest.mark.parametrize("reason", ["missing transformers", "incompatible transformers API"])
+def test_dependency_import_failure_has_actionable_install_hint(monkeypatch, reason):
     real_import = builtins.__import__
     monkeypatch.setattr("sheetsage.device.resolve_device", lambda device: device)
     for name in ("mir_eval", "safetensors", "torchaudio"):
@@ -182,18 +183,23 @@ def test_missing_optional_dependency_has_actionable_install_hint(monkeypatch):
 
     def missing_transformers(name, *args, **kwargs):
         if name == "transformers":
-            raise ImportError("missing transformers")
+            raise ImportError(reason)
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "__import__", missing_transformers)
     session = SheetSage2Session()
-    with pytest.raises(ImportError, match=r'pip install .*sheetsage-infer\[sheetsage2\]'):
+    with pytest.raises(ImportError, match="dependencies are missing or incompatible") as error:
         session.load()
+    assert ('pip install --upgrade "sheetsage-infer @ '
+            'git+https://github.com/openmirlab/sheetsage-infer.git@master"') in str(error.value)
+    assert "[sheetsage2]" not in str(error.value)
+    assert str(error.value.__cause__) == reason
     assert session.status == "failed"
     assert session._model is None
+    assert session._resolved_device is None
 
 
-def test_public_root_import_does_not_import_optional_model_stack():
+def test_public_root_import_does_not_import_model_stack():
     script = (
         "import sys, sheetsage; "
         "assert not any(name == 'torch' or name.startswith(('transformers', 'torchaudio')) "
@@ -278,7 +284,7 @@ def test_one_shot_closes_on_success_and_inference_error_and_sessions_are_indepen
     monkeypatch.setattr("sheetsage.device.resolve_device", lambda device: device)
     monkeypatch.setattr("sheetsage.sheetsage2_checkpoints.CheckpointStore.prepare",
                         lambda self, **kwargs: {"sheetsage2": "/a", "mert2": "/m"})
-    # Install the optional imports without replacing the real torch module.
+    # Install the backend imports without replacing the real torch module.
     for name in ("mir_eval", "safetensors", "torchaudio"):
         monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
     transformers = types.ModuleType("transformers")

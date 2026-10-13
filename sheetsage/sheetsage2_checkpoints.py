@@ -1,4 +1,4 @@
-"""Verified runtime artifacts for the experimental SheetSage2 backend.
+"""Verified runtime artifacts for the SheetSage2 backend.
 
 The packaged manifest owns file identities for both the adapter and its MERT2
 encoder. Inspection and loading share one resolver; upstream code stays in the

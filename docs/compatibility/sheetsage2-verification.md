@@ -1,8 +1,8 @@
 # SheetSage integration verification — 2026-10-13
 
 Verification target: code commit `decc543` (SheetSage2 backend, shared transcription
-API and merge-review fixes). Later documentation-only changes do not change the
-runtime tested here. This is integration and delivery evidence, not a benchmark
+API and merge-review fixes). Model checks below target that runtime; the later
+default-installation change is verified separately below. This is integration and delivery evidence, not a benchmark
 of transcription or verse/chorus recognition accuracy.
 
 ## Contract and delivery checks
@@ -25,6 +25,22 @@ against the immutable CPU boundary baseline; the skipped tests remain skipped.
 Jukebox's encoder checkpoints are absent; its GPU smoke was not run. This change
 does not alter the legacy Jukebox runtime. macOS/Windows and hosted CI were not
 executed in this local verification.
+
+## Default installation follow-up — 2026-10-13
+
+Both backends now install without extras. Fresh Python 3.10.18, 3.11.13 and
+3.12.11 environments installed the wheel built from sdist, after CPU Torch/audio.
+Each passed dependency checks, backend imports, installed-file verification and
+**165 tests, with the same three skips**. All used Torch 2.14.1+cpu,
+TorchAudio 2.11.0+cpu and Transformers 4.57.6; test tools were installed separately.
+
+Wheel metadata makes V2 dependencies unconditional and retains an empty
+`sheetsage2` extra; the previous wheel fails this default-dependency check.
+Root import and all native/shared session constructions passed with networking
+blocked and empty caches, without importing Torch/Transformers/TorchAudio.
+All 95 locked package identities remain unchanged. Model inference was not rerun
+for this packaging/error-message change; the model checks below remain the
+numerical evidence. Local logs: `/tmp/sheetsage-default-matrix`.
 
 ## Model and format checks
 

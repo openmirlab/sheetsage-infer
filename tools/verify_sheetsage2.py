@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compare the packaged SheetSage2 session with its pinned upstream model.
 
-Run from a checkout with the SheetSage2 optional dependencies installed. This
+Run from a checkout with the project dependencies installed. This
 loads both copies independently from verified local files, compares complete
 in-memory inference returns, and checks a compact JSON fingerprint reference.
 """

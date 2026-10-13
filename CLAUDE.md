@@ -159,7 +159,7 @@ mirror weights, or upload private caches. Hosting/access requires a separate dec
 
 Install the current source from `https://github.com/openmirlab/sheetsage-infer`. GitHub release workflows verify and build distributions but do not upload to PyPI. Existing PyPI versions, where any exist, are historical snapshots. Update installation examples to use Git when changing this package.
 
-## Experimental SheetSage2 backend
+## SheetSage2 backend
 
 The GitHub `master` source includes an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
 2026, https://arxiv.org/abs/2610.05336), using its MERT-v2-FullSong encoder.
@@ -177,9 +177,10 @@ then gives both local paths to AutoModel with local_files_only=True. Runtime
 code is downloaded into the user cache, not included in wheel/sdist. Source
 redistribution terms remain unresolved; see NOTICE before considering a port.
 
-The optional `sheetsage2` extra adds Transformers/torchaudio/safetensors/mir_eval.
-mir_eval is used by upstream MIDI chord encoding; no evaluation framework is
-added to the core install or our runtime. Transformers 5.19 fails at BART's
+Both backends ship in the default dependency set; `[sheetsage2]` remains an
+empty compatibility extra. Heavy imports and checkpoint downloads stay lazy.
+mir_eval is a runtime dependency for upstream MIDI chord encoding; this package
+contains no evaluation harness. Transformers 5.19 fails at BART's
 removed embed_tokens constructor argument; the justified <5 bound is tracked
 in docs/compatibility/sheetsage2-transformers.md. NumPy 2.4.6 works with
 Transformers 4.45.2 and Torch/torchaudio 2.9.1. A second 4.57.6 profile also
@@ -193,7 +194,7 @@ retry. Sequential calls are supported; concurrent inference on one session is
 not. CPU/CUDA selection uses the existing resolver. Rendering is excluded;
 ABC/MIDI/annotations and optional logits/scores/embeddings pass through.
 
-Verification commands (checkout, with the extra installed):
+Verification commands (checkout, with development dependencies installed):
 
 ```bash
 python -m pytest tests/ tools/test_dataset_examples.py
@@ -215,7 +216,7 @@ The 2026-10-13 full installed-wheel CPU check used Torch 2.14.1+cpu,
 torchaudio 2.11.0+cpu and Transformers 4.57.6. It produced 19 events and 16
 notes on the real fixture. Installing PyPI's CUDA torchaudio into CPU Torch
 first reproduced a libcudart load failure; the README and CPU CI recipe install
-both from the CPU wheel index. Optional import errors now explain this case.
+both from the CPU wheel index. Dependency import errors explain this case.
 The refreshed uv.lock reflects the existing Jukebox Git pin's Torch >=2.13
 requirement; it was already present in that dependency's metadata before this
 feature. The original local Torch 2.9.1 environment still replays SheetSage1's

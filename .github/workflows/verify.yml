@@ -26,11 +26,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install CPU Torch/audio and fresh project dependencies with SheetSage2
+      - name: Install CPU Torch/audio and default project dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install 'torch>=2.13' 'torchaudio>=2.8' --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install '.[dev,sheetsage2]' build
+          python -m pip install '.[dev]' build
           python -m pip check
           python -c 'import torch, torchaudio, transformers; assert torch.version.cuda is None, torch.__version__; print(torch.__version__, torchaudio.__version__, transformers.__version__)'
       - name: Lint delivery tools

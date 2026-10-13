@@ -220,3 +220,53 @@ The refreshed uv.lock reflects the existing Jukebox Git pin's Torch >=2.13
 requirement; it was already present in that dependency's metadata before this
 feature. The original local Torch 2.9.1 environment still replays SheetSage1's
 immutable baseline exactly, including its existing silence error.
+
+## Shared transcription and structure
+
+`SheetSageTranscriber` (package-qualified name) and `transcribe` add a shared
+interface over the unchanged native sessions. `sheetsage/transcription/api.py`
+owns routing/lifecycle, `options.py` owns immutable backend settings,
+`adapters.py` owns conversion, and `result.py` owns values, versioned semantics
+and JSON/MIDI export. Heavy imports stay lazy. No global runtime or second
+model/downloader is introduced. Native APIs and original result objects remain
+available; per-call options replace the whole typed object, and session settings
+cannot change after construction.
+
+Structure is a first-class optional result. V1 is unsupported; V2 exposes native
+labels and half-open intervals, including `(timestamp,structure)`-only prompts.
+`require_structure` rejects unsupported/disabled tasks before load.
+Capabilities describe support, statuses distinguish ok/empty from unsupported,
+not_requested and failed. ABC failure does not invalidate structure. Field
+conversion failure retains native evidence and successful other fields.
+
+Before editing converters or exports, read `docs/result-semantics.md`: it records
+source traces, model profiles, options and coordinate/value invariants. In
+particular V1 raw MIDI pitch is `pc+12*octave`, not `Note.as_midi_pitch()`'s default;
+V1 beat maps already include crop offsets; V2 stitched events already include
+window offsets. Shared MIDI contains note roles and text labels with generated
+velocity, while native MIDI retains upstream voicing/notation conventions.
+
+Verification commands:
+
+```bash
+python -m pytest tests/ tools/test_dataset_examples.py
+ruff check sheetsage/transcription tools/verify_transcription.py
+PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python tools/verify_transcription.py \
+  ~/.sheetsage/test/test1_44100.wav --model sheetsage1 --device cpu --output /tmp/shared-v1
+PYTHONPATH=. python tools/verify_transcription.py \
+  ~/.sheetsage/test/test1_44100.wav --model sheetsage2 --device cuda \
+  --cache-dir /path/to/populated/sheetsage2-cache --output /tmp/shared-v2
+python -m build
+python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz
+```
+
+The installed-byte gate allows five explicit new transcription modules and the
+precise additive root exports. Historical runtime hashes remain immutable.
+The source archive includes the result-semantics document. The public MIR skills
+capability map is updated in the same window. Integration fixtures do not certify
+natural whole-song structure quality; the 305-second repeated music/silence smoke
+exercises actual 300-second windows, not perceptual segmentation accuracy.
+
+Paper preset file/bytes/stream decoding requires upstream torchaudio.info. Tested
+modern torchaudio builds lack it; the shared facade explains this limitation.
+Paper waveform inputs bypass that reader and are independently verified.

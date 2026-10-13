@@ -45,9 +45,17 @@ def main():
             added_exports = b', "SheetSage2Session", "sheetsage2"'
             assert raw.count(added_import) == raw.count(added_exports) == 1
             raw = raw.replace(added_import, b"").replace(added_exports, b"")
+            shared_import = b"from .transcription import SheetSageTranscriber, SheetSage1Options, SheetSage2Options, TranscriptionResult, transcribe, result_semantics\n"
+            shared_exports = b', "SheetSageTranscriber", "SheetSage1Options", "SheetSage2Options", "TranscriptionResult", "transcribe", "result_semantics"'
+            assert raw.count(shared_import) == raw.count(shared_exports) == 1
+            raw = raw.replace(shared_import, b"").replace(shared_exports, b"")
         assert hashlib.sha256(raw).hexdigest() == baseline["runtime_sha256"][name], name
     tags = get_asset_tags()
     assert len(tags) == 24
+    shared = sheetsage.SheetSageTranscriber("sheetsage2", require_structure=True)
+    assert shared.status == "new" and shared.capabilities.structure
+    assert shared.semantics["schema_version"] == 1
+    shared.close()
     assert not any(tag.startswith(("HOOKTHEORY", "RWC_")) for tag in tags)
     session = sheetsage.SheetSageSession(device="cpu")
     assert session.status == "new"

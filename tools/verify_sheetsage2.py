@@ -19,13 +19,8 @@ from collections.abc import Mapping
 from pathlib import Path
 from unittest.mock import patch
 
-import huggingface_hub
 import numpy as np
-import scipy
 import torch
-import torchaudio
-import transformers
-from transformers import AutoModel
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 VOLATILE_FIELDS = {"elapsed_seconds", "peak_gpu_mib"}
@@ -85,6 +80,8 @@ def canonical(value):
         return {key: result[key] for key in sorted(result)}
     if isinstance(value, (list, tuple)):
         return [canonical(item) for item in value]
+    if isinstance(value, slice):
+        return {"__slice__": [canonical(value.start), canonical(value.stop), canonical(value.step)]}
     if isinstance(value, np.generic):
         return value.item()
     if value is None or isinstance(value, (str, int, float, bool)):
@@ -183,6 +180,11 @@ def in_memory_differences(left, right, path="$", limit=24):
 
 
 def artifact_fingerprint(session, audio_path: Path, device: str) -> dict:
+    import huggingface_hub
+    import scipy
+    import torchaudio
+    import transformers
+
     cache = session.cache_info()
     manifest_path = REPO_ROOT / "sheetsage" / "config" / "sheetsage2.json"
     local_files = {
@@ -317,6 +319,8 @@ def check_reference(reference_path: Path, fingerprint: dict, cases: dict) -> Non
 
 
 def main() -> int:
+    from transformers import AutoModel
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("audio", type=Path, help="real audio fixture to transcribe")
     parser.add_argument("--cache-dir", type=Path, required=True, help="verified package checkpoint cache")

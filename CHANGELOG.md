@@ -11,6 +11,13 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Shared `SheetSageTranscriber`/`transcribe` interface with typed model options,
+  versioned JSON/MIDI results, native result preservation and explicit capability
+  discovery. SheetSage2 structure is a first-class timed field and supports
+  structure-only prompts; SheetSage1 reports it as unsupported. Shared times use
+  the source-audio clock and notes retain raw predicted pitch. Legacy APIs and
+  native rendering remain unchanged.
+
 - Experimental SheetSage2 session and one-shot transcription API, with complete
   upstream ABC/MIDI/event results, optional dependencies, pinned SHA-256-verified
   runtime code/weights, configurable caches and offline local directories.

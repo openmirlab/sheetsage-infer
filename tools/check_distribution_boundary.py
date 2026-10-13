@@ -15,6 +15,11 @@ ADDITIVE_RUNTIME_FILES = {
     "sheetsage/sheetsage2.py",
     "sheetsage/sheetsage2_checkpoints.py",
     "sheetsage/config/sheetsage2.json",
+    "sheetsage/transcription/__init__.py",
+    "sheetsage/transcription/api.py",
+    "sheetsage/transcription/options.py",
+    "sheetsage/transcription/result.py",
+    "sheetsage/transcription/adapters.py",
 }
 
 

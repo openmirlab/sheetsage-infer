@@ -34,7 +34,7 @@ jobs:
           python -m pip check
           python -c 'import torch, torchaudio, transformers; assert torch.version.cuda is None, torch.__version__; print(torch.__version__, torchaudio.__version__, transformers.__version__)'
       - name: Lint delivery tools
-        run: ruff check tools/capture_cpu_baseline.py tools/check_distribution_boundary.py tools/verify_installed.py tools/verify_sheetsage2.py sheetsage/__about__.py sheetsage/sheetsage2.py sheetsage/sheetsage2_checkpoints.py
+        run: ruff check tools/capture_cpu_baseline.py tools/check_distribution_boundary.py tools/verify_installed.py tools/verify_sheetsage2.py sheetsage/__about__.py sheetsage/sheetsage2.py sheetsage/sheetsage2_checkpoints.py sheetsage/transcription tools/verify_transcription.py
       - name: Run complete current contract suite
         run: python -m pytest tests/ tools/test_dataset_examples.py -ra --junitxml=pytest-results.xml
       - name: Build wheel from source archive and verify package boundary

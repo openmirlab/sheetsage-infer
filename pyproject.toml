@@ -91,7 +91,7 @@ path = "sheetsage/__about__.py"
 packages = ["sheetsage"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/sheetsage", "/tests", "/tools", "/docs/compatibility", "/docs/result-semantics.md", "/README.md", "/CLAUDE.md", "/CHANGELOG.md", "/LICENSE", "/NOTICE", "/pyproject.toml"]
+include = ["/sheetsage", "/tests", "/tools", "/docs/compatibility", "/docs/result-semantics.md", "/docs/phonon-integration.md", "/README.md", "/CLAUDE.md", "/CHANGELOG.md", "/LICENSE", "/NOTICE", "/pyproject.toml"]
 exclude = ["/examples", "/hooktheory_data", "/hooktheory_transcription_results", "/tools/test_dataset_examples.py"]
 # The immutable derived-array baseline is intentionally tracked despite *.npz in .gitignore.
 artifacts = ["tests/fixtures/cpu_boundary_baseline/arrays.npz"]

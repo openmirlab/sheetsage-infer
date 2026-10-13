@@ -291,7 +291,7 @@ CFG digests are SHA-1; model and STEP artifacts use SHA-256. Override any artifa
 
 ### Shared transcription and song structure
 
-This checkout provides `SheetSageTranscriber` for both models. It owns
+The GitHub `master` source provides `SheetSageTranscriber` for both models. It owns
 one native session, reuses its loaded models, and returns `TranscriptionResult`:
 
 ```python
@@ -402,12 +402,21 @@ on natural whole songs is not established by these integration checks.
 
 ### Experimental SheetSage2
 
-This checkout includes `SheetSage2Session` and the `sheetsage2()` one-shot
-function. Install from this checkout; this backend is not a published release:
+The GitHub `master` source includes `SheetSage2Session` and the `sheetsage2()`
+one-shot function. Install the optional backend from the remote repository:
 
 ```bash
-python -m pip install '.[sheetsage2]'
+python -m pip install --upgrade "sheetsage-infer[sheetsage2] @ git+https://github.com/openmirlab/sheetsage-infer.git@master"
+# Persist the dependency in a uv project:
+uv add "sheetsage-infer[sheetsage2] @ git+https://github.com/openmirlab/sheetsage-infer.git@master"
 ```
+
+The backend remains experimental; historical PyPI versions do not provide this
+integration. Applications should lock the resolved Git commit. The tested merge
+is `7f90ab3433f3934926b6c5c9eab81206aa9faf6e`; replace `@master` with that SHA
+for a reproducible dependency. From a development checkout, `pip install
+'.[sheetsage2]'` is also supported. See the [Phonon integration guide](docs/phonon-integration.md)
+for the shared API, structure task and application acceptance checks.
 
 For a CPU-only environment, install both Torch and torchaudio from the CPU
 index before installing the extra, so a CUDA torchaudio wheel is not combined
@@ -415,7 +424,7 @@ with CPU Torch:
 
 ```bash
 python -m pip install 'torch>=2.13' 'torchaudio>=2.8' --index-url https://download.pytorch.org/whl/cpu
-python -m pip install '.[sheetsage2]'
+python -m pip install "sheetsage-infer[sheetsage2] @ git+https://github.com/openmirlab/sheetsage-infer.git@master"
 ```
 
 The existing pinned Jukebox dependency requires Torch >=2.13 for a complete

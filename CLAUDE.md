@@ -1,7 +1,7 @@
 # sheetsage-infer
 
 Inference-only fork of [SheetSage](https://github.com/chrisdonahue/sheetsage) (audio -> lead
-sheet: melody + chords). Packaged for `pip install sheetsage-infer` (previously published as
+sheet: melody + chords). Install the maintained source from GitHub (previously published as
 `openmirlab-sheetsage-infer` through 0.2.0; that name is now deprecated).
 
 ## Orientation
@@ -161,7 +161,7 @@ Install the current source from `https://github.com/openmirlab/sheetsage-infer`.
 
 ## Experimental SheetSage2 backend
 
-This checkout includes an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
+The GitHub `master` source includes an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
 2026, https://arxiv.org/abs/2610.05336), using its MERT-v2-FullSong encoder.
 `sheetsage/sheetsage2.py` owns `SheetSage2Session` and the lazy `sheetsage2()`
 one-shot API. It preserves the native rich result dictionary; it does not
@@ -222,6 +222,10 @@ feature. The original local Torch 2.9.1 environment still replays SheetSage1's
 immutable baseline exactly, including its existing silence error.
 
 ## Shared transcription and structure
+
+When integrating Phonon or another application, read `docs/phonon-integration.md`
+for the remote Git dependency, commit pin, shared result mapping and acceptance
+checks. Preserve the existing backend-specific options and native exports.
 
 `SheetSageTranscriber` (package-qualified name) and `transcribe` add a shared
 interface over the unchanged native sessions. `sheetsage/transcription/api.py`

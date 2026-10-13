@@ -105,8 +105,10 @@ class SheetSageTranscriber:
         kwargs = selected.inference_kwargs()
         native = self._session.infer(audio, **kwargs)
         adapter = adapters.from_sheetsage1 if self.model == "sheetsage1" else adapters.from_sheetsage2
+        provenance = ({"provenance": self._session.checkpoint_provenance()}
+                      if self.model == "sheetsage2" else {})
         return adapter(native, {**selected.session_kwargs(), **kwargs,
-                                "requested_device": self._device})
+                                "requested_device": self._device}, **provenance)
 
     def release(self):
         self._session.release()

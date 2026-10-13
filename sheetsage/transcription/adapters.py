@@ -8,8 +8,9 @@ only), package checkpoint manifest for provenance; read by: transcription.api.
 from __future__ import annotations
 
 import hashlib
-import json
 import math
+from collections.abc import Mapping
+from copy import deepcopy
 from pathlib import Path
 
 from ..__about__ import __version__
@@ -132,14 +133,24 @@ def from_sheetsage1(native, options):
     return result
 
 
+def _mapping(value, name):
+    if not isinstance(value, Mapping):
+        raise ValueError(f"Expected a mapping for {name}")
+    return value
+
+
+def _values(event):
+    return _mapping(event["values"], "event values")
+
+
 def _v2_intervals(events, field, end, make=LabelInterval):
     updates = []
     for event in events:
-        if field in event["values"]:
+        if field in _values(event):
             start = _number(event["time"])
             if not 0 <= start <= end:
                 raise ValueError(f"{field} event outside decoded audio extent")
-            updates.append((start, event["values"][field]))
+            updates.append((start, _values(event)[field]))
     # Stable sorting retains the last state update at identical timestamps.
     updates.sort(key=lambda x: x[0])
     output = []
@@ -172,7 +183,7 @@ def _v2_meters(events, end):
     changes = []
     last = None
     for event in events:
-        rhythm = event["values"].get("rhythm", {})
+        rhythm = _mapping(_values(event).get("rhythm", {}), "rhythm")
         if "meter" in rhythm:
             meter = _meter(rhythm["meter"])
             if meter != last:
@@ -184,7 +195,7 @@ def _v2_meters(events, end):
 def _v2_beats(events, end):
     meter, beats = None, []
     for event in events:
-        rhythm = event["values"].get("rhythm", {})
+        rhythm = _mapping(_values(event).get("rhythm", {}), "rhythm")
         if "meter" in rhythm:
             meter = _meter(rhythm["meter"])
         if "eighth_position" not in rhythm:
@@ -208,7 +219,7 @@ def _v2_notes(events, end):
         start = _number(event["time"])
         if not 0 <= start <= end:
             raise ValueError("Note onset outside decoded audio extent")
-        for note in event["values"].get("melody", ()):
+        for note in _values(event).get("melody", ()):
             track = _integer(note["track"])
             if track not in (0, 1):
                 raise ValueError(f"Unknown melody track: {track}")
@@ -220,16 +231,7 @@ def _v2_notes(events, end):
     return sorted(result, key=lambda n: (n.start, n.end, n.pitch, n.role))
 
 
-def _v2_provenance(options):
-    manifest_path = options.get("checkpoint_config") or Path(__file__).parents[1] / "config/sheetsage2.json"
-    raw = Path(manifest_path).read_bytes()
-    manifest = json.loads(raw)
-    return {"manifest_sha256": hashlib.sha256(raw).hexdigest(),
-            "components": {name: {k: config[k] for k in ("repository", "revision") if k in config}
-                           for name, config in manifest["components"].items()}}
-
-
-def from_sheetsage2(native, options):
+def from_sheetsage2(native, options, *, provenance=None):
     """Normalize stitched raw events, keeping native exports/tensors untouched."""
     end = _number(native["duration_seconds"])
     if end <= 0:
@@ -242,7 +244,8 @@ def from_sheetsage2(native, options):
     result.execution.update({key: native[key] for key in (
         "prompts", "preset", "dtype", "melody_only", "window_seconds", "overlap_seconds",
         "lookahead_seconds", "windows", "elapsed_seconds", "peak_gpu_mib") if key in native})
-    result.execution["provenance"] = _v2_provenance(options)
+    result.execution["provenance"] = deepcopy(provenance) if provenance is not None else {
+        "status": "unknown", "reason": "No session checkpoint snapshot supplied"}
     prompts = set(native["prompts"])
     events = native["events"]
     _apply(result, "notes", lambda: _v2_notes(events, end), bool(prompts & {"melody_full", "melody_vocal"}))

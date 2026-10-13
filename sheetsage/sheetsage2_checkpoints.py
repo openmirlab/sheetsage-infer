@@ -13,6 +13,7 @@ import json
 import os
 import re
 import tempfile
+from copy import deepcopy
 from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import urlopen
@@ -24,7 +25,8 @@ _MANIFEST = Path(__file__).with_name("config") / "sheetsage2.json"
 
 def _read_manifest(path):
     try:
-        manifest = json.loads(Path(path).read_text(encoding="utf-8"))
+        raw = Path(path).read_bytes()
+        manifest = json.loads(raw.decode("utf-8"))
         if manifest["schema_version"] != 1:
             raise ValueError("unsupported schema_version")
         components = manifest["components"]
@@ -52,7 +54,7 @@ def _read_manifest(path):
                     raise ValueError(f"unsupported artifact URL: {name}")
                 if parsed.scheme != "file" and not parsed.netloc:
                     raise ValueError(f"missing artifact URL host: {name}")
-        return manifest
+        return manifest, hashlib.sha256(raw).hexdigest()
     except (KeyError, TypeError, AttributeError, ValueError) as exc:
         raise ValueError(f"Invalid SheetSage2 checkpoint manifest {path}: {exc}") from exc
 
@@ -88,10 +90,23 @@ class CheckpointStore:
     """Resolve, inspect and verify both local checkpoint bundles without model imports."""
 
     def __init__(self, *, cache_dir=None, model_path=None, base_model_path=None, checkpoint_config=None):
-        self.manifest = _read_manifest(checkpoint_config if checkpoint_config is not None else _MANIFEST)
+        self.manifest, digest = _read_manifest(
+            checkpoint_config if checkpoint_config is not None else _MANIFEST,
+        )
+        self._provenance = {
+            "manifest_sha256": digest,
+            "components": {
+                key: {"repository": component["repository"], "revision": component["revision"]}
+                for key, component in self.manifest["components"].items()
+            },
+        }
         default_cache = os.environ.get("SHEETSAGE2_CACHE_DIR", str(CACHE_DIR / "sheetsage2"))
         self.cache_dir = Path(cache_dir if cache_dir is not None else default_cache).expanduser().resolve()
         self.overrides = {"sheetsage2": model_path, "mert2": base_model_path}
+
+    def provenance(self):
+        """Return an independent copy of the validated manifest's original identity."""
+        return deepcopy(self._provenance)
 
     def directory(self, key):
         override = self.overrides[key]

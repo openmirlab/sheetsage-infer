@@ -14,6 +14,9 @@ from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any
 
+_MIDI_MAX_PPQ = 9600
+_MIDI_EVENT_TICK_BUDGET = 4_000_000
+
 
 @dataclass(frozen=True)
 class NoteEvent:
@@ -121,7 +124,12 @@ def result_semantics(model: str) -> dict:
                       "features": "tokens/tensors remain native; no shared tensor interpretation claimed"}),
         "midi": {"policy": "notes by role, chord/structure text, key text and meter events",
                  "velocity": "constant 100, generated", "tempo": "constant 120 encoding clock, not estimated tempo",
-                 "resolution": 9600, "accompaniment": "not synthesized; native MIDI remains available"},
+                 "resolution": "adaptive integer PPQ, 1 through 9600",
+                 "resolution_policy": "9600 for zero extent; otherwise min(9600, floor(4000000 / (2 * latest exported second)))",
+                 "event_tick_budget": _MIDI_EVENT_TICK_BUDGET,
+                 "precision": "nearest tick; one tick is 1 / (2 * PPQ) seconds",
+                 "timestamp_limits": "finite nonnegative seconds, at most 2000000; otherwise ValueError",
+                 "accompaniment": "not synthesized; native MIDI remains available"},
     }
 
 
@@ -138,6 +146,23 @@ def _json_value(value):
     if callable(value):
         return {"callable": getattr(value, "__qualname__", type(value).__name__)}
     return {"type": type(value).__name__, "serialized": False}
+
+
+def _midi_resolution(notes, annotations, meters):
+    """Bound tick-to-time allocations when readers reopen long event exports."""
+    latest = 0.0
+    timestamps = (
+        [time for note in notes for time in (note.start, note.end)]
+        + [interval.start for interval in annotations]
+        + [meter.start for meter in meters]
+    )
+    for timestamp in timestamps:
+        if not math.isfinite(timestamp) or not 0 <= timestamp <= _MIDI_EVENT_TICK_BUDGET / 2:
+            raise ValueError(f"Invalid MIDI timestamp: {timestamp!r}; expected finite seconds from 0 to 2000000")
+        latest = max(latest, timestamp)
+    if latest <= _MIDI_EVENT_TICK_BUDGET / (2 * _MIDI_MAX_PPQ):
+        return _MIDI_MAX_PPQ
+    return math.floor(_MIDI_EVENT_TICK_BUDGET / (2 * latest))
 
 
 @dataclass
@@ -188,12 +213,18 @@ class TranscriptionResult:
 
         This is a portable event export; use native results for upstream voicing,
         octave adjustment, click tracks or notation. No synthesis is performed.
+        Resolution is at most 9600 PPQ and decreases for long event spans to
+        keep the final event within four million ticks at the 120 BPM clock.
         """
+        import mido
         import pretty_midi
 
         if self.notes is None:
             raise ValueError("notes are unavailable; inspect statuses['notes'] or export JSON")
-        midi = pretty_midi.PrettyMIDI(initial_tempo=120, resolution=9600)
+        annotations = [interval for name in ("chords", "keys", "structure")
+                       for interval in getattr(self, name) or ()]
+        resolution = _midi_resolution(self.notes, annotations, self.meters or ())
+        midi = pretty_midi.PrettyMIDI(initial_tempo=120, resolution=resolution)
         instruments = {}
         for note in self.notes:
             if not (math.isfinite(note.start) and math.isfinite(note.end)
@@ -214,7 +245,17 @@ class TranscriptionResult:
                 meter.numerator, meter.denominator, meter.start))
         stream = io.BytesIO()
         midi.write(stream)
-        data = stream.getvalue()
+        # Some PPQs make pretty_midi truncate the 120 BPM clock to 499999 us.
+        # Preserve the exact encoding clock so drift cannot accumulate in long files.
+        stream.seek(0)
+        encoded = mido.MidiFile(file=stream)
+        for track in encoded.tracks:
+            for message in track:
+                if message.type == "set_tempo":
+                    message.tempo = 500000
+        normalized = io.BytesIO()
+        encoded.save(file=normalized)
+        data = normalized.getvalue()
         if path is not None:
             Path(path).write_bytes(data)
         return data

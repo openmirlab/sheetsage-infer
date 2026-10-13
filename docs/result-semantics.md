@@ -92,14 +92,25 @@ reports this before inference and supports the paper waveform path. Input channe
 layout is documented in README. Input normalization, model accuracy and downstream
 application acceptance are separate from result conversion.
 
+The V2 checkpoint manifest hash and component revisions are captured from the
+validated bytes at session construction. Changing, removing or relocating that
+manifest later does not change a result's provenance. A standalone native-result
+conversion without a session snapshot explicitly reports unknown provenance.
+
 ## Exports
 
 JSON includes values, statuses, effective options, execution metadata and semantic
 snapshot. Native MIDI bytes/tensors are deliberately excluded; callbacks become
 names, not executable objects. JSON rejects nonfinite numeric values.
 
-Shared MIDI uses a 120-BPM encoding clock and 9600 ticks per quarter: note times
-round to the nearest tick (about52 microseconds). This tempo is not an estimate.
+Shared MIDI uses an exact 120-BPM encoding clock, not an estimated tempo.
+Resolution is at most 9600 ticks per quarter (PPQ), reduced for long files to
+`min(9600, floor(4000000 / (2 * latest_exported_second)))`; an empty timeline
+uses 9600 PPQ. Note onsets/offsets and annotation/meter starts determine the
+exported extent. Times round to the nearest tick, `1 / (2 * PPQ)` seconds
+(about 52 microseconds at 9600 PPQ). The four-million-tick budget keeps exports
+readable without excessive reader allocations. Negative, nonfinite, or greater
+than 2,000,000-second timestamps are rejected; JSON retains the original seconds.
 Notes retain roles/pitches, use generated velocity 100, and have no generated chord
 accompaniment. Chord/key/structure labels become text events; meter changes become
 MIDI time signatures. The richer interval/status contract is in JSON. Native MIDI

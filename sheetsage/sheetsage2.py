@@ -112,6 +112,10 @@ class SheetSage2Session:
     def cache_info(self):
         return self._store.cache_info()
 
+    def checkpoint_provenance(self):
+        """Report checkpoint identities captured at construction without loading."""
+        return self._store.provenance()
+
     def __enter__(self):
         return self.load()
 

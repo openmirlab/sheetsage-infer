@@ -52,6 +52,9 @@ def backends(monkeypatch):
         def close(self):
             self.status = "closed"
 
+        def checkpoint_provenance(self):
+            return {"manifest_sha256": "original"}
+
         def cache_info(self):
             return {"cached": True}
 
@@ -62,7 +65,7 @@ def backends(monkeypatch):
     monkeypatch.setattr(import_module("sheetsage.sheetsage2"), "SheetSage2Session", NativeSession)
     adapters = ModuleType("sheetsage.transcription.adapters")
     adapters.from_sheetsage1 = lambda native, options: ("sheetsage1", native, options)
-    adapters.from_sheetsage2 = lambda native, options: ("sheetsage2", native, options)
+    adapters.from_sheetsage2 = lambda native, options, **kwargs: ("sheetsage2", native, options, kwargs)
     monkeypatch.setitem(sys.modules, "sheetsage.transcription.adapters", adapters)
     monkeypatch.setattr(import_module("sheetsage.transcription"), "adapters", adapters, raising=False)
     return sessions
@@ -87,6 +90,8 @@ def test_reuses_backend_and_delegates_lifecycle(backends, model):
     assert second[1] is native.result
     assert first[2]["requested_device"] == "cpu"
     assert native.calls[0][0] is audio
+    if model == "sheetsage2":
+        assert first[3] == {"provenance": {"manifest_sha256": "original"}}
     assert native.builds == 1
     session.release()
     assert session.status == "released"

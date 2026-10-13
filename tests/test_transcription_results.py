@@ -162,7 +162,7 @@ def test_json_snapshot_and_no_native_serialization(tmp_path):
     assert payload["semantics"]["time"]["origin"] == "supplied_audio_start"
     assert payload["execution"]["options"]["native_path"] == str(tmp_path)
     assert payload["structure"] == [{"start": 1, "end": 10, "label": "verse"}]
-    assert payload["execution"]["provenance"]["components"]["sheetsage2"]["revision"].startswith("b83c3d")
+    assert payload["execution"]["provenance"]["status"] == "unknown"
 
 
 def test_common_midi_preserves_raw_pitch_time_roles_and_markers(tmp_path):
@@ -203,3 +203,43 @@ def test_v1_fractional_beats_interpolate_instead_of_using_bpm():
                      [(0, (0, (2, 2, 1, 2, 2, 2)))], [], [(1, 5, (0, 5))], 16)
     result = from_sheetsage1((lead, [0, 1, 2, 3, 4], [10, 11, 13, 14, 15]), {})
     assert (result.notes[0].start, result.notes[0].end) == (10.25, 12)
+
+
+@pytest.mark.parametrize("values", [None, [], "invalid"])
+def test_malformed_values_fail_requested_fields_without_losing_native(values):
+    native = native2([{"time": 0, "values": values}])
+    result = from_sheetsage2(native, {})
+    assert result.native is native
+    assert all(status.state == "failed" for status in result.statuses.values())
+
+
+@pytest.mark.parametrize("rhythm", [None, [], "invalid"])
+def test_malformed_rhythm_retains_independent_structure(rhythm):
+    result = from_sheetsage2(native2([event(0, rhythm=rhythm, structure="verse")]), {})
+    assert result.statuses["beats"].state == result.statuses["meters"].state == "failed"
+    assert result.structure[0].label == "verse"
+    assert result.statuses["structure"].state == "ok"
+
+
+def test_facade_provenance_survives_manifest_change_and_cwd(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from sheetsage import SheetSage2Options, SheetSageTranscriber
+    import sheetsage
+
+    original = Path(sheetsage.__file__).parent / "config/sheetsage2.json"
+    manifest = tmp_path / "custom.json"
+    manifest.write_bytes(original.read_bytes())
+    monkeypatch.chdir(tmp_path)
+    transcriber = SheetSageTranscriber("sheetsage2", options=SheetSage2Options(
+        checkpoint_config="custom.json", local_files_only=True))
+    # Isolate model inference, preserving real construction and adapter wiring.
+    transcriber._session._status = "ready"
+    monkeypatch.setattr(transcriber._session, "infer", lambda *a, **k: native2([]))
+    expected = transcriber._session.checkpoint_provenance()
+    manifest.write_text("{}")
+    assert transcriber.infer(b"audio").execution["provenance"] == expected
+    manifest.unlink()
+    monkeypatch.chdir(tmp_path.parent)
+    assert transcriber.infer(b"audio").execution["provenance"] == expected
+    transcriber.close()

@@ -60,6 +60,55 @@ def test_manifest_is_fully_validated_and_accepts_optional_code(tmp_path):
     assert "configuration.py" in store.manifest["components"]["sheetsage2"]["artifacts"]
 
 
+@pytest.mark.parametrize("source_change", ["modify", "delete"])
+def test_provenance_snapshots_validated_bytes_once_and_survives_source_changes(
+    tmp_path, monkeypatch, source_change,
+):
+    manifest, document = _manifest(tmp_path)
+    # Preserve exact bytes, including whitespace, rather than reserializing JSON.
+    original = b"\n  " + manifest.read_bytes() + b"\n"
+    manifest.write_bytes(original)
+    expected = {
+        "manifest_sha256": hashlib.sha256(original).hexdigest(),
+        "components": {
+            key: {"repository": value["repository"], "revision": value["revision"]}
+            for key, value in document["components"].items()
+        },
+    }
+    reads = []
+    read_bytes = Path.read_bytes
+
+    def counted_read(path):
+        reads.append(path.resolve())
+        return read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", counted_read)
+    monkeypatch.chdir(tmp_path)
+    store = CheckpointStore(checkpoint_config="manifest.json", cache_dir="cache")
+    assert reads == [manifest]
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+    if source_change == "modify":
+        document["components"]["sheetsage2"]["revision"] = "0" * 40
+        manifest.write_text(json.dumps(document))
+    else:
+        manifest.unlink()
+
+    def no_network(*args, **kwargs):
+        pytest.fail("provenance attempted a download")
+
+    monkeypatch.setattr("sheetsage.sheetsage2_checkpoints.urlopen", no_network)
+    snapshot = store.provenance()
+    assert snapshot == expected
+    snapshot["manifest_sha256"] = "changed"
+    snapshot["components"]["sheetsage2"]["revision"] = "changed"
+    snapshot["components"].pop("mert2")
+    assert store.provenance() == expected
+    assert reads == [manifest]
+    assert not (tmp_path / "cache").exists()
+
+
 @pytest.mark.parametrize("damage", ["malformed", "version", "revision", "hash", "unsafe"])
 def test_invalid_manifest_fails_at_store_construction(tmp_path, damage):
     manifest_path, document = _manifest(tmp_path)

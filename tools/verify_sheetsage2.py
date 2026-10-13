@@ -144,8 +144,15 @@ def in_memory_differences(left, right, path="$", limit=24):
                     "left_shape": list(a.shape), "right_shape": list(b.shape),
                 })
         elif isinstance(a, np.ndarray) or isinstance(b, np.ndarray):
-            if not (isinstance(a, np.ndarray) and isinstance(b, np.ndarray)) or not np.array_equal(a, b):
-                differences.append({"path": current, "reason": "array value or type mismatch"})
+            if not (isinstance(a, np.ndarray) and isinstance(b, np.ndarray)):
+                differences.append({"path": current, "reason": "array type mismatch"})
+            elif a.dtype != b.dtype or a.shape != b.shape or not np.array_equal(a, b):
+                differences.append({
+                    "path": current,
+                    "reason": "array value, dtype, or shape mismatch",
+                    "left_dtype": str(a.dtype), "right_dtype": str(b.dtype),
+                    "left_shape": list(a.shape), "right_shape": list(b.shape),
+                })
         elif isinstance(a, Mapping) or isinstance(b, Mapping):
             if not (isinstance(a, Mapping) and isinstance(b, Mapping)):
                 differences.append({"path": current, "reason": "mapping type mismatch"})

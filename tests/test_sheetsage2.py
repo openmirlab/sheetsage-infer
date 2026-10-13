@@ -109,6 +109,21 @@ def test_infer_requires_ready_state(status):
         session.infer("unused")
 
 
+def test_checkpoint_provenance_delegates_without_loading(monkeypatch):
+    snapshot = {"manifest_sha256": "test", "components": {}}
+    calls = []
+
+    def provenance(store):
+        calls.append(store)
+        return snapshot
+
+    monkeypatch.setattr("sheetsage.sheetsage2_checkpoints.CheckpointStore.provenance", provenance)
+    session = SheetSage2Session()
+    assert session.checkpoint_provenance() is snapshot
+    assert calls == [session._store]
+    assert session.status == "new"
+
+
 @pytest.mark.parametrize("failure_type", [RuntimeError, KeyboardInterrupt])
 def test_load_failure_clears_state_and_retry_succeeds(monkeypatch, failure_type):
     model = FakeModel()

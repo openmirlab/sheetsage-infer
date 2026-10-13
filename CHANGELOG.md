@@ -54,6 +54,13 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Snapshot SheetSage2 checkpoint provenance at construction so later manifest
+  changes cannot corrupt result metadata. Preserve independent fields when
+  native event/rhythm containers are malformed.
+- Keep long shared MIDI exports readable with adaptive tick resolution and an
+  exact encoding tempo. Compare NumPy dtype and shape as well as values in
+  integration verification.
+
 - Make session failures and releases observable as `failed` and `released`. Failed or
   interrupted loads clear session-owned references and can retry; successful loads remain
   reusable. Preserve terminal, idempotent close/context exit and exact CPU inference outputs.

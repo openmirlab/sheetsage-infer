@@ -161,7 +161,7 @@ Install the current source from `https://github.com/openmirlab/sheetsage-infer`.
 
 ## Experimental SheetSage2 backend
 
-This branch adds an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
+This checkout includes an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
 2026, https://arxiv.org/abs/2610.05336), using its MERT-v2-FullSong encoder.
 `sheetsage/sheetsage2.py` owns `SheetSage2Session` and the lazy `sheetsage2()`
 one-shot API. It preserves the native rich result dictionary; it does not

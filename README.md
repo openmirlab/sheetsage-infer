@@ -289,9 +289,9 @@ CFG digests are SHA-1; model and STEP artifacts use SHA-256. Override any artifa
 `SHEETSAGE_ASSET_URL_<TAG>`; cache location remains configurable with
 `SHEETSAGE_CACHE_DIR`.
 
-### Shared transcription and song structure (branch checkout)
+### Shared transcription and song structure
 
-The experimental branch provides `SheetSageTranscriber` for both models. It owns
+This checkout provides `SheetSageTranscriber` for both models. It owns
 one native session, reuses its loaded models, and returns `TranscriptionResult`:
 
 ```python
@@ -399,9 +399,9 @@ contracts; [cached model verification](tools/README.md#shared-transcription-veri
 checks the public facade against native calls. Structure accuracy on natural
 whole songs is not established by these integration checks.
 
-### Experimental SheetSage2 (branch checkout)
+### Experimental SheetSage2
 
-`experiment/sheetsage2` adds `SheetSage2Session` and the `sheetsage2()` one-shot
+This checkout includes `SheetSage2Session` and the `sheetsage2()` one-shot
 function. Install from this checkout; this backend is not a published release:
 
 ```bash

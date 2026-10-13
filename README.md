@@ -415,8 +415,7 @@ The backend remains experimental; historical PyPI versions do not provide this
 integration. Applications should lock the resolved Git commit. The tested merge
 is `7f90ab3433f3934926b6c5c9eab81206aa9faf6e`; replace `@master` with that SHA
 for a reproducible dependency. From a development checkout, `pip install
-'.[sheetsage2]'` is also supported. See the [Phonon integration guide](docs/phonon-integration.md)
-for the shared API, structure task and application acceptance checks.
+'.[sheetsage2]'` is also supported.
 
 For a CPU-only environment, install both Torch and torchaudio from the CPU
 index before installing the extra, so a CUDA torchaudio wheel is not combined

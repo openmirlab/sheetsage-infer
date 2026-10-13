@@ -223,10 +223,6 @@ immutable baseline exactly, including its existing silence error.
 
 ## Shared transcription and structure
 
-When integrating Phonon or another application, read `docs/phonon-integration.md`
-for the remote Git dependency, commit pin, shared result mapping and acceptance
-checks. Preserve the existing backend-specific options and native exports.
-
 `SheetSageTranscriber` (package-qualified name) and `transcribe` add a shared
 interface over the unchanged native sessions. `sheetsage/transcription/api.py`
 owns routing/lifecycle, `options.py` owns immutable backend settings,

@@ -10,6 +10,18 @@ import tarfile
 import zipfile
 from pathlib import Path
 
+ADDITIVE_RUNTIME_FILES = {
+    "sheetsage/__about__.py",
+    "sheetsage/sheetsage2.py",
+    "sheetsage/sheetsage2_checkpoints.py",
+    "sheetsage/config/sheetsage2.json",
+    "sheetsage/transcription/__init__.py",
+    "sheetsage/transcription/api.py",
+    "sheetsage/transcription/options.py",
+    "sheetsage/transcription/result.py",
+    "sheetsage/transcription/adapters.py",
+}
+
 
 def check(path):
     if path.suffix == ".whl":
@@ -22,12 +34,13 @@ def check(path):
                  "hooktheory_data/", "hooktheory_transcription_results/")
     assert not [name for name in names if any(value in name for value in forbidden)], path
     for required in ("sheetsage/assets/sheetsage.json", "sheetsage/assets/jukebox.json",
-                     "sheetsage/assets/test.json", "sheetsage/config/checkpoints.toml"):
+                     "sheetsage/assets/test.json", "sheetsage/config/checkpoints.toml",
+                     "sheetsage/config/sheetsage2.json"):
         assert any(name.endswith(required) for name in names), (path, required)
     baseline = Path(__file__).resolve().parents[1] / "tests/fixtures/delivery_baseline.json"
     if baseline.is_file():
         expected = set(json.loads(baseline.read_text())["runtime_sha256"])
-        expected.add("sheetsage/__about__.py")
+        expected.update(ADDITIVE_RUNTIME_FILES)
         actual = {"sheetsage/" + name.split("sheetsage/", 1)[1]
                   for name in names if "sheetsage/" in name and not name.endswith("/")}
         # tar may list directories without a trailing slash; only members representing files count.

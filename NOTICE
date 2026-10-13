@@ -34,3 +34,25 @@ Third-party dependencies retain their own licenses, notably:
 This NOTICE exists to make the licensing split explicit and machine-
 discoverable; it does not modify LICENSE, which remains the authoritative
 license grant for this repository's own code.
+
+Experimental SheetSage2 integration (2026-10-13)
+------------------------------------------------
+SheetSage2 is by Junyan Jiang, Ruibin Yuan, Jiahao Pan, Wei Xue, Yike Guo,
+Gus Xia, and Yann LeCun, released by M·A·P:
+https://huggingface.co/m-a-p/SheetSage2
+https://arxiv.org/abs/2610.05336
+Its encoder is MERT-v2-FullSong:
+https://huggingface.co/m-a-p/MERT-v2-FullSong
+
+The SheetSage2 and MERT2 model cards identify weights as CC BY-NC 4.0.
+The HF SheetSage2 LICENSE describes MERT2 model weights and expressly separates
+code/dependency terms. We have not established an explicit redistribution
+license for the distinct HF SheetSage2 Python files. The YuE GitHub repository's
+Apache-2.0 license is not assumed to cover those files.
+
+This distribution includes only our adapter and artifact metadata. It does not
+include upstream SheetSage2/MERT2 source files, model weights or render assets.
+The experimental backend downloads verified upstream code and weights to the
+user cache and executes that code locally. These downloads are not relicensed
+under this package's MIT license. Source-port redistribution and weight
+rehosting are outside the experiment.

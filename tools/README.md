@@ -91,3 +91,71 @@ HTTP 401 for **all seven** handcrafted files. TEST_WAV and official madmom weigh
 returned 200. A clean hosted real-model lane therefore needs an independently authorized
 access or hosting solution for the seven configured artifacts. No workflow uploads caches,
 changes mirrors, or treats unavailable weights as a passing model check.
+
+# Experimental SheetSage2 parity
+
+`verify_sheetsage2.py` loads the pinned upstream model and `SheetSage2Session`
+independently from a populated package cache. It compares full deterministic
+returns on real music and seven seconds of exact silence, including ABC, all
+MIDI parts, events, annotations, tokens, and optional logits/scores/embeddings.
+Only runtime/memory measurements are excluded. A load spy proves two sequential
+wrapper calls reuse the model. Golden references retain hashes, never audio,
+model weights or large tensors.
+
+```bash
+PYTHONPATH=. python tools/verify_sheetsage2.py ~/.sheetsage/test/test1_44100.wav \
+  --cache-dir /path/to/sheetsage2-cache --device cuda \
+  --output /tmp/sheetsage2-parity.json
+
+# Exact original numerical environment only:
+PYTHONPATH=. python tools/verify_sheetsage2.py ~/.sheetsage/test/test1_44100.wav \
+  --cache-dir /path/to/sheetsage2-cache --device cuda \
+  --reference tests/fixtures/sheetsage2_baseline.json
+```
+
+`--reference` checks input, upstream artifacts and the numerical environment
+before accepting output fingerprints. The ordinary A/B command works in another
+supported environment without claiming cross-environment identity. `--record`
+is an explicit baseline-creation operation; ordinary verification never rewrites
+fixtures. See the fixture for versions and exact file hashes. The measured CUDA
+profile uses Python 3.11, Torch/torchaudio 2.9.1, Transformers 4.45.2, NumPy 2.4.6
+and an RTX 4090. It is an isolated upstream comparison profile, separate from
+the complete package's newer Jukebox-driven Torch dependency requirement.
+
+The real 4.59-second fixture produces 19 events and 16 melody notes; seven
+seconds of silence produces no melody notes. These short-fixture parity runs
+verify integration, not transcription accuracy or long-song overlap quality.
+`tests/test_sheetsage2*.py` covers offline lifecycle, device selection, manifest,
+cache and integrity errors without model downloads.
+
+# Shared transcription verification
+
+The public `SheetSageTranscriber` preserves the native tuple/dictionary and converts
+it into typed seconds/MIDI results. Offline contracts:
+
+```bash
+python -m pytest tests/test_transcription_api.py tests/test_transcription_results.py
+```
+
+With independently populated caches and a real non-silent input, compare the
+original session with the shared facade, every native output field in memory,
+repeated normalized calls, JSON/MIDI export and V2 structure-only prompts:
+
+```bash
+PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python tools/verify_transcription.py \
+  ~/.sheetsage/test/test1_44100.wav --model sheetsage1 --device cpu \
+  --output /tmp/shared-v1
+PYTHONPATH=. python tools/verify_transcription.py \
+  ~/.sheetsage/test/test1_44100.wav --model sheetsage2 --device cuda \
+  --cache-dir /path/to/populated/sheetsage2-cache --output /tmp/shared-v2
+# Paper waveform path, bypassing upstream's obsolete torchaudio.info file reader:
+PYTHONPATH=. python tools/verify_transcription.py \
+  ~/.sheetsage/test/test1_44100.wav --model sheetsage2 --device cuda --preset paper --waveform \
+  --cache-dir /path/to/populated/sheetsage2-cache --output /tmp/shared-v2-paper
+```
+
+This verifier never records/replaces golden fixtures. Timings/peak memory are
+excluded from equality; actual tensor/array values are compared in memory.
+Run the immutable CPU replay and upstream SheetSage2 verifier above separately
+when changing native inference or its dependencies. These checks establish
+integration behavior, not transcription or song-structure accuracy.

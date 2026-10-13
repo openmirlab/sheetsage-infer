@@ -46,6 +46,11 @@ research. It is not affiliated with or endorsed by the original author.
   was created by **Chris Donahue** (repository created 2022-06-10, per
   GitHub). See [Citation](#citation) below for the paper's full author list
   (Donahue, Thickstun, and Liang).
+- **Experimental SheetSage2 backend**: [M·A·P's SheetSage2](https://huggingface.co/m-a-p/SheetSage2),
+  by Junyan Jiang, Ruibin Yuan, Jiahao Pan, Wei Xue, Yike Guo, Gus Xia, and Yann LeCun,
+  uses [MERT-v2-FullSong](https://huggingface.co/m-a-p/MERT-v2-FullSong).
+  This package provides an independent adapter; upstream code and weights are
+  downloaded at runtime and retain their own terms. See the experimental usage below.
 - **Source repository**: [github.com/chrisdonahue/sheetsage](https://github.com/chrisdonahue/sheetsage)
 - **Weights & data hosts**: SheetSage's own trained checkpoints are fetched
   from its S3 bucket (`sheetsage.s3.amazonaws.com`) for the handcrafted-feature
@@ -92,6 +97,19 @@ so only the Citation entry needed fixing.)*
 
 **If you use SheetSage-Infer in your research, please cite the original paper above.** This package is a maintenance fork to ensure easier deployment and continued compatibility - all credit for the models, algorithms, and research belongs to the original author.
 
+For the experimental SheetSage2 backend, cite its [technical report](https://arxiv.org/abs/2610.05336):
+
+```bibtex
+@misc{jiang2026sheetsage2,
+  title={SheetSage2: Coherent Lead-Sheet Transcription with Synthetic Supervision},
+  author={Jiang, Junyan and Yuan, Ruibin and Pan, Jiahao and Xue, Wei and Guo, Yike and Xia, Gus and LeCun, Yann},
+  year={2026},
+  eprint={2610.05336},
+  archivePrefix={arXiv},
+  primaryClass={cs.SD}
+}
+```
+
 ---
 
 ## ✨ Features
@@ -107,6 +125,8 @@ so only the Citation entry needed fixing.)*
 ## Scope
 
 **In scope:**
+- Experimental SheetSage2 transcription through a pinned upstream runtime,
+  with ABC/MIDI/annotations and independent model lifecycle
 - Inference-only transcription: audio -> lead sheet (melody + chord symbols),
   via handcrafted CPU features or Jukebox GPU embeddings
 - LilyPond / MIDI / PDF export via the `LeadSheet` API
@@ -124,7 +144,7 @@ so only the Citation entry needed fixing.)*
   these remain CC BY-NC-SA (non-commercial, share-alike) and are downloaded
   at runtime, never bundled (see
   ["What this project will NEVER bundle"](#what-this-project-will-never-bundle))
-- Time signatures beyond 4/4 and 3/4 (inherited limitation of the original
+- For SheetSage1, time signatures beyond 4/4 and 3/4 (inherited limitation of the original
   model)
 
 **Known constraints:**
@@ -269,7 +289,221 @@ CFG digests are SHA-1; model and STEP artifacts use SHA-256. Override any artifa
 `SHEETSAGE_ASSET_URL_<TAG>`; cache location remains configurable with
 `SHEETSAGE_CACHE_DIR`.
 
-### Command-Line Interface
+### Shared transcription and song structure
+
+This checkout provides `SheetSageTranscriber` for both models. It owns
+one native session, reuses its loaded models, and returns `TranscriptionResult`:
+
+```python
+from sheetsage import SheetSageTranscriber
+
+with SheetSageTranscriber(model="sheetsage2", device="auto",
+                         require_structure=True) as model:
+    result = model.infer("song.wav")
+
+for section in result.structure or []:
+    print(section.start, section.end, section.label)
+result.to_json("analysis.json")
+result.to_midi("transcription.mid")
+```
+
+Use the SheetSage2 installation instructions below first. Select
+`model="sheetsage1"` for the original model; V1 does not support structure, so
+omit `require_structure=True`. Requiring an unsupported or disabled structure
+task raises before loading weights. `model.capabilities` describes supported
+outputs; `result.statuses` describes what this particular call produced.
+The default model is `sheetsage1`.
+
+| Shared field | Meaning | SheetSage1 | SheetSage2 |
+|---|---|---|---|
+| `notes` | `start`, `end`, MIDI `pitch`, `role` | Lead melody | Vocal and instrumental melody |
+| `chords` | Timed native chord labels | Eight chord families | Selected full/major-minor vocabulary |
+| `beats` | `time`, one-based denominator-beat `position`, meter; `is_downbeat` | Beat-derived | Decoded rhythm |
+| `keys` | Timed key labels | Global estimate/fallback | Key events |
+| `meters` | Timed numerator/denominator | Single 3/4 or 4/4 | Meter changes |
+| `structure` | Timed native section labels | Unsupported | Intro, verse, chorus and other native labels |
+| `native` | Complete unchanged original result | LeadSheet/beat tuple, optionally intermediaries | Original dictionary, including ABC/MIDI/LAB/tokens/tensors |
+
+Times are seconds from the start of the supplied audio, with half-open intervals.
+V1 uses actual beat times, including its segment offset; its `analysis_end` is a
+rounded score boundary and may extend beyond the audio. V2 uses already-stitched
+event times. An externally cropped file has its own clock; no parent offset is
+invented. Notes preserve model pitches without the legacy renderer's octave
+adjustment. Shared labels retain model-specific vocabulary; V2 raw chord spelling
+can differ from its key-corrected LAB output. Unknown regions before a first label
+remain unannotated.
+
+Every field has an `OutputStatus` under `result.statuses`: `ok`, `unsupported`,
+`not_requested`, or `failed` with a reason. A `None` field requires checking this
+status; `[]` means a requested output with no decoded events. An `ok` status
+confirms conversion, not musical accuracy or complete annotation coverage.
+A malformed rhythm grid can fail `beats` while structure and other fields remain
+available. Upstream model/inference errors still raise.
+
+For structure alone, use the upstream task selection through typed options:
+
+```python
+from sheetsage import SheetSageTranscriber, SheetSage2Options
+
+options = SheetSage2Options(prompts=("timestamp", "structure"))
+with SheetSageTranscriber("sheetsage2", options=options,
+                         require_structure=True) as model:
+    result = model.infer("song.wav")
+assert result.statuses["structure"].state == "ok"
+result.to_json("structure.json")
+```
+
+This requests only timed structure; it makes no speed guarantee. ABC may be
+unavailable without rhythm/key prompts, while structure remains usable.
+`melody_only=True` controls native notation/accompaniment, not task selection.
+
+`SheetSage1Options` retains Jukebox, segment/beat hints, detection switches,
+thresholds and intermediaries. `SheetSage2Options` retains cache/offline paths,
+preset, prompts, window options, precision and tensor exports. Options for the
+wrong model raise. `infer(audio, options=...)` replaces the complete option object;
+use `dataclasses.replace(model.options, ...)` to change selected values. Session
+configuration (including V1 Jukebox choice and V2 checkpoint paths) is fixed at
+construction. `native_output_dir` on V2 saves original artifacts.
+The upstream `paper` preset file decoder requires `torchaudio.info()`, which is
+absent in the tested torchaudio 2.9.1/2.11.0 builds. For this preset, supply an
+already-decoded NumPy/Torch waveform with `sampling_rate`; use the default preset
+for normal file input. The facade reports an actionable error for this mismatch.
+
+Both models accept local paths and encoded audio bytes, passed through without
+changing decoding. V1 additionally accepts URLs; V2 accepts binary streams and
+NumPy/Torch waveforms with `sampling_rate` and `[channels, samples]` layout.
+The shared facade rejects a sample rate supplied for an encoded file/stream.
+
+`result.to_json()` returns text; `result.to_midi()` returns bytes; either accepts
+an optional output path. JSON includes schema version, effective configuration,
+semantics and field statuses, excluding native binary/tensor payloads. Shared MIDI
+exports notes in role tracks, constant generated velocity, meter changes and
+chord/key/structure text annotations. It does not synthesize chord accompaniment;
+use `result.native` for the original MIDI rendering. Structure-only results have
+no notes and therefore use JSON rather than shared MIDI.
+V1 LilyPond remains `result.native[0].as_lily()`; V2 ABC remains
+`result.native["abc"]`, with failure details in `result.native["abc_error"]`.
+
+`SheetSageTranscriber` supports `load`, ready-only `infer`, `release`, terminal
+`close`, `status`, `cache_info` and context management. Sequential calls reuse the
+model; concurrent calls on one instance are unsupported. `transcribe(audio,
+model=..., options=...)` is the one-shot equivalent and creates/closes a fresh
+session each time. Existing `SheetSageSession`, `SheetSage2Session`, `sheetsage()`
+and `sheetsage2()` keep their original contracts.
+
+Inspect `result_semantics("sheetsage2")` or `model.semantics` without loading
+weights. See [result interpretation](docs/result-semantics.md) for conversion
+sources, profile differences and verification. Run `python -m pytest
+tests/test_transcription_api.py tests/test_transcription_results.py` for offline
+contracts; [cached model verification](tools/README.md#shared-transcription-verification)
+checks the public facade against native calls. The [integration verification report](docs/compatibility/sheetsage2-verification.md)
+records tested environments, real inputs and remaining gaps. Structure accuracy
+on natural whole songs is not established by these integration checks.
+
+### Experimental SheetSage2
+
+This checkout includes `SheetSage2Session` and the `sheetsage2()` one-shot
+function. Install from this checkout; this backend is not a published release:
+
+```bash
+python -m pip install '.[sheetsage2]'
+```
+
+For a CPU-only environment, install both Torch and torchaudio from the CPU
+index before installing the extra, so a CUDA torchaudio wheel is not combined
+with CPU Torch:
+
+```bash
+python -m pip install 'torch>=2.13' 'torchaudio>=2.8' --index-url https://download.pytorch.org/whl/cpu
+python -m pip install '.[sheetsage2]'
+```
+
+The existing pinned Jukebox dependency requires Torch >=2.13 for a complete
+fresh installation, even when using SheetSage2. The refreshed lockfile reflects
+that requirement; isolated upstream Torch 2.9.1 measurements below are a
+separate numerical profile.
+
+FFmpeg must be on `PATH` for file/encoded-byte inputs. The extra uses Torch and
+torchaudio >=2.8 and Transformers >=4.45.2,<5. NumPy 2 works in the measured
+environment; upstream's NumPy 1.24 pin is not adopted. Transformers 5.19 fails
+on an upstream BART API change; [compatibility tracking](docs/compatibility/sheetsage2-transformers.md)
+records the reason and condition for removing the upper bound.
+
+```python
+from sheetsage import SheetSage2Session
+
+with SheetSage2Session(device="auto") as session:
+    result = session.infer("song.wav", output_dir="score")
+    print(result["abc"])
+    midi_bytes = result["midi"]
+    events = result["events"]
+```
+
+Outputs retain upstream's full schema: vocal/instrumental melodies, chords,
+rhythm, key and structure; ABC text, MIDI bytes, separate parts (`midis`),
+annotation text (`labs`), timed `events`, tokens and optional tensors. This
+result is a dictionary, not the legacy `LeadSheet` tuple. `output_dir` writes
+`score.abc`, `transcription.mid`, separate parts and annotation files; omitting
+it keeps results in memory. Upstream may return `abc_error` when notation cannot
+be built; inspect it rather than assuming a valid score. `melody_only=True`
+omits chord accompaniment from playback/ABC while retaining raw annotations.
+
+Inputs: local paths, encoded audio bytes, binary streams, or NumPy/Torch arrays
+with `sampling_rate=...`; multichannel arrays use `[channels, samples]`. Bare
+URLs are not supported by this adapter. Upstream handles mono conversion,
+24 kHz resampling and overlapping windows. Options such as `max_seconds`,
+`preset`, `dtype`, `export_logits`, `export_scores` and `export_embeddings`
+pass through unchanged. CUDA uses upstream BF16 autocast by default; CPU runs
+FP32. Adapter merging remains FP32. PDF/PNG/SVG and synthesized-audio rendering
+are outside this experimental adapter; export ABC/MIDI for separate rendering.
+
+Use `from sheetsage import sheetsage2; result = sheetsage2("song.wav")` for a
+single call. Each one-shot call constructs and closes its own model; a session
+reuses one model across sequential calls. The same `new/ready/failed/released/closed`
+states and ready-only `infer()` contract apply as for `SheetSageSession`.
+Failed loads can retry; `release()` retains disk files and allows reload;
+`close()` is terminal. Sessions are not designed for concurrent inference.
+Explicit `cpu`, `cuda`, and `cuda:N` are honored or fail; `mps` is unsupported.
+
+**Downloads and offline use.** First load downloads about 2.76 GB of weights
+(adapter plus MERT2), together with pinned upstream Python/config files, to
+`~/.sheetsage/sheetsage2`. Set `cache_dir=...` or `SHEETSAGE2_CACHE_DIR` to
+override this; otherwise the existing `SHEETSAGE_CACHE_DIR` supplies the parent.
+Every downloaded file is SHA-256 checked before upstream code executes.
+Both upstream model loaders then use verified local directories with network
+resolution disabled. `cache_info()` reports paths, file presence and matching
+sizes without downloading; `integrity_verified=False` explicitly distinguishes
+inspection from the hashing performed by `load()`.
+
+For manual acquisition, `sheetsage/config/sheetsage2.json` lists each exact URL,
+SHA-256 and size. This prints the complete URL-to-destination recipe without
+loading a model or downloading anything:
+
+```python
+from sheetsage import SheetSage2Session
+
+session = SheetSage2Session(cache_dir="/data/sheetsage2")
+for component in session.cache_info()["components"].values():
+    for artifact in component["artifacts"].values():
+        print(artifact["url"], "->", artifact["path"])
+```
+
+Place the files at those paths and use `local_files_only=True`. Alternatively,
+pass `model_path="/data/adapter"` and `base_model_path="/data/mert2"` for two
+manually populated directories; these are read-only and must contain every
+manifest file. A merged `save_pretrained` checkpoint is not the pinned adapter
+format. `checkpoint_config=...` accepts a trusted manifest with alternate
+artifact URLs/identities (schema matches the packaged JSON). Corrupt cached
+files fail explicitly; remove or replace the reported file before retrying.
+
+**License status:** the model cards label weights CC BY-NC 4.0. The HF LICENSE
+explicitly covers MERT2 weights and does not clearly grant redistribution of
+SheetSage2's Python source. This integration therefore downloads and executes
+the pinned upstream implementation instead of including it in this distribution.
+The package's MIT license does not cover downloaded code or weights. Clarifying
+upstream source licensing remains necessary before a maintained source port.
+
+### SheetSage1 command-line interface
 
 ```bash
 # Basic transcription
@@ -434,7 +668,9 @@ version, re-exported as `sheetsage.__version__`. Source archives include runtime
 verification tools, and derived-output fixtures; dataset examples/catalogs remain checkout-only.
 `tools/verify_installed.py CHECKOUT` checks an installed wheel from outside the checkout:
 all runtime/assets match source, and all pre-delivery bytes remain identical except the
-explicit version re-export. Python support, dependencies, and model assets are unchanged.
+explicit version and SheetSage2 exports. The additive SheetSage2 files are listed
+explicitly by the verifier. Python support and SheetSage1 model assets are preserved;
+the optional backend and refreshed lockfile add the dependencies described above.
 
 The immutable current CPU baseline and exact replay command are documented in
 [tools/README.md](tools/README.md). It compares every returned intermediate and decoded

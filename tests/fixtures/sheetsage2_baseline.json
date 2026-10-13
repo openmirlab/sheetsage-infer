@@ -1,0 +1,486 @@
+{
+  "cases": {
+    "real": {
+      "options": {
+        "export_embeddings": true,
+        "export_logits": true,
+        "export_scores": true
+      },
+      "output": {
+        "event_count": 19,
+        "field_sha256": {
+          "abc": "ed29cf3ff9719667a9f4d76c37274306a8230d4259309e3571d5bf803a420c56",
+          "abc_error": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "abc_measures": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "audio": "a6788bb0e9f18b32068b1cbfba4b1f7848526ad7376df4248f7b1ab0ab97372c",
+          "diagnostics": "65e6c343600ec1a463621d3f1505dda28d8428843ed20c773823c6c595d5d814",
+          "dtype": "aa11ee2dcd25726739c0df91c5985ac9b3ae8a3f56e8a43a51f273ac0d6b7138",
+          "duration_seconds": "d60c624fafb6c52acbf7b89e3e142636ff54295c9f8ee9c422185c4a6a9a7bc9",
+          "events": "2671fcdf520256434d68649beb821a19dde214bee898247ff47e8170f51dc9d9",
+          "instrumental_notes": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "labs": "12d3e9cc540eac58e277ecd6880b3d3c0cc7800df1c6d5800a228316ced063ae",
+          "lookahead_seconds": "43b87f618caab482ebe4976c92bcd6ad308b48055f1c27b4c574f3e31d7683e0",
+          "melody_notes": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+          "melody_only": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "midi": "be2fe9476a630a23a2d56455037a844c6416344449363ae84bf1886590d41acd",
+          "midis": "0d7d1a46e35aaa7b546b909123c82f1b10c776e8b772625f7047478bacdb880d",
+          "num_events": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+          "overlap_seconds": "f20032c43d0ea68c74fe526050f5ac012e1133635990277db7dace38972dbd22",
+          "playback": "674fca2e0c4e92386cd9b4c840dbd6680135e0f1c63a55b6a4eb9e44b49c23c0",
+          "preset": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+          "prompts": "1bc8d39b243b2f5bb3999e15d29ed4c01b2bf8ece6b592a1c606e19b753dc470",
+          "tensors": "2cff422286b295acbeb0fffe48bc5db0c39f716b58bb0df6a1b7b1a09ce41f99",
+          "tokens": "650e3e00ab6faa4dc67eaf48756240d38cbb0b28bd12f39176cbc7ec3fac853f",
+          "vocal_notes": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "warnings": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "window_seconds": "a970559125d5ccd0dbbbb7685636bbcae5ce7cac4e8d1c6954d2467616a9db8c",
+          "windows": "c16c448da29929d554acce5ca67c0cab8ea37633dd33d9cb35910d80b7da72e1"
+        },
+        "melody_note_count": 16,
+        "sha256": "754c1fc08863a8a81ba5c51d113e2b0dde660dfe675e6ee6613221e5c63bcde8",
+        "tensor_metrics": [
+          {
+            "dtype": "torch.int64",
+            "finite_values": 93,
+            "num_values": 93,
+            "path": "$.tokens[0]",
+            "rms_finite": 23418.302701964978,
+            "shape": [
+              93
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 32,
+            "num_values": 32,
+            "path": "$.tensors[0].token_batches[0].token_position",
+            "rms_finite": 25.248762345905195,
+            "shape": [
+              32
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 1013696,
+            "num_values": 1013696,
+            "path": "$.tensors[0].token_batches[0].logits",
+            "rms_finite": 2.6935841198331087,
+            "shape": [
+              32,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 239619,
+            "num_values": 1013696,
+            "path": "$.tensors[0].token_batches[0].scores",
+            "rms_finite": 2.7413152565012764,
+            "shape": [
+              32,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 32,
+            "num_values": 32,
+            "path": "$.tensors[0].token_batches[1].token_position",
+            "rms_finite": 56.26277632680421,
+            "shape": [
+              32
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 1013696,
+            "num_values": 1013696,
+            "path": "$.tensors[0].token_batches[1].logits",
+            "rms_finite": 2.91542880085759,
+            "shape": [
+              32,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 268536,
+            "num_values": 1013696,
+            "path": "$.tensors[0].token_batches[1].scores",
+            "rms_finite": 3.0367260029738476,
+            "shape": [
+              32,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 21,
+            "num_values": 21,
+            "path": "$.tensors[0].token_batches[2].token_position",
+            "rms_finite": 82.22327326655554,
+            "shape": [
+              21
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 665238,
+            "num_values": 665238,
+            "path": "$.tensors[0].token_batches[2].logits",
+            "rms_finite": 2.9040655580948527,
+            "shape": [
+              21,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 170197,
+            "num_values": 665238,
+            "path": "$.tensors[0].token_batches[2].scores",
+            "rms_finite": 3.2371305357693183,
+            "shape": [
+              21,
+              31678
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 32768,
+            "num_values": 32768,
+            "path": "$.tensors[0].decoder_batches[0].decoder_hidden_state",
+            "rms_finite": 0.7489434065882713,
+            "shape": [
+              1,
+              64,
+              512
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 64,
+            "num_values": 64,
+            "path": "$.tensors[0].decoder_batches[0].input_token_ids",
+            "rms_finite": 23491.629029361182,
+            "shape": [
+              1,
+              64
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 64,
+            "num_values": 64,
+            "path": "$.tensors[0].decoder_batches[0].token_positions",
+            "rms_finite": 36.51711927302043,
+            "shape": [
+              64
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 14336,
+            "num_values": 14336,
+            "path": "$.tensors[0].decoder_batches[1].decoder_hidden_state",
+            "rms_finite": 0.7552064748179973,
+            "shape": [
+              1,
+              28,
+              512
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 28,
+            "num_values": 28,
+            "path": "$.tensors[0].decoder_batches[1].input_token_ids",
+            "rms_finite": 23667.297528898995,
+            "shape": [
+              1,
+              28
+            ]
+          },
+          {
+            "dtype": "torch.int64",
+            "finite_values": 28,
+            "num_values": 28,
+            "path": "$.tensors[0].decoder_batches[1].token_positions",
+            "rms_finite": 77.9198305952984,
+            "shape": [
+              28
+            ]
+          },
+          {
+            "dtype": "torch.bfloat16",
+            "finite_values": 3840000,
+            "num_values": 3840000,
+            "path": "$.tensors[0].audio.encoder_last_hidden_state",
+            "rms_finite": 0.1842840955037951,
+            "shape": [
+              1,
+              7500,
+              512
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 7680000,
+            "num_values": 7680000,
+            "path": "$.tensors[0].audio.backbone_last_hidden_state",
+            "rms_finite": 0.17995010128431793,
+            "shape": [
+              1,
+              7500,
+              1024
+            ]
+          },
+          {
+            "dtype": "torch.float32",
+            "finite_values": 7680000,
+            "num_values": 7680000,
+            "path": "$.tensors[0].audio.mixed_hidden_state",
+            "rms_finite": 0.13615689898217587,
+            "shape": [
+              1,
+              7500,
+              1024
+            ]
+          },
+          {
+            "dtype": "torch.bool",
+            "finite_values": 7500,
+            "num_values": 7500,
+            "path": "$.tensors[0].audio.feature_attention_mask",
+            "rms_finite": 0.12382783747337807,
+            "shape": [
+              1,
+              7500
+            ]
+          },
+          {
+            "dtype": "torch.float64",
+            "finite_values": 7500,
+            "num_values": 7500,
+            "path": "$.tensors[0].audio.frame_times",
+            "rms_finite": 173.18776015257737,
+            "shape": [
+              7500
+            ]
+          }
+        ],
+        "tensor_windows": 1,
+        "token_count": 93,
+        "warnings": []
+      }
+    },
+    "zeros": {
+      "options": {
+        "sampling_rate": 24000
+      },
+      "output": {
+        "event_count": 15,
+        "field_sha256": {
+          "abc": "15967e354b3c1763bf3c590cf62b1814ac21f7398de583fe73f76cffafe3de1e",
+          "abc_error": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "abc_measures": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "audio": "53b773b65438e16d4299755882a66687096d63fe3a435d8bb340a718dc1cae29",
+          "diagnostics": "64690593787b6d13da25cb4a71ec4cd7c11d1596364198e6c09ba786c0160f63",
+          "dtype": "aa11ee2dcd25726739c0df91c5985ac9b3ae8a3f56e8a43a51f273ac0d6b7138",
+          "duration_seconds": "0de7cf39e1e6366122309794e86d197d025a81235881e67ec4f011c9db2df252",
+          "events": "500dcfa5531db1f3d93dc302923e1c50088294efd3e3edd750f7de7cf8d5fcb4",
+          "instrumental_notes": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "labs": "3ef2253f790c5ebbe24542105bd2c5d8efd5d3c60bef9ab8cf1adcb407f9ddd5",
+          "lookahead_seconds": "43b87f618caab482ebe4976c92bcd6ad308b48055f1c27b4c574f3e31d7683e0",
+          "melody_notes": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "melody_only": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+          "midi": "0200baac2d15ee5eda5bd052248ed0150e2a1321a8e3a625ae8302cba6fb4a8c",
+          "midis": "4d61a0f4e5668bd705bf0ee79387b966db55e8342cb36c4268a25c014c7537d6",
+          "num_events": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "overlap_seconds": "f20032c43d0ea68c74fe526050f5ac012e1133635990277db7dace38972dbd22",
+          "playback": "d3ea19043833a413be922c3a4920e04468b728c45b4618686c2cdd5cbbbe2953",
+          "preset": "1080a60800d9e5bddc69f51489c636a776bacaadb5368f46db4aa0947c67e3ba",
+          "prompts": "1bc8d39b243b2f5bb3999e15d29ed4c01b2bf8ece6b592a1c606e19b753dc470",
+          "tensors": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "tokens": "2200b51285b249f514d6d8a9f4407c0e558550e5c7b92ef7195a22744cd4e199",
+          "vocal_notes": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+          "warnings": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "window_seconds": "a970559125d5ccd0dbbbb7685636bbcae5ce7cac4e8d1c6954d2467616a9db8c",
+          "windows": "ae4e7920e23b68cc2eef3afe776489251bbe7133df1385d419fa67132a9502da"
+        },
+        "melody_note_count": 0,
+        "sha256": "609801edc9114edefba4de86a72eba935063f50f9f06cfc53bb94f9604de5f1f",
+        "tensor_metrics": [
+          {
+            "dtype": "torch.int64",
+            "finite_values": 63,
+            "num_values": 63,
+            "path": "$.tokens[0]",
+            "rms_finite": 18199.67982362711,
+            "shape": [
+              63
+            ]
+          }
+        ],
+        "tensor_windows": 0,
+        "token_count": 63,
+        "warnings": []
+      }
+    }
+  },
+  "fingerprint": {
+    "backend_files": {
+      "manifest": "5a96162d41e2b48dcfed69a98f65ae8233eb46f97e0727aa4008f23012266dd1",
+      "sheetsage2.py": "1f0f318153084ba98a724c3228dde8e1314c1687f9a556e3807bfc0965926afc",
+      "sheetsage2_checkpoints.py": "374803b289a4acfd30affa4515707666701bc66b9c199e31e297c0bb993a1e94"
+    },
+    "baseline_base_sha": "97ddf16f0de85951db8e03ab04013fbe7d81372a",
+    "components": {
+      "mert2": {
+        "artifacts": {
+          "config.json": {
+            "sha256": "f2e194895f58be3ddba327255db129ff0e3bee550cc0ecf08e4d22d79ce3bca3",
+            "size": 882
+          },
+          "configuration_mert2.py": {
+            "sha256": "77b53ec9d7ee31a599d744fb006e812c7eeaf7390deb46e2f460cf8c17b00bd6",
+            "size": 3860
+          },
+          "model.safetensors": {
+            "sha256": "e6dd2ab187d6dd62b6521cd7d8f932e237acf0c5757745a7232082e28391350d",
+            "size": 2529812848
+          },
+          "modeling_mert2.py": {
+            "sha256": "b1a3174e5649c4b26b0c90d8626f0adacfbbba111a58ed3bb72ad651945a2f5c",
+            "size": 17081
+          }
+        },
+        "revision": "d8ba1c745e733b3908ce6ad16ebeb17ac7600a42"
+      },
+      "sheetsage2": {
+        "artifacts": {
+          "__init__.py": {
+            "sha256": "19539a965cabf22d08231688efc15547d005e6345745f48684c2f02d010f82fd",
+            "size": 39
+          },
+          "audio_sheetsage2.py": {
+            "sha256": "ecce56e7bb8a08cbca9eb27a74d9aeff17f55e80efcc7c48f7436440f610ccc1",
+            "size": 4289
+          },
+          "chord_spelling_sheetsage2.py": {
+            "sha256": "5a673e3c8caa6d0a4cda19227ce5587c611a2bf85343f6bc623e3d66d99ed8b1",
+            "size": 9330
+          },
+          "config.json": {
+            "sha256": "a986e63f5d831ecb823c11d19cfb371d763f25ae2e614ec9acd714c0b8bb87fd",
+            "size": 2060
+          },
+          "configuration_mert2.py": {
+            "sha256": "77b53ec9d7ee31a599d744fb006e812c7eeaf7390deb46e2f460cf8c17b00bd6",
+            "size": 3860
+          },
+          "configuration_sheetsage2.py": {
+            "sha256": "36d174331b3721d984608252830179bf3516d77b7225f413acc85bdf5efb3bec",
+            "size": 4119
+          },
+          "durations_sheetsage2.py": {
+            "sha256": "abbc297b70b63a86f8509b1db74d0e85d7b46dcb83867cf33741c43f9d49db83",
+            "size": 296
+          },
+          "exports_sheetsage2.py": {
+            "sha256": "11782cff50f96dac1bf1eedefed86b3cd60222e31b8456bee366eeb373b6a7e5",
+            "size": 10405
+          },
+          "generation_sheetsage2.py": {
+            "sha256": "b58dbbfaebfba2a441a79b8c36183f0e4956acdd3aaf7c655c559933b4c20afd",
+            "size": 24722
+          },
+          "io_sheetsage2.py": {
+            "sha256": "afb5b4d4a52b513b11cfdad40e7b9d2286dd4ff6585b89688dbb31b3d5376da6",
+            "size": 1830
+          },
+          "labels_sheetsage2.py": {
+            "sha256": "4a80870695dd91da6070e7d8d0ce6b50f3bf71c3f629417a86cf12f4ef4f97e0",
+            "size": 978
+          },
+          "midi_sheetsage2.py": {
+            "sha256": "32f80d13592c669e56683ebb4c415f13bf8278c8ad1fe43afa500347bed35099",
+            "size": 4230
+          },
+          "model.safetensors": {
+            "sha256": "b235f68091a5f5b644000f2b5acb57d1e70432aca2b34ab1b9cf27236e1f4274",
+            "size": 228738564
+          },
+          "modeling_mert2.py": {
+            "sha256": "b1a3174e5649c4b26b0c90d8626f0adacfbbba111a58ed3bb72ad651945a2f5c",
+            "size": 17081
+          },
+          "modeling_sheetsage2.py": {
+            "sha256": "f1c45346dd76329fcbeadc5c721312836509326310c034634bc12d75263688bb",
+            "size": 24664
+          },
+          "notation_sheetsage2.py": {
+            "sha256": "f75f0e8b268cd9e9c622d791d3fd77d2e68ad355a4e67018c7e15aeb2bc05af7",
+            "size": 55775
+          },
+          "pipeline_sheetsage2.py": {
+            "sha256": "0ae572554ca375323e2aa4ea1fb25ba27e7f4d520c0ba5b101d74930c0a66c33",
+            "size": 15022
+          },
+          "processing_sheetsage2.py": {
+            "sha256": "ec5ef34ad61455437c750dd5ffb92142f7309638559e74114c639b57da56263c",
+            "size": 5408
+          },
+          "processor_config.json": {
+            "sha256": "1eed73513a74029fe74c71faba70f8cff002ae7be23ac1c926125846d1b29817",
+            "size": 277
+          },
+          "rendering_sheetsage2.py": {
+            "sha256": "ddbcaf314139d67727cb5df6840d7d60d671d5c67f6b185a26b840df1e2d9288",
+            "size": 15862
+          },
+          "schema_sheetsage2.py": {
+            "sha256": "3ee069f0d4dcfb8080f730c43676318d471ab6b3cfef86c6c225aa63a9db182f",
+            "size": 3893
+          },
+          "tensors_sheetsage2.py": {
+            "sha256": "51f72b51ed5a22c751d5adf915198490b1a95ec8959fcf9a38ee71b4444fc8b3",
+            "size": 4645
+          },
+          "tokenization_sheetsage2.py": {
+            "sha256": "2ad9f7734e3d9f750fe575f22fd9ec03a9a4ab52497a6314e76f53ed9024fa75",
+            "size": 30043
+          }
+        },
+        "revision": "b83c3d79a6d98bcffaf8f9ed112c90aa887887bc"
+      }
+    },
+    "environment": {
+      "cuda_available": true,
+      "cuda_runtime": "12.8",
+      "device": "cuda",
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "huggingface_hub": "0.36.2",
+      "numpy": "2.4.6",
+      "python": "3.11.13",
+      "scipy": "1.17.1",
+      "torch": "2.9.1+cu128",
+      "torchaudio": "2.9.1+cu128",
+      "transformers": "4.45.2"
+    },
+    "input": {
+      "real_fixture": {
+        "sha256": "ff8bf45609bfd5fd759af718b1e44e5544a5783c316156b6b7450ec48652718c",
+        "size": 809358
+      },
+      "zeros": {
+        "dtype": "float32",
+        "duration_seconds": 7,
+        "sampling_rate": 24000,
+        "sha256": "2239449e6789c4341e745fe54df55766a9165a3911be830fad0aaffbd0d0fa30",
+        "size": 672000
+      }
+    }
+  },
+  "schema_version": 1
+}

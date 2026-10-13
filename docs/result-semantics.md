@@ -129,8 +129,9 @@ load reuse with doubles. `tools/verify_transcription.py` compares real native
 returns with the public facade and repeats calls, including optional tensors and
 structure-only V2. It excludes elapsed time and peak GPU memory from equality.
 
-A305-second repeated-real-audio/silence fixture exercised two unchanged 300-second
-V2 windows on 2026-10-13 and produced 589 notes with valid shared bounds. That checks
-stitching and conversion, not natural-song section accuracy: this fixture yielded
-one structure interval. Natural-song structure quality, full Jukebox GPU parity,
-and the complete supported platform/Python matrix remain unmeasured here.
+Real full-song and 315-second music-plus-silence checks also preserve native
+structure intervals and multiwindow outputs. See the [integration verification
+report](compatibility/sheetsage2-verification.md) for the Python 3.10–3.12 matrix,
+input formats, full-song results and regression fixes. These establish
+integration behavior; annotated structure quality, full Jukebox GPU parity and
+cross-platform execution remain unmeasured.

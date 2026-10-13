@@ -396,8 +396,9 @@ weights. See [result interpretation](docs/result-semantics.md) for conversion
 sources, profile differences and verification. Run `python -m pytest
 tests/test_transcription_api.py tests/test_transcription_results.py` for offline
 contracts; [cached model verification](tools/README.md#shared-transcription-verification)
-checks the public facade against native calls. Structure accuracy on natural
-whole songs is not established by these integration checks.
+checks the public facade against native calls. The [integration verification report](docs/compatibility/sheetsage2-verification.md)
+records tested environments, real inputs and remaining gaps. Structure accuracy
+on natural whole songs is not established by these integration checks.
 
 ### Experimental SheetSage2
 

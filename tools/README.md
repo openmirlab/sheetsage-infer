@@ -91,3 +91,39 @@ HTTP 401 for **all seven** handcrafted files. TEST_WAV and official madmom weigh
 returned 200. A clean hosted real-model lane therefore needs an independently authorized
 access or hosting solution for the seven configured artifacts. No workflow uploads caches,
 changes mirrors, or treats unavailable weights as a passing model check.
+
+# Experimental SheetSage2 parity
+
+`verify_sheetsage2.py` loads the pinned upstream model and `SheetSage2Session`
+independently from a populated package cache. It compares full deterministic
+returns on real music and seven seconds of exact silence, including ABC, all
+MIDI parts, events, annotations, tokens, and optional logits/scores/embeddings.
+Only runtime/memory measurements are excluded. A load spy proves two sequential
+wrapper calls reuse the model. Golden references retain hashes, never audio,
+model weights or large tensors.
+
+```bash
+PYTHONPATH=. python tools/verify_sheetsage2.py ~/.sheetsage/test/test1_44100.wav \
+  --cache-dir /path/to/sheetsage2-cache --device cuda \
+  --output /tmp/sheetsage2-parity.json
+
+# Exact original numerical environment only:
+PYTHONPATH=. python tools/verify_sheetsage2.py ~/.sheetsage/test/test1_44100.wav \
+  --cache-dir /path/to/sheetsage2-cache --device cuda \
+  --reference tests/fixtures/sheetsage2_baseline.json
+```
+
+`--reference` checks input, upstream artifacts and the numerical environment
+before accepting output fingerprints. The ordinary A/B command works in another
+supported environment without claiming cross-environment identity. `--record`
+is an explicit baseline-creation operation; ordinary verification never rewrites
+fixtures. See the fixture for versions and exact file hashes. The measured CUDA
+profile uses Python 3.11, Torch/torchaudio 2.9.1, Transformers 4.45.2, NumPy 2.4.6
+and an RTX 4090. It is an isolated upstream comparison profile, separate from
+the complete package's newer Jukebox-driven Torch dependency requirement.
+
+The real 4.59-second fixture produces 19 events and 16 melody notes; seven
+seconds of silence produces no melody notes. These short-fixture parity runs
+verify integration, not transcription accuracy or long-song overlap quality.
+`tests/test_sheetsage2*.py` covers offline lifecycle, device selection, manifest,
+cache and integrity errors without model downloads.

@@ -12,6 +12,8 @@ import importlib.metadata
 import json
 from pathlib import Path
 
+from check_distribution_boundary import ADDITIVE_RUNTIME_FILES
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -28,17 +30,21 @@ def main():
     baseline = json.loads((checkout / "tests/fixtures/delivery_baseline.json").read_text())
     files = {"sheetsage/" + str(p.relative_to(installed)): p
              for p in installed.rglob("*") if p.is_file() and p.suffix in (".py", ".json", ".toml")}
-    assert set(files) == set(baseline["runtime_sha256"]) | {"sheetsage/__about__.py"}
+    assert set(files) == set(baseline["runtime_sha256"]) | ADDITIVE_RUNTIME_FILES
     for name, path in files.items():
         raw = path.read_bytes()
         assert raw == (checkout / name).read_bytes(), name
-        if name == "sheetsage/__about__.py":
+        if name in ADDITIVE_RUNTIME_FILES:
             continue
         if name == "sheetsage/__init__.py":
             assert raw.count(b"from .__about__ import __version__\n") == 1
             assert raw.count(b', "__version__"') == 1
             raw = raw.replace(b"from .__about__ import __version__\n", b"")
             raw = raw.replace(b', "__version__"', b"")
+            added_import = b"from .sheetsage2 import SheetSage2Session, sheetsage2\n"
+            added_exports = b', "SheetSage2Session", "sheetsage2"'
+            assert raw.count(added_import) == raw.count(added_exports) == 1
+            raw = raw.replace(added_import, b"").replace(added_exports, b"")
         assert hashlib.sha256(raw).hexdigest() == baseline["runtime_sha256"][name], name
     tags = get_asset_tags()
     assert len(tags) == 24
@@ -55,7 +61,7 @@ def main():
         raise AssertionError("Closed installed session loaded")
     print(json.dumps({"installed": str(installed), "version": __version__,
                       "source_identical_files": len(files), "unchanged_runtime_files": 27,
-                      "version_only_init": True, "asset_tags": len(tags)}))
+                      "additive_init_exports_only": True, "asset_tags": len(tags)}))
 
 
 if __name__ == "__main__":

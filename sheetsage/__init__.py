@@ -11,6 +11,7 @@ CACHE_DIR = CACHE_DIR.resolve()
 
 from .__about__ import __version__
 from .session import SheetSageSession
+from .sheetsage2 import SheetSage2Session, sheetsage2
 
 
 # NOTE: This changes the test discovery pattern from "test*.py" (default) to "*test.py".
@@ -19,4 +20,4 @@ def load_tests(loader, standard_tests, pattern):
     standard_tests.addTests(package_tests)
     return standard_tests
 
-__all__ = ["CACHE_DIR", "SheetSageSession", "__version__"]
+__all__ = ["CACHE_DIR", "SheetSageSession", "__version__", "SheetSage2Session", "sheetsage2"]

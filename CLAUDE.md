@@ -138,8 +138,9 @@ end-to-end (see CHANGELOG's Unreleased section) precisely because nothing exerci
 and test fixtures, including the explicitly included immutable CPU baseline NPZ.
 `tests/fixtures/delivery_baseline.json` records the lifecycle-stage wheel payload at `0a471250`.
 `tools/verify_installed.py CHECKOUT` checks every installed source/asset byte against final
-source and that manifest; only the two explicit version re-export additions in `__init__.py`
-are normalized. The new `__about__.py` is the only additional runtime file.
+source and that manifest; only explicit version and SheetSage2 exports in `__init__.py`
+are normalized. `tools/check_distribution_boundary.py` lists the exact additive
+runtime files: version owner, SheetSage2 session/checkpoint modules and manifest.
 
 The reusable `.github/workflows/verify.yml` runs Python 3.10–3.12 contracts, fresh CPU installs,
 `pip check`, scoped verification-tool lint, archive checks, and installed-wheel identity.
@@ -157,3 +158,65 @@ mirror weights, or upload private caches. Hosting/access requires a separate dec
 ## Distribution policy (2026-10-05)
 
 Install the current source from `https://github.com/openmirlab/sheetsage-infer`. GitHub release workflows verify and build distributions but do not upload to PyPI. Existing PyPI versions, where any exist, are historical snapshots. Update installation examples to use Git when changing this package.
+
+## Experimental SheetSage2 backend
+
+This branch adds an independent adapter for M·A·P's SheetSage2 (Jiang et al.,
+2026, https://arxiv.org/abs/2610.05336), using its MERT-v2-FullSong encoder.
+`sheetsage/sheetsage2.py` owns `SheetSage2Session` and the lazy `sheetsage2()`
+one-shot API. It preserves the native rich result dictionary; it does not
+convert it to SheetSage1's LeadSheet. Legacy inference modules are unchanged.
+
+`sheetsage/sheetsage2_checkpoints.py` owns manifest validation, resolution,
+inspection, SHA-256 checks and atomic downloads. `config/sheetsage2.json` pins
+23 adapter/runtime artifacts and 4 MERT2 artifacts, including both revisions,
+URLs, hashes and sizes. Local directory overrides are read-only; the same
+resolver serves load and cache_info. Inspection reports presence/size, not
+verified integrity. load verifies every file before executing upstream code,
+then gives both local paths to AutoModel with local_files_only=True. Runtime
+code is downloaded into the user cache, not included in wheel/sdist. Source
+redistribution terms remain unresolved; see NOTICE before considering a port.
+
+The optional `sheetsage2` extra adds Transformers/torchaudio/safetensors/mir_eval.
+mir_eval is used by upstream MIDI chord encoding; no evaluation framework is
+added to the core install or our runtime. Transformers 5.19 fails at BART's
+removed embed_tokens constructor argument; the justified <5 bound is tracked
+in docs/compatibility/sheetsage2-transformers.md. NumPy 2.4.6 works with
+Transformers 4.45.2 and Torch/torchaudio 2.9.1. A second 4.57.6 profile also
+loads and transcribes the real test clip. These observations do not establish
+numerical parity across dependency versions.
+
+Sessions use new/ready/failed/released/closed states, load once, and retain no
+shared model manager. infer is ready-only; release permits reload, close is
+terminal. Failed/interrupted loading drops session-owned references and allows
+retry. Sequential calls are supported; concurrent inference on one session is
+not. CPU/CUDA selection uses the existing resolver. Rendering is excluded;
+ABC/MIDI/annotations and optional logits/scores/embeddings pass through.
+
+Verification commands (checkout, with the extra installed):
+
+```bash
+python -m pytest tests/ tools/test_dataset_examples.py
+PYTHONPATH=. python tools/verify_sheetsage2.py ~/.sheetsage/test/test1_44100.wav \
+  --cache-dir /path/to/populated/sheetsage2-cache --device cuda \
+  --output /tmp/sheetsage2-parity.json
+python -m build
+python tools/check_distribution_boundary.py dist/*.whl dist/*.tar.gz
+```
+
+The verifier requires real cached files, compares direct upstream and wrapper
+outputs on real audio plus silence, and checks model reuse. Default unit tests
+are offline contracts, not model-quality evidence. The three legacy numerical /
+GPU skips remain explicit. Installed-wheel verification preserves every original
+runtime hash except the explicitly normalized root exports and explicitly listed
+new files; it also compares all added installed bytes to the checkout.
+
+The 2026-10-13 full installed-wheel CPU check used Torch 2.14.1+cpu,
+torchaudio 2.11.0+cpu and Transformers 4.57.6. It produced 19 events and 16
+notes on the real fixture. Installing PyPI's CUDA torchaudio into CPU Torch
+first reproduced a libcudart load failure; the README and CPU CI recipe install
+both from the CPU wheel index. Optional import errors now explain this case.
+The refreshed uv.lock reflects the existing Jukebox Git pin's Torch >=2.13
+requirement; it was already present in that dependency's metadata before this
+feature. The original local Torch 2.9.1 environment still replays SheetSage1's
+immutable baseline exactly, including its existing silence error.

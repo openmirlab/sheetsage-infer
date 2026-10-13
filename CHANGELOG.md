@@ -9,7 +9,21 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Experimental SheetSage2 session and one-shot transcription API, with complete
+  upstream ABC/MIDI/event results, optional dependencies, pinned SHA-256-verified
+  runtime code/weights, configurable caches and offline local directories.
+  Upstream source is not redistributed; its code licensing remains unresolved.
+  Transformers 5 is excluded because the pinned implementation requires the
+  removed BART `embed_tokens` constructor argument. SheetSage1 behavior is unchanged.
+
 ### Changed
+
+- Refresh the previously stale lockfile against the existing Git dependency
+  pins: Jukebox now resolves to its declared Torch >=2.13 floor. CPU delivery
+  checks install both Torch and torchaudio from the CPU index and exercise the
+  optional backend's import/dependency contracts without downloading models.
 
 - Remove checked-in HookTheory dataset copies and generated transcriptions. The
   repository-only transcription example now downloads its test segments through

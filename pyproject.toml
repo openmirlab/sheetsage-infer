@@ -53,6 +53,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+sheetsage2 = [
+    "torch>=2.8.0",  # SheetSage2's upstream inference baseline
+    "torchaudio>=2.8.0",
+    # v5 removes BartDecoder(embed_tokens=...), used by pinned upstream code.
+    # Remove ceiling after upstream migration + parity; tracked in
+    # docs/compatibility/sheetsage2-transformers.md.
+    "transformers>=4.45.2,<5",
+    "huggingface-hub>=0.36.0",
+    "safetensors>=0.5.3",
+    "mir-eval>=0.8.2",  # upstream MIDI export uses chord.encode, not evaluation
+    "mido>=1.3.3",
+]
 youtube = [
     "yt-dlp>=2025.11.0",
 ]
@@ -79,7 +91,7 @@ path = "sheetsage/__about__.py"
 packages = ["sheetsage"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/sheetsage", "/tests", "/tools", "/README.md", "/CLAUDE.md", "/CHANGELOG.md", "/LICENSE", "/NOTICE", "/pyproject.toml"]
+include = ["/sheetsage", "/tests", "/tools", "/docs/compatibility", "/README.md", "/CLAUDE.md", "/CHANGELOG.md", "/LICENSE", "/NOTICE", "/pyproject.toml"]
 exclude = ["/examples", "/hooktheory_data", "/hooktheory_transcription_results", "/tools/test_dataset_examples.py"]
 # The immutable derived-array baseline is intentionally tracked despite *.npz in .gitignore.
 artifacts = ["tests/fixtures/cpu_boundary_baseline/arrays.npz"]

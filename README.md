@@ -13,6 +13,10 @@ package name was `openmirlab-sheetsage-infer`; the import remains `sheetsage`.
 This package provides inference, dependency maintenance and adapters, without
 training code or bundled model weights/datasets.
 
+## Why this exists
+
+The original [SheetSage1](https://github.com/chrisdonahue/sheetsage) and [SheetSage2](https://huggingface.co/m-a-p/SheetSage2) systems provide related lead-sheet transcription through different model interfaces. This independent OpenMIRLab package maintains their inference dependencies and offers one shared API while keeping each backend's native outputs available. V1 checkpoint access currently requires separately available verified files; V2 uses pinned runtime downloads. The models and research remain the work of their original authors.
+
 ## Acknowledgments
 
 The models and research belong to their original authors:
@@ -34,7 +38,39 @@ The models and research belong to their original authors:
 This is an independent OpenMIRLab integration, without upstream affiliation or
 endorsement. Cite the relevant original work using [Citation](#citation).
 
-## Installation
+## Citation
+
+Cite the original work for the backend you use:
+
+```bibtex
+@inproceedings{donahue2022melody,
+  title={Melody Transcription via Generative Pre-Training},
+  author={Donahue, Chris and Thickstun, John and Liang, Percy},
+  booktitle={Proceedings of the 23rd International Society for Music Information Retrieval Conference (ISMIR)},
+  year={2022}
+}
+
+@misc{jiang2026sheetsage2,
+  title={SheetSage2: Coherent Lead-Sheet Transcription with Synthetic Supervision},
+  author={Jiang, Junyan and Yuan, Ruibin and Pan, Jiahao and Xue, Wei and Guo, Yike and Xia, Gus and LeCun, Yann},
+  year={2026},
+  eprint={2610.05336},
+  archivePrefix={arXiv},
+  primaryClass={cs.SD}
+}
+```
+
+## Features
+
+- Shared transcription of melody, chords, beats, key and meter, with timed song sections from V2.
+- Independent V1 and V2 sessions with native outputs, plus a common result and export API.
+- Explicit device selection, lazy model loading, checkpoint manifests and offline paths.
+
+## Scope
+
+This package maintains inference only: model adapters, audio decoding, result conversion, verified checkpoint resolution and exports. It does not ship training code, datasets or model weights. V1's handcrafted checkpoint URLs currently deny unauthenticated access; a fresh V1 installation requires separately acquired verified files. SheetSage2 Python source is fetched at a pinned revision because its redistribution terms remain unresolved.
+
+## Install
 
 Requires Python >=3.10 (tested on 3.10–3.12) and FFmpeg on `PATH`. LilyPond is
 optional for V1 PDF export. The default installation includes both backends:
@@ -60,7 +96,7 @@ python -m pip install 'torch>=2.13' 'torchaudio>=2.8' --index-url https://downlo
 Before a fresh V1 installation, check the recorded checkpoint-access limitation
 in [Weights and offline use](#weights-and-offline-use).
 
-## Shared transcription and song structure
+## Quick Start
 
 ```python
 from sheetsage import SheetSageTranscriber
@@ -79,6 +115,8 @@ Select `model="sheetsage1"` for V1 (the default), omitting
 `require_structure=True`. Requiring unsupported or disabled structure fails
 before model loading. Inspect `model.capabilities` for model support and
 `result.statuses` for each call's outcome.
+
+## Shared transcription and song structure
 
 | Shared field | SheetSage1 | SheetSage2 |
 |---|---|---|
@@ -251,41 +289,9 @@ pinned adapter/MERT2 file; merged `save_pretrained` checkpoints are incompatible
 A trusted `checkpoint_config` can override artifact identities/URLs. Corrupt
 files fail explicitly and must be removed or replaced before retrying.
 
-## License
+## What this project will NEVER bundle
 
-[LICENSE](LICENSE) covers this repository's code; [NOTICE](NOTICE) records the
-separate upstream terms:
-
-- Repository code, including adapted SheetSage code: **MIT**.
-- SheetSage1 weights and HookTheory-derived data: **CC BY-NC-SA 3.0**.
-- SheetSage2/MERT2 weights: model cards label them **CC BY-NC 4.0**. Redistribution
-  terms for the distinct SheetSage2 Python source remain unresolved; this package
-  downloads it at runtime rather than redistributing it. Our MIT license does
-  not cover these downloads.
-- Jukebox weights retain OpenAI's terms; madmom source is BSD-2-Clause and its
-  pretrained models are CC BY-NC-SA 4.0.
-
-## Citation
-
-Cite the original work for the backend you use:
-
-```bibtex
-@inproceedings{donahue2022melody,
-  title={Melody Transcription via Generative Pre-Training},
-  author={Donahue, Chris and Thickstun, John and Liang, Percy},
-  booktitle={Proceedings of the 23rd International Society for Music Information Retrieval Conference (ISMIR)},
-  year={2022}
-}
-
-@misc{jiang2026sheetsage2,
-  title={SheetSage2: Coherent Lead-Sheet Transcription with Synthetic Supervision},
-  author={Jiang, Junyan and Yuan, Ruibin and Pan, Jiahao and Xue, Wei and Guo, Yike and Xia, Gus and LeCun, Yann},
-  year={2026},
-  eprint={2610.05336},
-  archivePrefix={arXiv},
-  primaryClass={cs.SD}
-}
-```
+The wheel and source archive exclude checkpoint weights, datasets and training pipelines. Models remain separately licensed and are acquired through the documented verified paths.
 
 ## Development
 
@@ -311,3 +317,21 @@ and their tags are absent from the installed asset API. See [CLAUDE.md](CLAUDE.m
 for architecture and contribution guidance, [CHANGELOG.md](CHANGELOG.md) for
 history, and [GitHub Issues](https://github.com/openmirlab/sheetsage-infer/issues)
 for support.
+
+## License
+
+[LICENSE](LICENSE) covers this repository's code; [NOTICE](NOTICE) records the
+separate upstream terms:
+
+- Repository code, including adapted SheetSage code: **MIT**.
+- SheetSage1 weights and HookTheory-derived data: **CC BY-NC-SA 3.0**.
+- SheetSage2/MERT2 weights: model cards label them **CC BY-NC 4.0**. Redistribution
+  terms for the distinct SheetSage2 Python source remain unresolved; this package
+  downloads it at runtime rather than redistributing it. Our MIT license does
+  not cover these downloads.
+- Jukebox weights retain OpenAI's terms; madmom source is BSD-2-Clause and its
+  pretrained models are CC BY-NC-SA 4.0.
+
+## Support
+
+Report package bugs through [GitHub Issues](https://github.com/openmirlab/sheetsage-infer/issues). Questions about model research belong with the original [SheetSage1](https://github.com/chrisdonahue/sheetsage) or [SheetSage2](https://huggingface.co/m-a-p/SheetSage2) authors.

@@ -2,6 +2,7 @@
 
 ## Unreleased — distribution policy
 
+- Reorder the README to credit the SheetSage1/2 authors before package details, put installation before Quick Start, and make the current inference scope and support path explicit.
 - Stop publishing new versions to PyPI; GitHub source is the maintained installation channel. GitHub release CI continues to run verification and build checks.
 
 All notable changes to this project are documented here. Format loosely

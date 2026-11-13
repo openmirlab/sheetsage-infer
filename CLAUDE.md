@@ -1,5 +1,7 @@
 # sheetsage-infer
 
+The top-level README follows the OpenMIRLab sequence: Why this exists, upstream Acknowledgments and Citation, Features, Scope, Install, Quick Start, details, Development, License and Support. Keep the V1 checkpoint access limitation and V2 source-rights uncertainty visible when editing it; a successful package install is not a working fresh V1 inference run.
+
 Inference-only fork of [SheetSage](https://github.com/chrisdonahue/sheetsage) (audio -> lead
 sheet: melody + chords). Install the maintained source from GitHub (previously published as
 `openmirlab-sheetsage-infer` through 0.2.0; that name is now deprecated).
